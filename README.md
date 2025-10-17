@@ -7,7 +7,7 @@
 * Haonan Ma(hma8) 
 * Ao Lu（alu9）
 
-[Team Meetings](https://github.com/CMPUT301F25String/String-events/wiki/Team-Meetings)
+* [Team Meetings](https://github.com/CMPUT301F25String/String-events/wiki/Team-Meetings)
 
 
 #
