@@ -12,5 +12,5 @@
 
 #
 **Project Part 2 Deliverables**
-
+* [User Interface Mockup](https://github.com/CMPUT301F25String/String-events/wiki/User-Interface-Mockup)
 * [Work Distribution](https://github.com/CMPUT301F25String/String-events/wiki/Project-Part-2-Work-Distribution)
