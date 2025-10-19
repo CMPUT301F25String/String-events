@@ -12,7 +12,7 @@
 
 #
 **Project Part 2 Deliverables**
-* [Product Backlog](https://github.com/CMPUT301F25String/String-events/wiki/Product-Backlog)
+* [Product Backlog](https://github.com/orgs/CMPUT301F25String/projects/1)
 * [User Interface Mockup](https://github.com/CMPUT301F25String/String-events/wiki/User-Interface-Mockup)
 * [Storyboard Sequences](https://github.com/CMPUT301F25String/String-events/wiki/Storyboard-Sequences)
 * [Object-Oriented Analysis (CRC Cards)](https://github.com/CMPUT301F25String/String-events/wiki/Object%E2%80%90Oriented-Analysis-(CRC-Cards))
