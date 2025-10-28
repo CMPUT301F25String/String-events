@@ -80,15 +80,9 @@
             android:layout_height="36dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:src="@drawable/notif"
+            android:src="@drawable/notification"
             android:contentDescription="Notifications"
-            android:scaleType="centerInside"
-
-
-
-
-
-      />
+            android:scaleType="centerInside" />
 
         <ImageButton
             android:id="@+id/btnProfile"
@@ -100,4 +94,5 @@
             android:contentDescription="Profile"
             android:scaleType="centerInside" />
     </LinearLayout>
+
 </LinearLayout>
