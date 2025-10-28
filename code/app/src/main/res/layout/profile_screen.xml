@@ -153,57 +153,53 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/white"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="4"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/btnHome"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/calendar"
-            android:contentDescription="Home"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnCamera"/>
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginStart="25dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/calendar"
+            android:contentDescription="Home"/>
 
         <ImageButton
             android:id="@+id/btnCamera"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/camera"
-            android:contentDescription="Camera"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnHome"
-            app:layout_constraintEnd_toStartOf="@id/btnNotification"/>
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/camera"
+            android:contentDescription="Camera"/>
 
         <ImageButton
             android:id="@+id/btnNotification"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/notification"
-            android:contentDescription="Notifications"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnCamera"
-            app:layout_constraintEnd_toStartOf="@id/btnProfile"/>
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/notification"
+            android:contentDescription="Notifications"/>
 
         <ImageButton
             android:id="@+id/btnProfile"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            android:background="@drawable/profile_clicked"
-            android:contentDescription="Profile"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnNotification"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="25dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/profile_clicked"
+            android:contentDescription="Profile"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
