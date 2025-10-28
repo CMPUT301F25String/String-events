@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.string_events"
-    compileSdk = 34
+    namespace = "com.example.eventspage"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.string_events"
-        minSdk = 34
-        targetSdk = 34
+        applicationId = "com.example.eventspage"
+        minSdk = 26
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -26,13 +26,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
 dependencies {
-
+    implementation("com.google.android.material:material:1.12.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

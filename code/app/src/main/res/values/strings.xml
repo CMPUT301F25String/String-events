@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">String-Events</string>
+    <string name="app_name">EventsPage</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_camera">Camera</string>
+    <string name="nav_bell">Notifications</string>
+    <string name="nav_person">Profile</string>
+
 </resources>

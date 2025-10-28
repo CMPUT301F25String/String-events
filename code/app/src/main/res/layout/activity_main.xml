@@ -1,19 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#F5F5F7">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <View
+            android:id="@+id/title_bg"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:background="#F2F2F2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Events"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#101114"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="@id/title_bg"
+            app:layout_constraintBottom_toBottomOf="@id/title_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Click on an event to sign up"
+            android:textSize="14sp"
+            android:textColor="#101114"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/title_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/label_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filters:"
+            android:textSize="14sp"
+            android:textColor="#101114"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/chip_badminton"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:gravity="center_vertical"
+            android:text="Badminton"
+            android:textSize="12sp"
+            android:textColor="#101114"
+            android:background="@drawable/bg_chip_grey"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/label_filters"
+            app:layout_constraintTop_toTopOf="@id/label_filters" />
+
+        <TextView
+            android:id="@+id/chip_games"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical"
+            android:text="Games"
+            android:textSize="12sp"
+            android:textColor="#101114"
+            android:background="@drawable/bg_chip_grey"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/chip_badminton"
+            app:layout_constraintTop_toTopOf="@id/chip_badminton" />
+
+        <TextView
+            android:id="@+id/chip_add"
+            android:layout_width="36dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_chip_grey"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="#101114"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.066"
+            app:layout_constraintStart_toEndOf="@id/chip_games"
+            app:layout_constraintTop_toTopOf="@id/chip_games"
+            app:layout_goneMarginEnd="16dp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            app:layout_constraintTop_toBottomOf="@id/label_filters"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_bar"
+        android:layout_below="@id/header_container"
+        android:layout_marginTop="-2dp"
+        android:layout_marginBottom="2dp"
+        android:clipToPadding="false"
+        android:divider="#E6E8EB"
+        android:dividerHeight="1dp"
+        android:listSelector="?attr/selectableItemBackground"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        tools:listitem="@android:layout/simple_list_item_2" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:elevation="6dp">
+
+        <ImageButton
+            android:id="@+id/nav_calendar"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_calendar"
+            app:srcCompat="@drawable/ic_calendar_outline_24"
+            app:tint="#FF7A00"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/nav_camera"
+            app:layout_constraintHorizontal_chainStyle="spread" />
+
+        <ImageButton
+            android:id="@+id/nav_camera"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_camera"
+            app:srcCompat="@drawable/ic_camera_outline_24"
+            app:tint="#101114"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/nav_calendar"
+            app:layout_constraintEnd_toStartOf="@id/nav_bell" />
+
+        <ImageButton
+            android:id="@+id/nav_bell"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_bell"
+            app:srcCompat="@drawable/ic_bell_outline_24"
+            app:tint="#101114"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/nav_camera"
+            app:layout_constraintEnd_toStartOf="@id/nav_person" />
+
+        <ImageButton
+            android:id="@+id/nav_person"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_person"
+            app:srcCompat="@drawable/ic_person_outline_24"
+            app:tint="#101114"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/nav_bell"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
+
