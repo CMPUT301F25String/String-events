@@ -23,7 +23,7 @@
             android:layout_width="10dp"
             android:layout_height="0dp"
             android:contentDescription="status"
-            android:src="@drawable/Rectangle_8"
+            android:src="@drawable/rectangle_8"
             android:scaleType="fitXY"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
