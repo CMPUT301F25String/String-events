@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="22dp"
+    app:cardUseCompatPadding="false"
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp">
+
+
+        <ImageView
+            android:id="@+id/imgStatus"
+            android:layout_width="10dp"
+            android:layout_height="0dp"
+            android:contentDescription="status"
+            android:src="@drawable/rectangle_8"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_marginStart="12dp"
+            android:contentDescription="event image"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/RoundedImage12"
+            app:layout_constraintStart_toEndOf="@id/imgStatus"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+
+        <ImageView
+            android:id="@+id/imgOpen"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="open"
+            android:src="@drawable/arrow_upright"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="2dp"
+            android:text="Congratulations,\nyou were selected for:"
+            android:textColor="#111111"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@id/imgThumb"
+            app:layout_constraintEnd_toStartOf="@id/imgOpen"
+            app:layout_constraintTop_toTopOf="@id/imgThumb" />
+
+
+        <TextView
+            android:id="@+id/tvEventName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:text="Badminton Drop In"
+            android:textColor="#111111"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/imgThumb"
+            app:layout_constraintEnd_toStartOf="@id/imgOpen"
+            app:layout_constraintTop_toBottomOf="@id/tvMessage" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
