@@ -5,4 +5,11 @@
     <color name="grey">#FF6E6E6E</color>
     <color name="red">#FFFF0000</color>
     <color name="yellow">#FFFFD165</color>
+    <color name="color_bg">#F6F7F9</color>
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_text_primary">#111111</color>
+    <color name="color_text_secondary">#6B7280</color>
+    <color name="color_text_muted">#9CA3AF</color>
+    <color name="color_divider">#E5E7EB</color>
+    <color name="color_accent_yellow">#FFC94A</color>
 </resources>

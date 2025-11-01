@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F6F6"
+    tools:context=".EventDetailActivity">
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#FAFAFA"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/backbutton" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Details"
+            android:textColor="#111111"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/button_container"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_rounded"
+                android:padding="16dp"
+                android:elevation="2dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Badminton Drop In"
+                    android:textStyle="bold"
+                    android:textSize="22sp"
+                    android:textColor="#000000" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/community_centre_image"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="City Centre Community Centre"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/color_text_primary"/>
+                </LinearLayout>
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:layout_marginTop="12dp"
+                    android:src="@drawable/sample_event"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_image_rounded"
+                    android:clipToOutline="true" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/spots_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/sofa"
+                            android:tint="@color/color_text_primary"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:id="@+id/spots_taken"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="(10/20) Spots Taken"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/color_text_primary"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/waiting_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="20 Waiting List"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/color_text_primary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBaseline_toBaselineOf="@id/spots_left"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/calendar"
+                        android:tint="@color/color_text_primary"
+                        android:layout_marginEnd="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wed, Oct 8, 2025"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/color_text_primary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="11:00 AM - 1:00 PM"
+                            android:textSize="13sp"
+                            android:textColor="@color/color_text_muted"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/location"
+                        android:tint="@color/color_text_primary"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="123 Generic Ave, Edmonton, AB, Can"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/color_text_primary"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="16dp"
+                android:background="#E5E7EB" />
+
+            <TextView
+                android:text="About the Event"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis."
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottom_btn_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@color/color_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/apply_button"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_btn_apply"
+            android:text="Apply"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="@color/color_text_primary"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:textAlignment="center"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
