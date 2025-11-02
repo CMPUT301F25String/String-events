@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.eventspage"
+    namespace = "com.example.string_events"
     compileSdk = 36
 
     defaultConfig {
