@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F6F6"
-    tools:context=".EventDetailActivity">
+    android:background="#F6F6F6">
 
     <RelativeLayout
         android:id="@+id/top_bar"
@@ -38,7 +37,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
-        app:layout_constraintBottom_toTopOf="@id/button_container"
         android:padding="16dp">
 
         <LinearLayout
@@ -113,8 +111,8 @@
                             android:layout_width="18dp"
                             android:layout_height="18dp"
                             android:src="@drawable/sofa"
-                            android:tint="@color/color_text_primary"
-                            android:layout_marginEnd="8dp"/>
+                            android:layout_marginEnd="8dp"
+                            app:tint="@color/color_text_primary" />
 
                         <TextView
                             android:id="@+id/spots_taken"
@@ -149,8 +147,8 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/calendar"
-                        android:tint="@color/color_text_primary"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        app:tint="@color/color_text_primary" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -187,8 +185,8 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/location"
-                        android:tint="@color/color_text_primary"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        app:tint="@color/color_text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"

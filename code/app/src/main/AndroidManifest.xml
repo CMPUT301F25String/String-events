@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StringEvents">
         <activity
+            android:name=".CreateEventScreen"
+            android:exported="false" />
+        <activity
             android:name=".ProfileScreen"
             android:exported="false" />
         <activity
