@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-</selector>
+<!-- res/drawable/yellow_rounded_button.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#F7D17B" /> <!-- 黄色实心 -->
+    <corners android:radius="25dp" /> <!-- 圆角 -->
+</shape>
