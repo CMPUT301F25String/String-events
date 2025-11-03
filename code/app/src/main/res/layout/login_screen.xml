@@ -94,19 +94,7 @@
 
                         <Space android:layout_width="12dp" android:layout_height="1dp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnOrganizer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:minWidth="0dp"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp"
-                            android:text="Organizer"
-                            android:textAllCaps="false"
-                            android:textColor="#1E1E1E"
-                            app:useMaterialThemeColors="false"
-                            app:cornerRadius="8dp"
-                            app:backgroundTint="#FFFFCC59" />
+
 
                         <Space android:layout_width="12dp" android:layout_height="1dp" />
 
