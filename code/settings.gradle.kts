@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "EventsPage"
+rootProject.name = "StringEvents"
 include(":app")
  
