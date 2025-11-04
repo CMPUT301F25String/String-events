@@ -13,4 +13,17 @@
     <string name="lottery_information">Lottery Information</string>
     <string name="lottery_guidelines">Lottery Guidelines</string>
     <string name="lottery_guidelines_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.</string>
+    <string name="admin_event_management">Admin Event Management</string>
+    <string name="admin_event_details">Event Details</string>
+    <string name="search_events">Search events…</string>
+    <string name="create_event">Create Event</string>
+    <string name="delete_event">Delete Event</string>
+    <string name="sample_event_title">Community Sports Day</string>
+    <string name="sample_event_subtitle">Nov 10, 2:00 PM · UofA Gym</string>
+    <string name="sample_event_time">Nov 10, 2:00 PM – 5:00 PM</string>
+    <string name="sample_event_location">Location: UofA Gym Hall A</string>
+    <string name="description">Description</string>
+    <string name="sample_event_description">This event is open to all students. Bring your student ID to participate.</string>
+    <string name="sample_event_counts">Joined: 18 · Waitlist: 42 · Capacity: 30</string>
+
 </resources>
