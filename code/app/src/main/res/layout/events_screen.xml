@@ -134,6 +134,14 @@
         android:paddingEnd="20dp"
         tools:listitem="@android:layout/simple_list_item_2" />
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogout"
+        android:layout_width="62dp"
+        android:layout_height="33dp"
+        android:text="Logout" />
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
