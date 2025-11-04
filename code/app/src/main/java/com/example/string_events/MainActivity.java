@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case USER_HOME:
-                setContentView(R.layout.activity_main);
+                setContentView(R.layout.events_screen);
                 wireCommon();
                 onClick(R.id.nav_bell,   () -> show(Screen.NOTIFICATIONS));
                 onClick(R.id.nav_person, () -> show(Screen.PROFILE));

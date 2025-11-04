@@ -30,6 +30,7 @@
                     app:srcCompat="@drawable/rectangle1" />
                 
                 <ImageButton
+                    android:id="@+id/back_button"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_marginStart="5dp"
@@ -92,18 +93,29 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginStart="20dp"
-                    android:text="Event Photos"
+                    android:text="Event Photo"
                     android:textSize="20sp"
                     android:fontFamily="@font/prompt_regular"
                     app:layout_constraintTop_toTopOf="@id/event_photos_layout"
                     app:layout_constraintStart_toStartOf="@id/event_photos_layout"/>
-                
+
                 <ImageButton
+                    android:id="@+id/add_photo_button"
                     android:layout_width="95dp"
                     android:layout_height="95dp"
                     android:background="@drawable/add_photos_button"
                     app:layout_constraintTop_toBottomOf="@id/event_photos"
                     app:layout_constraintStart_toStartOf="@id/event_photos"/>
+
+                <ImageView
+                    android:id="@+id/event_photo"
+                    android:layout_width="95dp"
+                    android:layout_height="85dp"
+                    android:layout_marginTop="2dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintTop_toTopOf="@id/add_photo_button"
+                    app:layout_constraintBottom_toBottomOf="@id/add_photo_button"
+                    app:layout_constraintStart_toEndOf="@id/add_photo_button"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -118,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginStart="20dp"
-                    android:text="Event Description"
+                    android:text="Event Description\n(500 character limit)"
                     android:textSize="20sp"
                     android:fontFamily="@font/prompt_regular"
                     app:layout_constraintTop_toTopOf="@id/event_description_layout"
@@ -127,12 +139,11 @@
                 <EditText
                     android:id="@+id/event_description_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="150dp"
                     android:layout_marginStart="17dp"
                     android:ems="15"
+                    android:maxLength="500"
                     android:inputType="textMultiLine"
-                    android:minLines="3"
-                    android:maxLines="6"
                     android:hint="@string/add_text_hint"
                     android:gravity="top|start"
                     app:layout_constraintTop_toBottomOf="@id/event_description"
@@ -158,6 +169,7 @@
                     app:layout_constraintStart_toStartOf="@id/event_tags_layout"/>
 
                 <ImageButton
+                    android:id="@+id/add_tags_button"
                     android:layout_width="70dp"
                     android:layout_height="45dp"
                     android:background="@drawable/add_tags_button"
@@ -189,8 +201,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter start date"
-                    android:clickable="false"
+                    android:hint="Select start date"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_start_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_start_time_editText"/>
@@ -201,8 +213,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter start time"
-                    android:clickable="false"
+                    android:hint="Select start time"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_start_datetime"
                     app:layout_constraintStart_toEndOf="@id/event_start_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -232,8 +244,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter end date"
-                    android:clickable="false"
+                    android:hint="Select end date"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_end_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_end_time_editText"/>
@@ -244,8 +256,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter end time"
-                    android:clickable="false"
+                    android:hint="Select end time"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_end_datetime"
                     app:layout_constraintStart_toEndOf="@id/event_end_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -305,8 +317,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter start date"
-                    android:clickable="false"
+                    android:hint="Select start date"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_start_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/registration_start_time_editText"/>
@@ -317,8 +329,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter start time"
-                    android:clickable="false"
+                    android:hint="Select start time"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_start_datetime"
                     app:layout_constraintStart_toEndOf="@id/registration_start_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -348,8 +360,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter end date"
-                    android:clickable="false"
+                    android:hint="Select end date"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_end_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/registration_end_time_editText"/>
@@ -360,8 +372,8 @@
                     android:layout_height="40dp"
                     android:ems="7"
                     android:inputType="datetime"
-                    android:hint="Enter end time"
-                    android:clickable="false"
+                    android:hint="Select end time"
+                    android:focusable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_end_datetime"
                     app:layout_constraintStart_toEndOf="@id/registration_end_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -442,8 +454,7 @@
                     android:scaleX="1.5"
                     android:scaleY="1.5"
                     app:thumbTint="@color/white"
-                    app:trackTint="@color/yellow"
-                    app:switchMinWidth="45dp"
+                    app:trackTint="@color/switch_track_colour"
                     app:layout_constraintTop_toTopOf="@id/event_geolocation_layout"
                     app:layout_constraintStart_toStartOf="parent"/>
 
@@ -473,7 +484,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:layout_marginStart="20dp"
-                    android:text="Event Visibility"
+                    android:text="Event Visibility (default is private)"
                     android:textSize="20sp"
                     android:fontFamily="@font/prompt_regular"
                     app:layout_constraintTop_toTopOf="@id/event_visibility_layout"

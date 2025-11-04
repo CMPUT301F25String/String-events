@@ -25,5 +25,6 @@
     <string name="description">Description</string>
     <string name="sample_event_description">This event is open to all students. Bring your student ID to participate.</string>
     <string name="sample_event_counts">Joined: 18 · Waitlist: 42 · Capacity: 30</string>
+    <string name="add_text_hint">Click to add text</string>
 
 </resources>
