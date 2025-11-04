@@ -5,7 +5,6 @@
     android:layout_height="110dp"
     android:layout_marginStart="12dp"
     android:layout_marginEnd="12dp"
-    android:layout_marginBottom="10dp"
     app:cardCornerRadius="22dp"
     app:cardUseCompatPadding="false"
     app:strokeWidth="0dp"
@@ -18,12 +17,13 @@
         android:layout_height="match_parent"
         android:padding="12dp">
 
+
         <ImageView
             android:id="@+id/imgStatus"
             android:layout_width="10dp"
             android:layout_height="0dp"
             android:contentDescription="status"
-            android:src="@drawable/selected_status"
+            android:src="@drawable/rectangle_8"
             android:scaleType="fitXY"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,15 +44,16 @@
             app:layout_constraintVertical_bias="0.5" />
 
 
-        <ImageButton
+        <ImageView
             android:id="@+id/imgOpen"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:contentDescription="open"
-            android:background="@drawable/arrow_upright"
+            android:src="@drawable/arrow_upright"
             android:scaleType="centerInside"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 
         <TextView
@@ -61,10 +62,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="2dp"
             android:text="Congratulations,\nyou were selected for:"
             android:textColor="#111111"
-            android:textSize="14sp"
-            android:fontFamily="@font/prompt_regular"
+            android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/imgThumb"
             app:layout_constraintEnd_toStartOf="@id/imgOpen"
             app:layout_constraintTop_toTopOf="@id/imgThumb" />
@@ -80,8 +81,7 @@
             android:text="Badminton Drop In"
             android:textColor="#111111"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:fontFamily="@font/prompt_regular"
+            android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@id/imgThumb"
             app:layout_constraintEnd_toStartOf="@id/imgOpen"
             app:layout_constraintTop_toBottomOf="@id/tvMessage" />

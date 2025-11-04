@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CreateEventScreen extends AppCompatActivity {
@@ -154,7 +153,7 @@ public class CreateEventScreen extends AppCompatActivity {
                 // create a DatePicker
                 (view, selectedYear, selectedMonth, selectedDay) -> {
                     // set the EditText in the screen to the selected date padding with 0s if needed
-                    dateEditText.setText(String.format(Locale.CANADA,"%02d-%02d-%02d", selectedYear, (selectedMonth + 1), selectedDay));
+                    dateEditText.setText(String.format("%02d-%02d-%02d", selectedYear, (selectedMonth + 1), selectedDay));
                 },
                 // pass the current date to the datePicker so the default date is the current date
                 year, month, day);
@@ -174,7 +173,7 @@ public class CreateEventScreen extends AppCompatActivity {
                 // create a TimePicker
                 (timePicker, selectedHour, selectedMinute) -> {
                     // set the EditText in the screen to the selected time padding with 0s if needed
-                    timeEditText.setText(String.format(Locale.CANADA, "%02d:%02d", selectedHour, selectedMinute));
+                    timeEditText.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
                 },
                 // pass the current time to the timePicker so the default time is the current time
                 hour, minute, false);

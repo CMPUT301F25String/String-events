@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace = "com.example.string_events"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.string_events"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
