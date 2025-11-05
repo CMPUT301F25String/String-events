@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     for (DocumentSnapshot d : snap) {
                         boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
                         String eventName = d.getString("eventName");
-                        String imageUrl  = d.getString("imageUrl");   // optional
+                        String imageUrl  = d.getString("imageUrl");
                         Uri photo = (imageUrl == null || imageUrl.isEmpty())
                                 ? null : Uri.parse(imageUrl);
 
@@ -280,6 +280,15 @@ public class MainActivity extends AppCompatActivity {
                             .add(android.R.id.content, f, "event_detail")
                             .addToBackStack("event_detail")
                             .commit();
+                });
+            }
+
+            if (h.imgCover != null) {
+                h.imgCover.setOnClickListener(v3 -> {
+                    EventItem e3 = getItem(p);
+                    Intent i = new Intent(MainActivity.this, LotteryDrawActivity.class);
+                    i.putExtra("event_id", e3.id);
+                    startActivity(i);
                 });
             }
 
