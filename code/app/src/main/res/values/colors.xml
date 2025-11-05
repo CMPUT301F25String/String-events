@@ -5,4 +5,8 @@
     <color name="grey">#FF6E6E6E</color>
     <color name="red">#FFFF0000</color>
     <color name="yellow">#FFFFD165</color>
+    
+    <color name="status_scheduled">#43C06B</color>
+    <color name="status_canceled">#FF6B6B</color>
+    <color name="status_full">#FFA500</color>
 </resources>
