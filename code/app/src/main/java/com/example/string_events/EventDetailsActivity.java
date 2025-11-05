@@ -21,11 +21,11 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         String eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
 
-        findViewById(R.id.btnRoll).setOnClickListener(v -> {
-            Intent it = new Intent(this, LotteryActivity.class);
-            it.putExtra(EXTRA_EVENT_ID, eventId);
-            startActivity(it);
-        });
+//        findViewById(R.id.btnRoll).setOnClickListener(v -> {
+//            Intent it = new Intent(this, LotteryActivity.class);
+//            it.putExtra(EXTRA_EVENT_ID, eventId);
+//            startActivity(it);
+//        });
 
         findViewById(R.id.btnCanceled).setOnClickListener(v -> {
             Intent it = new Intent(this, CanceledUsersActivity.class);
