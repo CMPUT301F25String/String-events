@@ -36,5 +36,12 @@
             </intent-filter>
 
         </activity>
+
+        <activity android:name=".EventDetailsActivity" />
+        <activity android:name=".CanceledUsersActivity" />
+        <activity android:name=".ParticipatingUsersActivity" />
+        <activity android:name=".WaitlistUsersActivity" />
+        <activity android:name=".LotteryActivity" />
+
     </application>
 </manifest>
