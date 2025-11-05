@@ -4,6 +4,7 @@ package com.example.string_events;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,12 +14,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import android.net.Uri;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -54,16 +62,21 @@ public class MainActivity extends AppCompatActivity {
             case USER_HOME:
                 setContentView(R.layout.events_screen);
                 wireCommon();
+
                 onClick(R.id.nav_bell,   () -> show(Screen.NOTIFICATIONS));
                 onClick(R.id.nav_person, () -> show(Screen.PROFILE));
+
                 loadEventsIntoList();
                 break;
+
             case NOTIFICATIONS:
                 setContentView(R.layout.notification_screen);
                 wireCommon();
                 onClick(R.id.btnHome,    () -> show(Screen.USER_HOME));
                 onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
+                loadNotificationsIntoRecycler();
                 break;
+
             case PROFILE:
                 setContentView(R.layout.profile_screen);
                 wireCommon();
@@ -83,6 +96,44 @@ public class MainActivity extends AppCompatActivity {
         if (v != null) v.setOnClickListener(_v -> action.run());
     }
 
+
+    private void loadNotificationsIntoRecycler() {
+        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
+        if (rv == null) return;
+
+        rv.setLayoutManager(new LinearLayoutManager(this));
+
+        ArrayList<Notification> data = new ArrayList<>();
+        NotificationAdapter adapter = new NotificationAdapter(this, data);
+        rv.setAdapter(adapter);
+
+        db.collection("notifications")
+                .get()
+                .addOnSuccessListener(snap -> {
+                    data.clear();
+                    for (DocumentSnapshot d : snap) {
+                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+                        String eventName = d.getString("eventName");
+                        String imageUrl  = d.getString("imageUrl");   // optional
+                        Uri photo = (imageUrl == null || imageUrl.isEmpty())
+                                ? null : Uri.parse(imageUrl);
+
+                        data.add(new Notification(selected, photo, eventName));
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+
+                });
+    }
+
+
+
+
+
+
+
+
     private int getId(String name) {
         return getResources().getIdentifier(name, "id", getPackageName());
     }
@@ -99,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         finishAffinity();
         overridePendingTransition(0, 0);
     }
+
 
     private void loadEventsIntoList() {
         final ListView lv = findViewById(R.id.list);
@@ -131,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
             EventItem clicked = data.get(position);
             Intent i = new Intent(MainActivity.this, EventDetailActivity.class);
-            i.putExtra("event_id", clicked.id);   // Firestore doc id
+            i.putExtra("event_id", clicked.id);
             startActivity(i);
         });
     }
@@ -219,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
                 h.btnStatus.setBackgroundTintList(ColorStateList.valueOf(color));
             }
 
-
             return v;
         }
 
@@ -228,5 +279,33 @@ public class MainActivity extends AppCompatActivity {
             TextView tvTitle, tvTime, tvSpots, tvPlace;
             MaterialButton btnStatus;
         }
+    }
+
+
+    private void setupNotificationsScreen() {
+        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
+        if (rv == null) return;
+
+        rv.setLayoutManager(new LinearLayoutManager(this));
+
+        ArrayList<Notification> data = new ArrayList<>();
+        NotificationAdapter adapter = new NotificationAdapter(this, data);
+        rv.setAdapter(adapter);
+
+
+        db.collection("notifications")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    data.clear();
+                    for (QueryDocumentSnapshot d : snap) {
+                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+                        String name = d.getString("eventName");
+                        String imageUrl = d.getString("imageUrl");
+                        Uri photo = imageUrl == null ? null : Uri.parse(imageUrl);
+                        data.add(new Notification(selected, photo, name));
+                    }
+                    adapter.notifyDataSetChanged();
+                });
     }
 }
