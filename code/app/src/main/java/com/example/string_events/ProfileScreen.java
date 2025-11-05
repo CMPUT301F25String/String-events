@@ -28,7 +28,7 @@ public class ProfileScreen extends AppCompatActivity {
         ImageView profileImageView = findViewById(R.id.profile_imageView);
         TextView nameTextView = findViewById(R.id.name_textView);
         TextView emailTextView = findViewById(R.id.email_textView);
-        ImageView infoImageView = findViewById(R.id.info_imageView);
+        ImageView infoImageView = findViewById(R.id.info_imageButton);
         ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
 
         // bottom bar buttons
