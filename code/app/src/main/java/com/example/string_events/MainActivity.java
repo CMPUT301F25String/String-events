@@ -1,4 +1,3 @@
-
 package com.example.string_events;
 
 import android.content.Intent;
@@ -126,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
 
                 });
     }
-
 
 
 
@@ -269,6 +267,20 @@ public class MainActivity extends AppCompatActivity {
                 }
                 h.btnStatus.setText(text);
                 h.btnStatus.setBackgroundTintList(ColorStateList.valueOf(color));
+            }
+
+            final int p = pos;
+            if (h.btnStatus != null) {
+                h.btnStatus.setOnClickListener(v2 -> {
+                    EventItem e2 = getItem(p);
+                    EventDetailFragment f = EventDetailFragment.newInstance(e2.id);
+                    MainActivity.this.getSupportFragmentManager()
+                            .beginTransaction()
+                            .setReorderingAllowed(true)
+                            .add(android.R.id.content, f, "event_detail")
+                            .addToBackStack("event_detail")
+                            .commit();
+                });
             }
 
             return v;
