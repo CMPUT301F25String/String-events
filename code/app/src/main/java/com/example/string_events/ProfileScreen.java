@@ -1,49 +1,58 @@
 package com.example.string_events;
 
-import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+public class ProfileScreen {
 
-import java.util.ArrayList;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-public class ProfileScreen extends AppCompatActivity {
+    public void setupProfileScreen(Activity activity, String username, String fullName, String email) {
+        TextView nameTextView = activity.findViewById(R.id.name_textView);
+        TextView emailTextView = activity.findViewById(R.id.email_textView);
+        ImageButton deleteProfileButton = activity.findViewById(R.id.delete_profile_button);
 
-    ArrayList<ProfileEvent> profileEventsList;
+        // Update text fields
+        if (fullName != null) nameTextView.setText("Name: " + fullName);
+        if (email != null) emailTextView.setText("Email: " + email);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile_screen);
+        // Delete button logic
+        deleteProfileButton.setOnClickListener(v -> {
+            if (username == null || username.isEmpty()) {
+                Toast.makeText(activity, "No user to delete", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        // screen buttons
-        TextView editProfileTextView = findViewById(R.id.edit_textView);
-        TextView logOutTextView = findViewById(R.id.logOut_textView);
-        SwitchCompat notificationSwitch = findViewById(R.id.notification_switch);
-        ImageView profileImageView = findViewById(R.id.profile_imageView);
-        TextView nameTextView = findViewById(R.id.name_textView);
-        TextView emailTextView = findViewById(R.id.email_textView);
-        ImageView infoImageView = findViewById(R.id.info_imageButton);
-        ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
-
-        // bottom bar buttons
-        ImageButton homeImageButton = findViewById(R.id.btnHome);
-        ImageButton cameraImageButton = findViewById(R.id.btnCamera);
-        ImageButton notificationImageButton = findViewById(R.id.btnNotification);
-        ImageButton profileImageButton = findViewById(R.id.btnProfile);
-
-
-    }
-
-    private void setupRecyclerView() {
-        RecyclerView profileEventsRecyclerview = findViewById(R.id.profile_events_recyclerView);
-        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
-        profileEventsRecyclerview.setAdapter(profileEventsAdapter);
-        profileEventsRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+            db.collection("users")
+                    .whereEqualTo("username", username)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(query -> {
+                        if (!query.isEmpty()) {
+                            String docId = query.getDocuments().get(0).getId();
+                            db.collection("users").document(docId)
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(activity, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(activity, WelcomeActivity.class);
+                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                                Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        activity.startActivity(i);
+                                        activity.finish();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(activity, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        } else {
+                            Toast.makeText(activity, "User not found", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(activity, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
     }
 }
