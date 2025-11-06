@@ -36,16 +36,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".EventDetailActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".WelcomeActivity"
-            android:exported="false">
-
-        </activity>
-
         <activity android:name=".OrganizerEventDetails" />
         <activity android:name=".CanceledUsersActivity" />
         <activity android:name=".ParticipatingUsersActivity" />
