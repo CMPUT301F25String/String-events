@@ -12,17 +12,16 @@
             android:exported="false" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".LoginScreen"
             android:exported="false" />
 
         <activity
-            android:name=".RegisterActivity"
+            android:name=".RegisterScreen"
             android:exported="false" />
 
         <activity
             android:name=".NotificationScreen"
             android:exported="false" />
-
 
         <activity
             android:name=".EventDetailActivity"
@@ -37,7 +36,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".EventDetailsActivity" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false">
+
+        </activity>
+
+        <activity android:name=".OrganizerEventDetails" />
         <activity android:name=".CanceledUsersActivity" />
         <activity android:name=".ParticipatingUsersActivity" />
         <activity android:name=".WaitlistUsersActivity" />

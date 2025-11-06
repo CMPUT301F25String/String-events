@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -19,10 +18,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity {
-
+public class RegisterScreen extends AppCompatActivity {
     private FirebaseFirestore db;
-
     private TextInputEditText etFullName, etEmail, etPassword, etPhone;
     private FrameLayout btnRegister;
     private MaterialButton btnSignIn;
@@ -90,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
         db.collection("users").document(docId).set(doc)
                 .addOnSuccessListener(v -> {
                     toast("Account created");
-                    Intent i = new Intent(RegisterActivity.this, MainActivity.class);
+                    Intent i = new Intent(RegisterScreen.this, MainActivity.class);
                     i.putExtra("role", "user");
                     i.putExtra("user", username);
                     startActivity(i);

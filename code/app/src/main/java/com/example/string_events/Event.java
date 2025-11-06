@@ -4,30 +4,34 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Event {
+    String eventId;
+    String eventCreator;
     String title;
     Uri photo; // event photo is stored as an Uri because it is uploaded by the user
     String description;
     ArrayList<String> tags;
-    LocalDateTime startDateTime;
-    LocalDateTime endDateTime;
+    ZonedDateTime startDateTime;
+    ZonedDateTime endDateTime;
     String location;
-    LocalDateTime registrationStartDateTime;
-    LocalDateTime registrationEndDateTime;
-    int numOfAttendants;
+    ZonedDateTime registrationStartDateTime;
+    ZonedDateTime registrationEndDateTime;
+    int maxAttendees;
     int waitlistLimit;
     boolean geolocationRequirement;
     boolean visibility;
 
     ArrayList<User> waitlist;
 
-    public Event(String title, Uri photo, String description, ArrayList<String> tags,
-                 LocalDateTime startDateTime, LocalDateTime endDateTime, String location,
-                 LocalDateTime registrationStartDateTime, LocalDateTime registrationEndDateTime,
+    public Event(String eventCreator, String title, Uri photo, String description, ArrayList<String> tags,
+                 ZonedDateTime startDateTime, ZonedDateTime endDateTime, String location,
+                 ZonedDateTime registrationStartDateTime, ZonedDateTime registrationEndDateTime,
                  int numOfAttendants, int waitlistLimit, boolean geolocationRequirement, boolean visibility) {
+        this.eventCreator = eventCreator;
         this.title = title;
         this.photo = photo;
         this.description = description;
@@ -37,12 +41,38 @@ public class Event {
         this.location = location;
         this.registrationStartDateTime = registrationStartDateTime;
         this.registrationEndDateTime = registrationEndDateTime;
-        this.numOfAttendants = numOfAttendants;
+        this.maxAttendees = numOfAttendants;
         this.waitlistLimit = waitlistLimit;
         this.geolocationRequirement = geolocationRequirement;
         this.visibility = visibility;
 
+        // generates a unique random id for the new event
+        this.eventId = UUID.randomUUID().toString();
         this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created
+    }
+
+    // testing constructor
+    public Event(String title, Uri photo, String description, ArrayList<String> tags,
+                 ZonedDateTime startDateTime, ZonedDateTime endDateTime, String location,
+                 ZonedDateTime registrationStartDateTime, ZonedDateTime registrationEndDateTime) {
+        this.eventId = UUID.randomUUID().toString();
+        this.title = title;
+        this.photo = photo;
+        this.description = description;
+        this.tags = tags;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.location = location;
+        this.registrationStartDateTime = registrationStartDateTime;
+        this.registrationEndDateTime = registrationEndDateTime;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public String getEventCreator() {
+        return eventCreator;
     }
 
     public String getTitle() {
@@ -53,11 +83,11 @@ public class Event {
         this.title = title;
     }
 
-    public Uri getPhoto() {
+    public Uri getPhotoUri() {
         return photo;
     }
 
-    public void setPhoto(Uri photo) {
+    public void setPhotoUri(Uri photo) {
         this.photo = photo;
     }
 
@@ -77,19 +107,19 @@ public class Event {
         this.tags = tags;
     }
 
-    public LocalDateTime getStartDateTime() {
+    public ZonedDateTime getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
+    public void setStartDateTime(ZonedDateTime startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public LocalDateTime getEndDateTime() {
+    public ZonedDateTime getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
+    public void setEndDateTime(ZonedDateTime endDateTime) {
         this.endDateTime = endDateTime;
     }
 
@@ -101,28 +131,28 @@ public class Event {
         this.location = location;
     }
 
-    public LocalDateTime getRegistrationStartDateTime() {
+    public ZonedDateTime getRegistrationStartDateTime() {
         return registrationStartDateTime;
     }
 
-    public void setRegistrationStartDateTime(LocalDateTime registrationStartDateTime) {
+    public void setRegistrationStartDateTime(ZonedDateTime registrationStartDateTime) {
         this.registrationStartDateTime = registrationStartDateTime;
     }
 
-    public LocalDateTime getRegistrationEndDateTime() {
+    public ZonedDateTime getRegistrationEndDateTime() {
         return registrationEndDateTime;
     }
 
-    public void setRegistrationEndDateTime(LocalDateTime registrationEndDateTime) {
+    public void setRegistrationEndDateTime(ZonedDateTime registrationEndDateTime) {
         this.registrationEndDateTime = registrationEndDateTime;
     }
 
-    public int getNumOfAttendants() {
-        return numOfAttendants;
+    public int getMaxAttendees() {
+        return maxAttendees;
     }
 
-    public void setNumOfAttendants(int numOfAttendants) {
-        this.numOfAttendants = numOfAttendants;
+    public void setMaxAttendees(int maxAttendees) {
+        this.maxAttendees = maxAttendees;
     }
 
     public int getWaitlistLimit() {
@@ -133,7 +163,7 @@ public class Event {
         this.waitlistLimit = waitlistLimit;
     }
 
-    public boolean isGeolocationRequirement() {
+    public boolean getGeolocationRequirement() {
         return geolocationRequirement;
     }
 
@@ -141,12 +171,16 @@ public class Event {
         this.geolocationRequirement = geolocationRequirement;
     }
 
-    public boolean isEventVisible() {
+    public boolean getEventVisibility() {
         return visibility;
     }
 
-    public void setEventVisible(boolean eventVisible) {
+    public void setEventVisibility(boolean eventVisible) {
         this.visibility = eventVisible;
+    }
+
+    public ArrayList<User> getWaitlist() {
+        return waitlist;
     }
 
     @NonNull
@@ -162,7 +196,7 @@ public class Event {
                 ", location='" + location + '\'' +
                 ", registrationStartDateTime=" + registrationStartDateTime +
                 ", registrationEndDateTime=" + registrationEndDateTime +
-                ", numOfAttendants=" + numOfAttendants +
+                ", numOfAttendants=" + maxAttendees +
                 ", waitlistLimit=" + waitlistLimit +
                 ", geolocationRequirement=" + geolocationRequirement +
                 ", eventVisible=" + visibility +
