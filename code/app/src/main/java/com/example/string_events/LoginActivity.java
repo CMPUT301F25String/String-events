@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         btnUser.setOnClickListener(v -> setRole(Role.USER));
         btnAdmin.setOnClickListener(v -> setRole(Role.ADMIN));
         btnSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
-        btnSignIn.setOnClickListener(v -> signIn());
+        btnSignIn.setOnClickListener(view -> signIn());
     }
 
     private void setRole(Role role) {
@@ -71,27 +71,23 @@ public class LoginActivity extends AppCompatActivity {
     private String lower(String s) { return s == null ? "" : s.trim().toLowerCase(Locale.US); }
 
     private void signIn() {
-        final String idOrEmail = lower(etEmail.getText() == null ? "" : etEmail.getText().toString());
-        final String pass      = etPassword.getText() == null ? "" : etPassword.getText().toString().trim();
+        String idOrEmail = lower(etEmail.getText() == null ? "" : etEmail.getText().toString());
+        String pass      = etPassword.getText() == null ? "" : etPassword.getText().toString().trim();
+        String username = idOrEmail.contains("@") ? idOrEmail.substring(0, idOrEmail.indexOf('@')) : idOrEmail;
 
         if (idOrEmail.isEmpty() || pass.isEmpty()) {
             toast(" enter username/email and password");
             return;
         }
-
         setLoading(true);
 
         if (selectedRole == Role.ADMIN) {
-
-            final String username = idOrEmail.contains("@") ? idOrEmail.substring(0, idOrEmail.indexOf('@')) : idOrEmail;
-
-
             db.collection("admins").whereEqualTo("username", username).limit(1).get()
                     .addOnSuccessListener(q -> {
                         if (q.isEmpty()) { setLoading(false); toast("not admin account"); return; }
                         String storedPw = q.getDocuments().get(0).getString("password");
                         if (storedPw != null && storedPw.equals(pass)) {
-                            goHome("admin");
+                            goHome("admin", null);
                         } else {
                             setLoading(false); toast("wrong admin password");
                         }
@@ -99,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> { setLoading(false); toast("Login failed: " + e.getLocalizedMessage()); });
 
         } else {
-
             boolean looksLikeEmail = idOrEmail.contains("@");
 
             db.collection("users")
@@ -110,7 +105,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (q.isEmpty()) { setLoading(false); toast("no account go create one"); return; }
                         String storedPw = q.getDocuments().get(0).getString("password"); // plain text
                         if (storedPw != null && storedPw.equals(pass)) {
-                            goHome("user");
+                            // after a successful sign in, send the person's role and their username/email to the next screen as arguments
+                            goHome("user", username);
                         } else {
                             setLoading(false); toast("Wrong password");
                         }
@@ -119,10 +115,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void goHome(String role) {
+    private void goHome(String role, String username) {
         setLoading(false);
         Intent i = new Intent(this, MainActivity.class);
         i.putExtra("role", role);
+        i.putExtra("user", username);
         startActivity(i);
         finish();
     }

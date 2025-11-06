@@ -1,3 +1,4 @@
+
 package com.example.string_events;
 
 import android.content.Intent;
@@ -37,12 +38,14 @@ public class MainActivity extends AppCompatActivity {
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String username;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         String role = getIntent().getStringExtra("role");
+        username = getIntent().getStringExtra("user");
+
         if ("admin".equalsIgnoreCase(role)) {
             show(Screen.ADMIN_HOME);
         } else {
@@ -113,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     for (DocumentSnapshot d : snap) {
                         boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
                         String eventName = d.getString("eventName");
-                        String imageUrl  = d.getString("imageUrl");
+                        String imageUrl  = d.getString("imageUrl");   // optional
                         Uri photo = (imageUrl == null || imageUrl.isEmpty())
                                 ? null : Uri.parse(imageUrl);
 
@@ -125,12 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
                 });
     }
-
-
-
-
-
-
 
     private int getId(String name) {
         return getResources().getIdentifier(name, "id", getPackageName());
@@ -182,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
             EventItem clicked = data.get(position);
             Intent i = new Intent(MainActivity.this, EventDetailActivity.class);
             i.putExtra("event_id", clicked.id);
+            i.putExtra("user", username);
             startActivity(i);
         });
     }
@@ -267,29 +265,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 h.btnStatus.setText(text);
                 h.btnStatus.setBackgroundTintList(ColorStateList.valueOf(color));
-            }
-
-            final int p = pos;
-            if (h.btnStatus != null) {
-                h.btnStatus.setOnClickListener(v2 -> {
-                    EventItem e2 = getItem(p);
-                    EventDetailFragment f = EventDetailFragment.newInstance(e2.id);
-                    MainActivity.this.getSupportFragmentManager()
-                            .beginTransaction()
-                            .setReorderingAllowed(true)
-                            .add(android.R.id.content, f, "event_detail")
-                            .addToBackStack("event_detail")
-                            .commit();
-                });
-            }
-
-            if (h.imgCover != null) {
-                h.imgCover.setOnClickListener(v3 -> {
-                    EventItem e3 = getItem(p);
-                    Intent i = new Intent(MainActivity.this, LotteryDrawActivity.class);
-                    i.putExtra("event_id", e3.id);
-                    startActivity(i);
-                });
             }
 
             return v;

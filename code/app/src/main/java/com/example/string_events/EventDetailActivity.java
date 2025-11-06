@@ -1,20 +1,32 @@
 package com.example.string_events;
 
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firestore.v1.StructuredQuery;
 
 import java.text.DateFormat;
 import java.util.Locale;
 
 public class EventDetailActivity extends AppCompatActivity {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
+    private CollectionReference eventsCollectionRef;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,11 +36,25 @@ public class EventDetailActivity extends AppCompatActivity {
         if (back != null) back.setOnClickListener(v -> finish());
 
         String eventId = getIntent().getStringExtra("event_id");
+        String username = getIntent().getStringExtra("user");
         if (eventId == null || eventId.isEmpty()) { finish(); return; }
 
-        db.collection("events").document(eventId).get()
+        db = FirebaseFirestore.getInstance();
+        eventsCollectionRef = db.collection("events");
+
+        eventsCollectionRef.document(eventId).get()
                 .addOnSuccessListener(this::bind)
                 .addOnFailureListener(e -> finish());
+
+        MaterialButton applyButton = findViewById(R.id.apply_button);
+
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addUserToWaitlist(eventId, username);
+                Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void bind(DocumentSnapshot s) {
@@ -58,10 +84,15 @@ public class EventDetailActivity extends AppCompatActivity {
 
         setText(getId("spots_taken"),  "(" + taken + "/" + max + ") Spots Taken");
         setText(getId("waiting_list"), wait + " Waiting List");
-
-
     }
 
+    public void addUserToWaitlist(String eventId, String username) {
+        // eventId is the id of the event that the user wants to join the waitlist for
+        // username is the user to be added to the event's waitlist
+        DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
+        // arrayUnion automatically won't add the username to the waitlist if it's already in there'
+        eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
+    }
 
     private void setText(int id, String value) {
         if (id == 0) return;
