@@ -43,6 +43,7 @@
         <activity android:name=".WaitlistUsersActivity" />
         <activity android:name=".LotteryActivity" />
         <activity android:name=".AdminEventManagementActivity" />
+        <activity android:name=".AdminProfileScreen" />
 
     </application>
 </manifest>
