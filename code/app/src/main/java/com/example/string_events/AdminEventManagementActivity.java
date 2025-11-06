@@ -2,15 +2,21 @@ package com.example.string_events;
 
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 使用 ListView 展示三张卡片：
+ * 1. In Progress（黄色）
+ * 2. Scheduled（绿色）
+ * 3. Finished（红色）
+ */
 public class AdminEventManagementActivity extends AppCompatActivity {
 
     @Override
@@ -18,44 +24,46 @@ public class AdminEventManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_event_management_screen);
 
+        TextView title = findViewById(R.id.tv_title);
+        title.setText(getString(R.string.event_management));
+
         ImageButton back = findViewById(R.id.btn_back);
-        if (back != null) back.setOnClickListener(v -> finish());
+        back.setOnClickListener(v -> finish());
 
-        RecyclerView rv = findViewById(R.id.rv_admin_events);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        ListView listView = findViewById(R.id.list_admin_events);
 
+        // 准备数据（使用你项目已有的资源名）
         List<AdminEvent> data = new ArrayList<>();
-        // 1) 黄 In Progress
         data.add(new AdminEvent(
-                getString(R.string.sample_event_title),
-                getString(R.string.sample_time),
+                "Badminton Drop In",
+                "11:00 am",
                 getString(R.string.sample_location),
-                getString(R.string.sample_organizer),
+                "XYZ",
                 AdminEvent.Status.IN_PROGRESS,
                 R.drawable.sample_event,
                 R.drawable.community_centre_image
         ));
-        // 2) 绿 Scheduled
         data.add(new AdminEvent(
-                getString(R.string.sample_event_title),
-                getString(R.string.sample_time),
+                "Badminton Drop In",
+                "11:00 am",
                 getString(R.string.sample_location),
-                getString(R.string.sample_organizer),
+                "XYZ",
                 AdminEvent.Status.SCHEDULED,
                 R.drawable.sample_event,
                 R.drawable.community_centre_image
         ));
-        // 3) 红 Finished
         data.add(new AdminEvent(
-                getString(R.string.sample_event_title),
-                getString(R.string.sample_time),
+                "Badminton Drop In",
+                "11:00 am",
                 getString(R.string.sample_location),
-                getString(R.string.sample_organizer),
+                "XYZ",
                 AdminEvent.Status.FINISHED,
                 R.drawable.sample_event,
                 R.drawable.community_centre_image
         ));
 
-        rv.setAdapter(new AdminEventAdapter(data));
+        // 绑定 ListView
+        AdminEventAdapter adapter = new AdminEventAdapter(this, data);
+        listView.setAdapter(adapter);
     }
 }

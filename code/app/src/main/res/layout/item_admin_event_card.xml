@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
+    android:foreground="?attr/selectableItemBackground"
     app:cardUseCompatPadding="true"
-    app:cardCornerRadius="18dp"
-    app:cardBackgroundColor="#FFFFFFFF"
-    app:cardElevation="3dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,90 +16,84 @@
         android:padding="12dp">
 
         <ImageView
-            android:id="@+id/iv_cover"
+            android:id="@+id/imgCover"
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
             android:src="@drawable/sample_event"
-            android:background="@drawable/bg_card_rounded" />
+            android:background="@drawable/bg_image_rounded"
+            android:contentDescription="@string/event_image"/>
 
         <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/sample_title"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="#000000" />
-
-        <!-- 时间 + 位置 行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sample_time"
-                android:textSize="14sp"
-                android:textColor="#555555" />
-
-            <Space
-                android:layout_width="16dp"
-                android:layout_height="1dp" />
-
-            <ImageView
-                android:id="@+id/iv_location_logo"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/community_centre_image" />
-
-            <TextView
-                android:id="@+id/tv_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/sample_location"
-                android:textSize="14sp"
-                android:textColor="#555555" />
-        </LinearLayout>
-
-        <!-- 组织者 + 状态胶囊 -->
-        <LinearLayout
+            android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Badminton Drop In"/>
+
+        <!-- 时间 + 地点 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_time_outline"
+                android:contentDescription="@string/time"/>
 
             <TextView
-                android:id="@+id/tv_organizer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/sample_organizer"
-                android:textSize="14sp"
-                android:textColor="#444444" />
-
-            <TextView
-                android:id="@+id/tv_status"
+                android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:text="@string/status_in_progress"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textColor="#000000"
-                android:background="@drawable/bg_status_inprogress" />
+                android:text="11:00 am"/>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgLocationLogo"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/community_centre_image"
+                android:contentDescription="@string/location_logo"/>
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_location"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvOrganizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/sample_organizer"/>
+
+        <!-- 状态胶囊 -->
+        <TextView
+            android:id="@+id/chipStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="@string/status_in_progress"
+            android:textSize="12sp"
+            android:background="@drawable/bg_status_inprogress"
+            android:textColor="@android:color/black"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
