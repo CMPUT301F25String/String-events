@@ -109,26 +109,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/name_textView" />
 
-        <ImageButton
-            android:id="@+id/info_imageButton"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/info_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/email_textView"/>
-
-        <TextView
-            android:id="@+id/info_textView"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lottery_info_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Lottery Information"
-            android:textSize="12sp"
-            app:layout_constraintTop_toTopOf="@id/info_imageButton"
-            app:layout_constraintBottom_toBottomOf="@id/info_imageButton"
-            app:layout_constraintStart_toEndOf="@id/info_imageButton"/>
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/email_textView">
+
+            <ImageButton
+                android:id="@+id/info_imageButton"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/info_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Lottery Information"
+                android:textSize="12sp"
+                app:layout_constraintTop_toTopOf="@id/info_imageButton"
+                app:layout_constraintBottom_toBottomOf="@id/info_imageButton"
+                app:layout_constraintStart_toEndOf="@id/info_imageButton"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/joined_events_textView"
@@ -138,7 +144,7 @@
             android:layout_marginStart="20dp"
             android:text="Joined Events:"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/info_imageButton"
+            app:layout_constraintTop_toBottomOf="@id/lottery_info_layout"
             app:layout_constraintStart_toStartOf="parent"/>
 
 
@@ -148,6 +154,7 @@
         android:id="@+id/profile_events_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout2" />

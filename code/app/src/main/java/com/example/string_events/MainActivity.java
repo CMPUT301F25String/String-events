@@ -22,13 +22,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
@@ -88,28 +85,33 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case PROFILE:
-                setContentView(R.layout.profile_screen);
                 wireCommon();
-                onClick(R.id.btnNotification, () -> show(Screen.NOTIFICATIONS));
-                onClick(getId("btnHome"), () -> show(Screen.USER_HOME));
 
-                // display name and email immediately
-                TextView nameTextView = findViewById(R.id.name_textView);
-                TextView emailTextView = findViewById(R.id.email_textView);
-                nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
-                emailTextView.setText("Email: " + (email != null ? email : ""));
-
-                onClick(R.id.edit_textView, () -> {
-                    Intent intent = new Intent(this, EditInformationActivity.class);
-                    intent.putExtra("user", username);
-                    startActivity(intent);
-                });
-
-                onClick(R.id.info_imageButton, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
-                onClick(R.id.info_textView, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
+                Intent intent = new Intent(this, ProfileScreen.class);
+                intent.putExtra("user", username);
+                intent.putExtra("fullName", fullName);
+                intent.putExtra("email", email);
+                startActivity(intent);
 
 
-                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
+
+//                // display name and email immediately
+//                TextView nameTextView = findViewById(R.id.name_textView);
+//                TextView emailTextView = findViewById(R.id.email_textView);
+//                nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
+//                emailTextView.setText("Email: " + (email != null ? email : ""));
+//
+//                onClick(R.id.edit_textView, () -> {
+//                    Intent intent = new Intent(this, EditInformationActivity.class);
+//                    intent.putExtra("user", username);
+//                    startActivity(intent);
+//                });
+
+//                onClick(R.id.info_imageButton, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
+//                onClick(R.id.info_textView, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
+
+
+//                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
         }
     }

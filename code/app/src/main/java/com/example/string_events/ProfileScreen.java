@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -15,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
 
@@ -36,45 +38,60 @@ public class ProfileScreen extends AppCompatActivity {
         ImageButton switchRolesButton = findViewById(R.id.switch_roles_button);
         TextView nameTextView = findViewById(R.id.name_textView);
         TextView emailTextView = findViewById(R.id.email_textView);
-        ImageView infoImageView = findViewById(R.id.info_imageButton);
+        ConstraintLayout lotteryInfoLayout = findViewById(R.id.lottery_info_layout);
         ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
 
-        switchRolesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
-                // get the current role of the user and switch it to either entrant or organizer
-                String currentRole = sharedPreferences.getString("role", null);
-                assert currentRole != null;
+        // bottom bar buttons
+        ImageButton homeButton = findViewById(R.id.btnHome);
+        ImageButton cameraButton = findViewById(R.id.btnCamera);
+        ImageButton notificationsButton = findViewById(R.id.btnNotification);
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                if (currentRole.equals("entrant")) {
-                    editor.putString("role", "organizer");
-                    editor.apply();
-                    openOrganizerEventScreen();
-                } else {
-                    editor.putString("role", "organizer");
-                    editor.apply();
-                    openEntrantEventScreen();
-                }
+
+        // get the user's username, full name, and email to be displayed
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("user");
+        String fullName = intent.getStringExtra("fullName");
+        String email = intent.getStringExtra("email");
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        // get the current role of the user and switch it to either entrant or organizer
+        String currentRole = sharedPreferences.getString("role", null);
+        assert currentRole != null;
+
+        // display name and email immediately
+        nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
+        emailTextView.setText("Email: " + (email != null ? email : ""));
+
+        homeButton.setOnClickListener(view -> {
+            if (currentRole.equals("entrant")) {
+                openEntrantEventScreen();
+            } else {
+                openOrganizerEventScreen();
             }
         });
 
-    }
+        notificationsButton.setOnClickListener(view -> openNotificationsScreen());
 
-    public void setupProfileScreen (Activity activity, String username, String fullName, String email) {
-        TextView nameTextView = activity.findViewById(R.id.name_textView);
-        TextView emailTextView = activity.findViewById(R.id.email_textView);
-        ImageButton deleteProfileButton = activity.findViewById(R.id.delete_profile_button);
+        editProfileTextView.setOnClickListener(view -> openEditInformationScreen(username));
 
-        // Update text fields
-        if (fullName != null) nameTextView.setText("Name: " + fullName);
-        if (email != null) emailTextView.setText("Email: " + email);
+        lotteryInfoLayout.setOnClickListener(view -> openLotteryInformationScreen());
 
-        // Delete button logic
-        deleteProfileButton.setOnClickListener(v -> {
+        switchRolesButton.setOnClickListener(view -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (currentRole.equals("entrant")) {
+                editor.putString("role", "organizer");
+                editor.apply();
+                openOrganizerEventScreen();
+            } else {
+                editor.putString("role", "organizer");
+                editor.apply();
+                openEntrantEventScreen();
+            }
+        });
+
+        deleteProfileImageButton.setOnClickListener(v -> {
             if (username == null || username.isEmpty()) {
-                Toast.makeText(activity, "No user to delete", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileScreen.this, "No user to delete", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -88,34 +105,49 @@ public class ProfileScreen extends AppCompatActivity {
                             db.collection("users").document(docId)
                                     .delete()
                                     .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(activity, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                        Intent i = new Intent(activity, WelcomeActivity.class);
+                                        Toast.makeText(ProfileScreen.this, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(ProfileScreen.this, WelcomeActivity.class);
                                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                                 Intent.FLAG_ACTIVITY_NEW_TASK |
                                                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        activity.startActivity(i);
-                                        activity.finish();
+                                        ProfileScreen.this.startActivity(i);
+                                        ProfileScreen.this.finish();
                                     })
                                     .addOnFailureListener(e ->
-                                            Toast.makeText(activity, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                                            Toast.makeText(ProfileScreen.this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                         } else {
-                            Toast.makeText(activity, "User not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProfileScreen.this, "User not found", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(e ->
-                            Toast.makeText(activity, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
+
     }
 
-    public void openOrganizerEventScreen () {
-        Context context = ProfileScreen.this;
-        Intent myIntent = new Intent(context, OrganizerEventScreen.class);
-        context.startActivity(myIntent);
+    public void openNotificationsScreen() {
+        Intent myIntent = new Intent(ProfileScreen.this, NotificationScreen.class);
+        startActivity(myIntent);
     }
 
-    public void openEntrantEventScreen () {
-        Context context = ProfileScreen.this;
-        Intent myIntent = new Intent(context, MainActivity.class);
-        context.startActivity(myIntent);
+    public void openEditInformationScreen(String username) {
+        Intent intent = new Intent(ProfileScreen.this, EditInformationActivity.class);
+        intent.putExtra("user", username);
+        startActivity(intent);
+    }
+
+    public void openLotteryInformationScreen() {
+        Intent intent = new Intent(ProfileScreen.this, LotteryInformationActivity.class);
+        startActivity(intent);
+    }
+
+    public void openOrganizerEventScreen() {
+        Intent myIntent = new Intent(ProfileScreen.this, OrganizerEventScreen.class);
+        startActivity(myIntent);
+    }
+
+    public void openEntrantEventScreen() {
+        Intent myIntent = new Intent(ProfileScreen.this, MainActivity.class);
+        startActivity(myIntent);
     }
 }
