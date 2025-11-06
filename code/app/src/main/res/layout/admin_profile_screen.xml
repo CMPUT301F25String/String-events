@@ -60,7 +60,7 @@
         android:id="@+id/img_avatar"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        android:src="@drawable/ic_profile_placeholder"
+        android:src="@drawable/profile"
         android:scaleType="centerCrop"
         android:background="@drawable/bg_avatar_circle"
         app:layout_constraintTop_toBottomOf="@id/badge_admin"
