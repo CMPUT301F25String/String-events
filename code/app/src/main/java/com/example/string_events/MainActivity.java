@@ -38,12 +38,14 @@ public class MainActivity extends AppCompatActivity {
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String username;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         String role = getIntent().getStringExtra("role");
+        username = getIntent().getStringExtra("user");
+
         if ("admin".equalsIgnoreCase(role)) {
             show(Screen.ADMIN_HOME);
         } else {
@@ -127,13 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-
-
-
-
-
-
-
     private int getId(String name) {
         return getResources().getIdentifier(name, "id", getPackageName());
     }
@@ -184,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
             EventItem clicked = data.get(position);
             Intent i = new Intent(MainActivity.this, EventDetailActivity.class);
             i.putExtra("event_id", clicked.id);
+            i.putExtra("user", username);
             startActivity(i);
         });
     }

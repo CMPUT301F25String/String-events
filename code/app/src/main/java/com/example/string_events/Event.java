@@ -22,6 +22,8 @@ public class Event {
     boolean geolocationRequirement;
     boolean visibility;
 
+    ArrayList<User> waitlist;
+
     public Event(String title, Uri photo, String description, ArrayList<String> tags,
                  LocalDateTime startDateTime, LocalDateTime endDateTime, String location,
                  LocalDateTime registrationStartDateTime, LocalDateTime registrationEndDateTime,
@@ -39,6 +41,8 @@ public class Event {
         this.waitlistLimit = waitlistLimit;
         this.geolocationRequirement = geolocationRequirement;
         this.visibility = visibility;
+
+        this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created
     }
 
     public String getTitle() {

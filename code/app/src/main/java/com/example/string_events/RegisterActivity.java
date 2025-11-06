@@ -92,6 +92,7 @@ public class RegisterActivity extends AppCompatActivity {
                     toast("Account created");
                     Intent i = new Intent(RegisterActivity.this, MainActivity.class);
                     i.putExtra("role", "user");
+                    i.putExtra("user", username);
                     startActivity(i);
                     finish();
                 })
