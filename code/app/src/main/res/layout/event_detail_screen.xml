@@ -252,18 +252,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/apply_button"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@drawable/bg_btn_apply"
-            android:text="Apply"
-            android:textAllCaps="false"
-            android:textSize="18sp"
-            android:textColor="@color/color_text_primary"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:textAlignment="center"/>
+            android:background="@drawable/apply_button" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
