@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card_rounded"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- 顶部大图（羽毛球） -->
+    <ImageView
+        android:id="@+id/iv_banner"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sample_event"
+        android:background="@drawable/bg_image_rounded"
+        android:contentDescription="@string/event_image" />
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/tv_event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Badminton Drop In"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000" />
+
+    <!-- 时间 + 地点（带社区中心徽标） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <!-- 时间 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_time_outline"
+                android:contentDescription="@string/time" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="11:00 am"
+                android:textSize="14sp"
+                android:textColor="#333333"/>
+        </LinearLayout>
+
+        <!-- 地点（左侧放 community_centre_image.png 作为徽标） -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|end">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/community_centre_image"
+                android:contentDescription="@string/location_logo" />
+
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Community Centre"
+                android:textSize="14sp"
+                android:textColor="#333333"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 组织者 + 右侧状态 pill -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_organizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Organizer: XYZ"
+            android:textSize="14sp"
+            android:textColor="#444444" />
+
+        <!-- 状态：示例为 In Progress；你也可切换为 bg_status_scheduled / bg_status_finished -->
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:minWidth="72dp"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="In Progress"
+            android:textSize="12sp"
+            android:textColor="#6A4B00"
+            android:background="@drawable/bg_status_inprogress" />
+    </LinearLayout>
+
+</LinearLayout>
