@@ -101,7 +101,11 @@ public class EventDetailActivity extends AppCompatActivity {
         Timestamp et = s.getTimestamp("endAt");
         int max   = asInt(s.get("maxAttendees"));
         int taken = asInt(s.get("attendeesCount"));
-        int wait  = asInt(s.get("waitlistLimit"));
+        int waitLimit  = asInt(s.get("waitlistLimit"));
+
+
+        List<String> waitlist = (List<String>) s.get("waitlist");
+        int currentWaitCount = (waitlist != null) ? waitlist.size() : 0;
 
         DateFormat dFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
         DateFormat tFmt = DateFormat.getTimeInstance(DateFormat.SHORT,  Locale.getDefault());
@@ -111,14 +115,19 @@ public class EventDetailActivity extends AppCompatActivity {
                 (et==null? "" : tFmt.format(et.toDate()));
 
         setText(getId("tvEventTitle"),  title);
-        setText(getId("tvAddress"),    addr);
+        setText(getId("tvAddress"),     addr);
         setText(getId("tvDateLine"),    dateLine);
         setText(getId("tvTimeLine"),    timeLine);
         setText(getId("tvAddress"),     loc);
         setText(getId("tvDescription"), desc);
 
         setText(getId("spots_taken"),  "(" + taken + "/" + max + ") Spots Taken");
-        setText(getId("waiting_list"), wait + " Waiting List");
+
+
+        if (waitLimit > 0)
+            setText(getId("waiting_list"), currentWaitCount + "/" + waitLimit + " on Waitlist");
+        else
+            setText(getId("waiting_list"), currentWaitCount + " on Waitlist");
     }
 
     private void setText(int id, String value) {
