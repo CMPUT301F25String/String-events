@@ -1,6 +1,5 @@
 package com.example.string_events;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,22 +10,19 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firestore.v1.StructuredQuery;
 
 import java.text.DateFormat;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventDetailActivity extends AppCompatActivity {
-
-    private FirebaseFirestore db;
-    private CollectionReference eventsCollectionRef;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,22 +33,58 @@ public class EventDetailActivity extends AppCompatActivity {
 
         String eventId = getIntent().getStringExtra("event_id");
         String username = getIntent().getStringExtra("user");
-        if (eventId == null || eventId.isEmpty()) { finish(); return; }
+        if (eventId == null || username == null || eventId.isEmpty()) { finish(); return; }
 
-        db = FirebaseFirestore.getInstance();
-        eventsCollectionRef = db.collection("events");
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsCollectionRef = db.collection("events");
 
         eventsCollectionRef.document(eventId).get()
                 .addOnSuccessListener(this::bind)
                 .addOnFailureListener(e -> finish());
 
-        MaterialButton applyButton = findViewById(R.id.apply_button);
+        ImageButton applyButton = findViewById(R.id.apply_button);
 
-        applyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addUserToWaitlist(eventId, username);
+        AtomicBoolean userInEventWaitlist = new AtomicBoolean();
+        DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
+        eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                @SuppressWarnings("unchecked")
+                // get the waitlist of the clicked event from the database
+                List<String> waitlist = (List<String>) documentSnapshot.get("waitlist");
+                if (waitlist != null && waitlist.contains(username)) {
+                    // user is already waitlisted in the event
+                    Log.d("FirestoreCheck", "already in waitlist");
+                    userInEventWaitlist.set(true);
+                    applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+                } else {
+                    // user isn't waitlisted in the event yet
+                    Log.d("FirestoreCheck", "not on waitlist");
+                    userInEventWaitlist.set(false);
+                    applyButton.setBackgroundResource(R.drawable.apply_button);
+                }
+            } else {
+                Log.d("FirestoreCheck", "Document does not exist.");
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("FirestoreCheck", "Error fetching document", e);
+        });
+
+        applyButton.setOnClickListener(view -> {
+            // if user isn't in the event waitlist yet
+            if (!userInEventWaitlist.get()) {
+                // adds the user to the event waitlist
+                eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
                 Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
+                userInEventWaitlist.set(true);
+                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+            }
+            // user is in the event waitlist already
+            else {
+                // removes the user from the event waitlist
+                eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
+                Toast.makeText(EventDetailActivity.this, "Removed from waitlist!", Toast.LENGTH_SHORT).show();
+                userInEventWaitlist.set(false);
+                applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         });
     }
@@ -84,14 +116,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         setText(getId("spots_taken"),  "(" + taken + "/" + max + ") Spots Taken");
         setText(getId("waiting_list"), wait + " Waiting List");
-    }
-
-    public void addUserToWaitlist(String eventId, String username) {
-        // eventId is the id of the event that the user wants to join the waitlist for
-        // username is the user to be added to the event's waitlist
-        DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
-        // arrayUnion automatically won't add the username to the waitlist if it's already in there'
-        eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
     }
 
     private void setText(int id, String value) {
