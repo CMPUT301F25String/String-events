@@ -42,6 +42,7 @@
         <activity android:name=".ParticipatingUsersActivity" />
         <activity android:name=".WaitlistUsersActivity" />
         <activity android:name=".LotteryActivity" />
+        <activity android:name=".AdminEventManagementActivity" />
 
     </application>
 </manifest>
