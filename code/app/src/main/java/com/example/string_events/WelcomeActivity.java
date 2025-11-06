@@ -4,7 +4,7 @@ package com.example.string_events;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 
@@ -15,9 +15,9 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.welcome_screen);
 
         ((MaterialButton) findViewById(R.id.btnSignIn))
-                .setOnClickListener(v -> startActivity(new Intent(this, LoginActivity.class)));
+                .setOnClickListener(v -> startActivity(new Intent(this, LoginScreen.class)));
         ((MaterialButton) findViewById(R.id.btnRegister))
-                .setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+                .setOnClickListener(v -> startActivity(new Intent(this, RegisterScreen.class)));
     }
 
     @Override protected void onStart() {

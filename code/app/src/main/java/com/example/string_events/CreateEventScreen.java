@@ -5,33 +5,48 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CreateEventScreen extends AppCompatActivity {
-
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_event_screen);
+        db = FirebaseFirestore.getInstance();
 
         ImageButton backButton = findViewById(R.id.back_button);
         EditText eventTitleEditText = findViewById(R.id.event_title_editText);
@@ -56,6 +71,9 @@ public class CreateEventScreen extends AppCompatActivity {
         ImageButton eventVisibilityPrivate = findViewById(R.id.event_private_button);
         // needs to be atomic boolean to avoid an error
         AtomicBoolean visibility = new AtomicBoolean(false);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        String username = sharedPreferences.getString("user", null);
 
         // putting a bunch of similar editTexts into arrays so we can simplify repeated code
         EditText[] dateEditTexts = {
@@ -106,37 +124,44 @@ public class CreateEventScreen extends AppCompatActivity {
         doneButton.setOnClickListener(view -> {
             String title = String.valueOf(eventTitleEditText.getText());
             Uri photo = (Uri)eventPhotoImageView.getTag();
-            String description = String.valueOf(eventDescriptionEditText);
+
+            String description = String.valueOf(eventDescriptionEditText.getText());
             ArrayList<String> tags = null; // TODO
 
-            LocalDateTime startDateTime = LocalDate.parse(
+            // converts the text in the editText into a LocalDateTime and then into a ZonedDateTime (has timezone)
+            ZonedDateTime startDateTime = LocalDate.parse(
                     String.valueOf(eventStartDateEditText.getText()))
-                    .atTime(LocalTime.parse(String.valueOf(eventStartTimeEditText.getText())));
+                    .atTime(LocalTime.parse(String.valueOf(eventStartTimeEditText.getText())))
+                    .atZone(ZoneId.systemDefault());
 
-            LocalDateTime endDateTime = LocalDate.parse(
+            ZonedDateTime endDateTime = LocalDate.parse(
                     String.valueOf(eventEndDateEditText.getText()))
-                    .atTime(LocalTime.parse(String.valueOf(eventEndTimeEditText.getText())));
+                    .atTime(LocalTime.parse(String.valueOf(eventEndTimeEditText.getText())))
+                    .atZone(ZoneId.systemDefault());
 
             String location = String.valueOf(eventLocationEditText.getText());
 
-            LocalDateTime registrationStartDateTime = LocalDate.parse(
+            ZonedDateTime registrationStartDateTime = LocalDate.parse(
                     String.valueOf(registrationStartDateEditText.getText()))
-                    .atTime(LocalTime.parse(String.valueOf(registrationStartTimeEditText.getText())));
+                    .atTime(LocalTime.parse(String.valueOf(registrationStartTimeEditText.getText())))
+                    .atZone(ZoneId.systemDefault());
 
-            LocalDateTime registrationEndDateTime = LocalDate.parse(
+            ZonedDateTime registrationEndDateTime = LocalDate.parse(
                     String.valueOf(registrationEndDateEditText.getText()))
-                    .atTime(LocalTime.parse(String.valueOf(registrationEndTimeEditText.getText())));
+                    .atTime(LocalTime.parse(String.valueOf(registrationEndTimeEditText.getText())))
+                    .atZone(ZoneId.systemDefault());
 
-            int numOfAttendants = Integer.parseInt(eventAttendantsEditText.getText().toString());
+            int maxAttendees = Integer.parseInt(eventAttendantsEditText.getText().toString());
             int waitlistLimit = Integer.parseInt(eventWaitlistEdittext.getText().toString());
             boolean geolocationRequirement = eventGeolocationSwitch.isChecked();
 
-            Event newEvent = new Event(title, photo, description, tags,
+            Event newEvent = new Event(username, title, photo, description, tags,
                     startDateTime, endDateTime, location,
                     registrationStartDateTime, registrationEndDateTime,
-                    numOfAttendants, waitlistLimit, geolocationRequirement, visibility.get());
+                    maxAttendees, waitlistLimit, geolocationRequirement, visibility.get());
 
-            // TODO link the newly created event to database and other screens
+            uploadNewEventToDatabase(newEvent);
+
         });
     }
 
@@ -179,5 +204,89 @@ public class CreateEventScreen extends AppCompatActivity {
                 // pass the current time to the timePicker so the default time is the current time
                 hour, minute, false);
         timePickerDialog.show();
+    }
+
+    private void uploadNewEventToDatabase(Event event) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child("event_images/" + UUID.randomUUID().toString() + ".png");
+
+        // start file upload
+        imageRef.putFile(event.getPhotoUri())
+                .addOnSuccessListener(taskSnapshot -> {
+                    // wait for the image to upload first before getting the download url
+                    imageRef.getDownloadUrl().addOnSuccessListener(photoUri -> {
+                        // get the download url of the photo
+                        String downloadUrl = photoUri.toString();
+                        Log.d("UploadImage", "image uploaded successfully url: " + downloadUrl);
+
+                        // call helper function to fill in the event details and upload event to database
+                        saveEventToDatabase(event, downloadUrl);
+
+                    }).addOnFailureListener(e -> {
+                        Log.e("UploadImage", "couldn't get download url: " + e.getMessage());
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UploadImage", "couldn't upload image: " + e.getMessage());
+                });
+    }
+
+    // Helper function to handle saving the document to Firestore
+    private void saveEventToDatabase(Event event, String imageUrl) {
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("creator", event.getEventCreator());
+        doc.put("title", event.getTitle());
+        // only add the image url if it's not null
+        if (imageUrl != null) {
+            doc.put("imageUrl", imageUrl);
+        }
+        doc.put("description", event.getDescription());
+        doc.put("categories", "TODO");
+        // need to convert the ZonedDateTime type into a Date type so it can be stored properly as a timestamp
+        doc.put("startAt", Date.from(event.getStartDateTime().toInstant()));
+        doc.put("endAt", Date.from(event.getEndDateTime().toInstant()));
+        doc.put("location", event.getLocation());
+        doc.put("regStartAt", Date.from(event.getRegistrationStartDateTime().toInstant()));
+        doc.put("regEndAt", Date.from(event.getRegistrationEndDateTime().toInstant()));
+        doc.put("attendeesCount", -1);
+        doc.put("maxAttendees", event.getMaxAttendees());
+        doc.put("waitlistLimit", event.getWaitlistLimit());
+        doc.put("geolocationReq", event.getGeolocationRequirement());
+        doc.put("visibility", event.getEventVisibility());
+
+        // creating new event in database under collection "events"
+        db.collection("events").document(event.getEventId()).set(doc)
+                .addOnSuccessListener(v -> {
+                    Toast.makeText(CreateEventScreen.this, "Event Created!", Toast.LENGTH_SHORT).show();
+                    Log.d("Firestore", "event uploaded to database");
+                    // testing function that replaces the image button on the screen with the database uploaded image
+                    // this is just to test that we can get the image back from the database and use it in the app
+                    testingImageGet(event);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(CreateEventScreen.this, "Error creating event in database", Toast.LENGTH_SHORT).show();
+                    Log.e("Firestore", "couldn't upload event to database", e);
+                });
+    }
+
+    public void testingImageGet(Event event) {
+        // get the specified event from the database
+        DocumentReference documentReference = db.collection("events").document(event.getEventId());
+        documentReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // getting the imageUrl from the specified event's field
+                String imageUrl = documentSnapshot.getString("imageUrl");
+                if (imageUrl != null) {
+                    // load the image from the imageUrl into an ImageButton (can also be an ImageView)
+                    ImageButton addPhotoButton = findViewById(R.id.add_photo_button);
+                    Glide.with(CreateEventScreen.this)
+                            .load(imageUrl)
+                            .into(addPhotoButton);
+                }
+            } else {
+                Log.d("Firestore", "document doesn't exist");
+            }
+        });
     }
 }

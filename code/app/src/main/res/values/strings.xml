@@ -12,7 +12,7 @@
     <string name="done">Done</string>
     <string name="lottery_information">Lottery Information</string>
     <string name="lottery_guidelines">Lottery Guidelines</string>
-    <string name="lottery_guidelines_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.</string>
+    <string name="lottery_guidelines_text">This event sign-up process uses a fair lottery system instead of first come, first served registration. When you join an event’s waiting list, your name will be entered into a random draw that takes place after the registration period closes. Everyone on the waiting list has an equal chance of being selected. If you’re chosen, you’ll receive a notification inviting you to confirm your spot. If you decide not to accept or don’t respond, another entrant will be randomly selected in your place. This system ensures that everyone gets a fair opportunity to participate, without the pressure of rushing to sign up first.</string>
     <string name="admin_event_management">Admin Event Management</string>
     <string name="admin_event_details">Event Details</string>
     <string name="search_events">Search events…</string>

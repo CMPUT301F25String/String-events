@@ -74,7 +74,7 @@
             android:id="@+id/ivClock"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:src="@drawable/clock"
+            android:src="@drawable/clock_icon"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/tvEventName"
             app:layout_constraintStart_toStartOf="parent" />
