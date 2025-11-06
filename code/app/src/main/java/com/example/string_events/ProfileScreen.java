@@ -16,9 +16,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
+import java.util.ArrayList;
+
 public class ProfileScreen extends AppCompatActivity {
 
+    ArrayList<ProfileEvent> profileEventsList;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.profile_screen);
+
         // screen buttons
         TextView editProfileTextView = findViewById(R.id.edit_textView);
         TextView logOutTextView = findViewById(R.id.logOut_textView);
@@ -29,11 +38,6 @@ public class ProfileScreen extends AppCompatActivity {
         TextView emailTextView = findViewById(R.id.email_textView);
         ImageView infoImageView = findViewById(R.id.info_imageButton);
         ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
-
-    public void setupProfileScreen(Activity activity, String username, String fullName, String email) {
-        TextView nameTextView = activity.findViewById(R.id.name_textView);
-        TextView emailTextView = activity.findViewById(R.id.email_textView);
-        ImageButton deleteProfileButton = activity.findViewById(R.id.delete_profile_button);
 
         switchRolesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,14 +52,21 @@ public class ProfileScreen extends AppCompatActivity {
                     editor.putString("role", "organizer");
                     editor.apply();
                     openOrganizerEventScreen();
-                }
-                else {
+                } else {
                     editor.putString("role", "organizer");
                     editor.apply();
                     openEntrantEventScreen();
                 }
             }
         });
+
+    }
+
+    public void setupProfileScreen (Activity activity, String username, String fullName, String email) {
+        TextView nameTextView = activity.findViewById(R.id.name_textView);
+        TextView emailTextView = activity.findViewById(R.id.email_textView);
+        ImageButton deleteProfileButton = activity.findViewById(R.id.delete_profile_button);
+
         // Update text fields
         if (fullName != null) nameTextView.setText("Name: " + fullName);
         if (email != null) emailTextView.setText("Email: " + email);
@@ -96,13 +107,13 @@ public class ProfileScreen extends AppCompatActivity {
         });
     }
 
-    public void openOrganizerEventScreen() {
+    public void openOrganizerEventScreen () {
         Context context = ProfileScreen.this;
         Intent myIntent = new Intent(context, OrganizerEventScreen.class);
         context.startActivity(myIntent);
     }
 
-    public void openEntrantEventScreen() {
+    public void openEntrantEventScreen () {
         Context context = ProfileScreen.this;
         Intent myIntent = new Intent(context, MainActivity.class);
         context.startActivity(myIntent);
