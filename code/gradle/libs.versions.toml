@@ -8,6 +8,7 @@ material = "1.13.0"
 activity = "1.11.0"
 constraintlayout = "2.2.1"
 materialVersion = "1.12.0"
+firebaseCommon = "22.0.1"
 recyclerview = "1.4.0"
 firebaseStorage = "22.0.1"
 
@@ -20,6 +21,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v1120 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+firebase-common = { group = "com.google.firebase", name = "firebase-common", version.ref = "firebaseCommon" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 

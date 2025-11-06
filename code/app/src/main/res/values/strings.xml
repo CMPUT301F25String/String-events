@@ -25,6 +25,31 @@
     <string name="description">Description</string>
     <string name="sample_event_description">This event is open to all students. Bring your student ID to participate.</string>
     <string name="sample_event_counts">Joined: 18 · Waitlist: 42 · Capacity: 30</string>
+
+    <string name="my_profile">My Profile</string>
+    <string name="log_out">Log Out</string>
+    <string name="admin_badge">Admin</string>
+    <string name="event_image">Event image</string>
+    <string name="time">Time</string>
+    <string name="location_logo">Location logo</string>
+    <string name="label_name">Name:</string>
+    <string name="label_email">Email:</string>
+    <string name="label_password">Password:</string>
+    <string name="placeholder_name"></string>
+    <string name="placeholder_email"></string>
+    <string name="event_management">Event Management</string>
+    <string name="sample_location">Community Centre</string>
+    <string name="sample_organizer">Organizer: XYZ</string>
+    <string name="image_management">Image Management</string>
+    <string name="delete_image">Delete Image</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_finished">Finished</string>
     <string name="add_text_hint">Click to add text</string>
+    <string name="sample_title">Community Sports Day</string>
+    <string name="sample_time">Nov 10, 2:00 PM</string>
+    <string name="sample_status_scheduled">Scheduled</string>
+    <string name="sample_status_in_progress">In Progress</string>
+    <string name="sample_status_finished">Finished</string>
 
 </resources>
