@@ -25,6 +25,7 @@
     <string name="description">Description</string>
     <string name="sample_event_description">This event is open to all students. Bring your student ID to participate.</string>
     <string name="sample_event_counts">Joined: 18 · Waitlist: 42 · Capacity: 30</string>
+
     <string name="my_profile">My Profile</string>
     <string name="log_out">Log Out</string>
     <string name="admin_badge">Admin</string>
@@ -44,4 +45,6 @@
     <string name="status_scheduled">Scheduled</string>
     <string name="status_in_progress">In Progress</string>
     <string name="status_finished">Finished</string>
+    <string name="add_text_hint">Click to add text</string>
+
 </resources>
