@@ -11,6 +11,6 @@ public class LotteryInformationActivity extends AppCompatActivity {
         setContentView(R.layout.lottery_information_screen);
 
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
-        // Add your lottery logic here
+
     }
 }
