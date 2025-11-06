@@ -1,5 +1,6 @@
 package com.example.string_events;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +33,9 @@ public class EventDetailActivity extends AppCompatActivity {
         if (back != null) back.setOnClickListener(v -> finish());
 
         String eventId = getIntent().getStringExtra("event_id");
-        String username = getIntent().getStringExtra("user");
+        // get the username of the app user through shared preferences
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        String username = sharedPreferences.getString("user", null);
         if (eventId == null || username == null || eventId.isEmpty()) { finish(); return; }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -23,15 +23,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.DocumentSnapshot;
-import android.net.Uri;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,9 +44,17 @@ public class MainActivity extends AppCompatActivity {
         String role = getIntent().getStringExtra("role");
         username = getIntent().getStringExtra("user");
 
+        // users that sign in as admins have very different app flows
         if ("admin".equalsIgnoreCase(role)) {
             show(Screen.ADMIN_HOME);
         } else {
+            // this is to store the user's role and their username between activities
+            // it serves as an easier way to access those variables without passing intents through each activity
+            SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("role", "entrant");
+            editor.putString("user", username);
+            editor.apply();
             show(Screen.USER_HOME);
         }
     }
@@ -179,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
             EventItem clicked = data.get(position);
             Intent i = new Intent(MainActivity.this, EventDetailActivity.class);
             i.putExtra("event_id", clicked.id);
-            i.putExtra("user", username);
             startActivity(i);
         });
     }
@@ -215,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             View v = convertView;
             Holder h;
             if (v == null) {
-                v = getLayoutInflater().inflate(R.layout.item_event_card, parent, false);
+                v = getLayoutInflater().inflate(R.layout.item_event, parent, false);
                 h = new Holder();
                 h.imgCover  = v.findViewById(R.id.img_cover);
                 h.tvTitle   = v.findViewById(R.id.tv_title);

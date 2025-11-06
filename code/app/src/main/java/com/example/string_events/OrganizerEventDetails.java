@@ -7,14 +7,14 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class EventDetailsActivity extends AppCompatActivity {
+public class OrganizerEventDetails extends AppCompatActivity {
 
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_details);
+        setContentView(R.layout.org_event_details);
 
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
