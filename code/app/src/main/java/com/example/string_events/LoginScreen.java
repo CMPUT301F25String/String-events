@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -17,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Locale;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginScreen extends AppCompatActivity {
 
     enum Role { USER, ADMIN }
 
@@ -49,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         btnUser.setOnClickListener(v -> setRole(Role.USER));
         btnAdmin.setOnClickListener(v -> setRole(Role.ADMIN));
-        btnSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+        btnSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterScreen.class)));
         btnSignIn.setOnClickListener(view -> signIn());
     }
 

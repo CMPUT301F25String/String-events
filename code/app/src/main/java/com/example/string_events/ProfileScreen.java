@@ -1,6 +1,10 @@
 package com.example.string_events;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +30,7 @@ public class ProfileScreen extends AppCompatActivity {
         TextView logOutTextView = findViewById(R.id.logOut_textView);
         SwitchCompat notificationSwitch = findViewById(R.id.notification_switch);
         ImageView profileImageView = findViewById(R.id.profile_imageView);
+        ImageButton switchRolesButton = findViewById(R.id.switch_roles_button);
         TextView nameTextView = findViewById(R.id.name_textView);
         TextView emailTextView = findViewById(R.id.email_textView);
         ImageView infoImageView = findViewById(R.id.info_imageButton);
@@ -37,6 +42,27 @@ public class ProfileScreen extends AppCompatActivity {
         ImageButton notificationImageButton = findViewById(R.id.btnNotification);
         ImageButton profileImageButton = findViewById(R.id.btnProfile);
 
+        switchRolesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+                // get the current role of the user and switch it to either entrant or organizer
+                String currentRole = sharedPreferences.getString("role", null);
+                assert currentRole != null;
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                if (currentRole.equals("entrant")) {
+                    editor.putString("role", "organizer");
+                    editor.apply();
+                    openOrganizerEventScreen();
+                }
+                else {
+                    editor.putString("role", "organizer");
+                    editor.apply();
+                    openEntrantEventScreen();
+                }
+            }
+        });
 
     }
 
@@ -45,5 +71,17 @@ public class ProfileScreen extends AppCompatActivity {
         ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
         profileEventsRecyclerview.setAdapter(profileEventsAdapter);
         profileEventsRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+    }
+
+    public void openOrganizerEventScreen() {
+        Context context = ProfileScreen.this;
+        Intent myIntent = new Intent(context, OrganizerEventScreen.class);
+        context.startActivity(myIntent);
+    }
+
+    public void openEntrantEventScreen() {
+        Context context = ProfileScreen.this;
+        Intent myIntent = new Intent(context, MainActivity.class);
+        context.startActivity(myIntent);
     }
 }
