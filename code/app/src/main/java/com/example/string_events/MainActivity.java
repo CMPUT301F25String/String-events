@@ -164,29 +164,29 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-    private void loadNotificationsIntoRecycler() {
-        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
-        if (rv == null) return;
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<Notification> data = new ArrayList<>();
-        NotificationAdapter adapter = new NotificationAdapter(this, data);
-        rv.setAdapter(adapter);
-
-        db.collection("notifications")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    data.clear();
-                    for (QueryDocumentSnapshot d : snap) {
-                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
-                        String name = d.getString("eventName");
-                        String imageUrl = d.getString("imageUrl");
-                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
-                        data.add(new Notification(selected, photo, name));
-                    }
-                    adapter.notifyDataSetChanged();
-                });
-    }
+//    private void loadNotificationsIntoRecycler() {
+//        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
+//        if (rv == null) return;
+//        rv.setLayoutManager(new LinearLayoutManager(this));
+//        ArrayList<Notification> data = new ArrayList<>();
+//        NotificationAdapter adapter = new NotificationAdapter(this, data);
+//        rv.setAdapter(adapter);
+//
+//        db.collection("notifications")
+//                .orderBy("createdAt", Query.Direction.DESCENDING)
+//                .get()
+//                .addOnSuccessListener(snap -> {
+//                    data.clear();
+//                    for (QueryDocumentSnapshot d : snap) {
+//                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+//                        String name = d.getString("eventName");
+//                        String imageUrl = d.getString("imageUrl");
+//                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
+//                        data.add(new Notification(selected, photo, name));
+//                    }
+//                    adapter.notifyDataSetChanged();
+//                });
+//    }
 
     private void loadEventsIntoList() {
         final ListView lv = findViewById(R.id.list);

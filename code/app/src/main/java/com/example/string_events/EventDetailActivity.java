@@ -2,8 +2,10 @@ package com.example.string_events;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,7 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EventDetailActivity extends AppCompatActivity {
 
     private boolean fromTest = false;
-    private String eventId;
     private String username;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,9 @@ public class EventDetailActivity extends AppCompatActivity {
         Intent it = getIntent();
         fromTest = it != null && it.getBooleanExtra("fromTest", false);
 
-        eventId = (it != null) ? it.getStringExtra("event_id") : null;
+        assert it != null;
+        String selectedStatus = it.getStringExtra("selectedStatus");
+        String eventId = it.getStringExtra("event_id");
 
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         username = sp.getString("user", null);
@@ -51,7 +54,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 username = "ui-tester";
             }
         }
-        if ((eventId == null || eventId.isEmpty() || username == null) && !fromTest) {
+        if (eventId == null || eventId.isEmpty() || username == null) {
             finish();
             return;
         }
@@ -66,8 +69,26 @@ public class EventDetailActivity extends AppCompatActivity {
                 });
 
         ImageButton applyButton = findViewById(R.id.apply_button);
+        ImageButton acceptInviteButton = findViewById(R.id.accept_invite_button);
+        ImageButton declineInviteButton = findViewById(R.id.decline_invite_button);
 
+        if (selectedStatus != null) {
+            if (selectedStatus.equals("true")) {
+                applyButton.setVisibility(View.GONE);
+                acceptInviteButton.setVisibility(View.VISIBLE);
+                declineInviteButton.setVisibility(View.VISIBLE);
+            }
+            else {
+                applyButton.setVisibility(View.VISIBLE);
+                acceptInviteButton.setVisibility(View.GONE);
+                declineInviteButton.setVisibility(View.GONE);
+            }
+        }
+
+        AtomicBoolean userInEventAttendees = new AtomicBoolean();
         AtomicBoolean userInEventWaitlist = new AtomicBoolean();
+
+        // getting the value of userInEventWaitlist
         DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
         eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -87,6 +108,25 @@ public class EventDetailActivity extends AppCompatActivity {
             }
         }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
 
+        // getting the value of userInEventAttendees
+        eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                @SuppressWarnings("unchecked")
+                List<String> attendeesList = (List<String>) documentSnapshot.get("attendees");
+                if (attendeesList != null && attendeesList.contains(username)) {
+                    Log.d("FirestoreCheck", "already in attendees");
+                    userInEventAttendees.set(true);
+                    applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+                } else {
+                    Log.d("FirestoreCheck", "not in attendees");
+                    userInEventAttendees.set(false);
+                    applyButton.setBackgroundResource(R.drawable.apply_button);
+                }
+            } else {
+                Log.d("FirestoreCheck", "Document does not exist.");
+            }
+        }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
+
         applyButton.setOnClickListener(view -> {
             if (fromTest) {
                 if (!userInEventWaitlist.get()) {
@@ -99,17 +139,49 @@ public class EventDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            if (!userInEventWaitlist.get()) {
+            // user has not applied for this event yet
+            if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
                 eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
                 Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
                 userInEventWaitlist.set(true);
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            } else {
+            }
+            // user has applied for the event and is not an attendee yet (not been accepted yet)
+            else if (userInEventWaitlist.get() && !userInEventAttendees.get()){
                 eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from waitlist!", Toast.LENGTH_SHORT).show();
                 userInEventWaitlist.set(false);
                 applyButton.setBackgroundResource(R.drawable.apply_button);
             }
+            // user is already an attendee and wants to cancel their appearance
+            else if (!userInEventWaitlist.get() && userInEventAttendees.get()){
+                eventDocumentRef.update("attendees", FieldValue.arrayRemove(username));
+                Toast.makeText(EventDetailActivity.this, "Removed from attendees!", Toast.LENGTH_SHORT).show();
+                userInEventAttendees.set(false);
+                applyButton.setBackgroundResource(R.drawable.apply_button);
+            }
+        });
+
+        acceptInviteButton.setOnClickListener(view -> {
+            eventDocumentRef.update("attendees", FieldValue.arrayUnion(username));
+            eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
+            Toast.makeText(EventDetailActivity.this, "Confirmed your attendance!", Toast.LENGTH_SHORT).show();
+            userInEventAttendees.set(true);
+            userInEventWaitlist.set(false);
+            applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+            applyButton.setVisibility(View.VISIBLE);
+            acceptInviteButton.setVisibility(View.GONE);
+            declineInviteButton.setVisibility(View.GONE);
+        });
+
+        declineInviteButton.setOnClickListener(view -> {
+            eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
+            Toast.makeText(EventDetailActivity.this, "Removed from waitlist!", Toast.LENGTH_SHORT).show();
+            userInEventWaitlist.set(false);
+            applyButton.setBackgroundResource(R.drawable.apply_button);
+            applyButton.setVisibility(View.VISIBLE);
+            acceptInviteButton.setVisibility(View.GONE);
+            declineInviteButton.setVisibility(View.GONE);
         });
     }
 
