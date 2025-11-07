@@ -12,8 +12,20 @@
             android:exported="false"/>
 
         <activity
+            android:name=".ImageManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CreateEventScreen"
+            android:exported="false"/>
+
+        <activity
             android:name=".LoginScreen"
             android:exported="false"/>
+
+        <activity
+            android:name=".UiHostActivity"
+            android:exported="false" />
 
         <activity
             android:name=".RegisterScreen"
@@ -61,22 +73,6 @@
         <activity
             android:name=".LotteryInformationActivity"
             android:exported="false" />
-
-        <activity
-            android:name=".OrganizerEventDetails"
-            android:exported="false"/>
-
-        <activity
-            android:name=".CanceledUsersActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".ParticipatingUsersActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".WaitlistUsersActivity"
-            android:exported="false"/>
 
         <activity
             android:name=".AdminEventManagementActivity"
