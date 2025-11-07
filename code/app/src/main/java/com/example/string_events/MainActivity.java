@@ -1,23 +1,29 @@
 package com.example.string_events;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -31,43 +37,40 @@ public class MainActivity extends AppCompatActivity {
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String username;
-    private String fullName;
-    private String email;
-    private Screen currentScreen = Screen.USER_HOME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         String role = getIntent().getStringExtra("role");
-        username = getIntent().getStringExtra("user");
-        fullName = getIntent().getStringExtra("name");
-        email = getIntent().getStringExtra("email");
+        String username = getIntent().getStringExtra("user");
+        String fullName = getIntent().getStringExtra("name");
+        String email = getIntent().getStringExtra("email");
 
-        // users that sign in as admins have very different app flows
-        if ("admin".equalsIgnoreCase(role)) {
-            show(Screen.ADMIN_HOME);
-        } else {
+        if (username != null) {
             // this is to store the user's role and their username between activities
             // it serves as an easier way to access those variables without passing intents through each activity
             SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("role", "entrant");
             editor.putString("user", username);
+            editor.putString("fullName", fullName);
+            editor.putString("email", email);
             editor.apply();
+        }
+
+        // users that sign in as admins have very different app flows
+        if ("admin".equalsIgnoreCase(role)) {
+            show(Screen.ADMIN_HOME);
+        }
+        else {
             show(Screen.USER_HOME);
         }
     }
 
-    private void show(Screen s) {
-        currentScreen = s;
-        switch (s) {
-            case ADMIN_HOME:
-                setContentView(R.layout.admin_dashboard);
-                wireCommon();
-                break;
 
+    private void show(Screen s) {
+        switch (s) {
             case USER_HOME:
                 setContentView(R.layout.events_screen);
                 wireCommon();
@@ -89,9 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 wireCommon();
 
                 Intent profileIntent = new Intent(this, ProfileScreen.class);
-                profileIntent.putExtra("user", username);
-                profileIntent.putExtra("fullName", fullName);
-                profileIntent.putExtra("email", email);
                 startActivity(profileIntent);
 
 
@@ -114,6 +114,29 @@ public class MainActivity extends AppCompatActivity {
 
 //                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
+
+
+            case ADMIN_HOME:
+                setContentView(R.layout.admin_dashboard);
+                wireCommon();
+
+
+                onClick(R.id.btnEvents, () -> {
+                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnImages, () -> {
+                    Intent intent = new Intent(this, AdminImageManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnProfiles, () -> {
+                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
+                });
+
+                break;
+
         }
     }
 
@@ -141,29 +164,29 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-    private void loadNotificationsIntoRecycler() {
-        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
-        if (rv == null) return;
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<Notification> data = new ArrayList<>();
-        NotificationAdapter adapter = new NotificationAdapter(this, data);
-        rv.setAdapter(adapter);
-
-        db.collection("notifications")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    data.clear();
-                    for (QueryDocumentSnapshot d : snap) {
-                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
-                        String name = d.getString("eventName");
-                        String imageUrl = d.getString("imageUrl");
-                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
-                        data.add(new Notification(selected, photo, name));
-                    }
-                    adapter.notifyDataSetChanged();
-                });
-    }
+//    private void loadNotificationsIntoRecycler() {
+//        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
+//        if (rv == null) return;
+//        rv.setLayoutManager(new LinearLayoutManager(this));
+//        ArrayList<Notification> data = new ArrayList<>();
+//        NotificationAdapter adapter = new NotificationAdapter(this, data);
+//        rv.setAdapter(adapter);
+//
+//        db.collection("notifications")
+//                .orderBy("createdAt", Query.Direction.DESCENDING)
+//                .get()
+//                .addOnSuccessListener(snap -> {
+//                    data.clear();
+//                    for (QueryDocumentSnapshot d : snap) {
+//                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+//                        String name = d.getString("eventName");
+//                        String imageUrl = d.getString("imageUrl");
+//                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
+//                        data.add(new Notification(selected, photo, name));
+//                    }
+//                    adapter.notifyDataSetChanged();
+//                });
+//    }
 
     private void loadEventsIntoList() {
         final ListView lv = findViewById(R.id.list);
@@ -179,6 +202,10 @@ public class MainActivity extends AppCompatActivity {
                     data.clear();
                     for (QueryDocumentSnapshot d : snap) {
                         EventItem e = new EventItem();
+                        String imageUrl = d.getString("imageUrl");
+                        if (imageUrl != null) {
+                            e.imageUrl = imageUrl;
+                        }
                         e.id = d.getId();
                         e.title = d.getString("title");
                         e.location = d.getString("location");
@@ -210,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static class EventItem {
+        String imageUrl;
         String id;
         String title;
         String location;
@@ -248,6 +276,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
             EventItem e = getItem(pos);
+            // no image uploaded for event
+            if (e.imageUrl == null) {
+                h.imgCover.setImageResource(R.drawable.no_image_available);
+            }
+            // image uploaded for event and retrieved from database successfully
+            else {
+                Glide.with(MainActivity.this)
+                        .load(e.imageUrl)
+                        .into(h.imgCover);
+            }
             if (h.tvTitle != null) h.tvTitle.setText(e.title == null ? "" : e.title);
             if (h.tvPlace != null) h.tvPlace.setText(e.location == null ? "" : e.location);
             if (h.tvTime != null) {

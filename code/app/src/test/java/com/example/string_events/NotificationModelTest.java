@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 
 public class NotificationModelTest {
 
-    //Simple POJO test for Notification model
     @Test
     public void ctor_and_getters_setters_work() {
-        Notification n = new Notification(false, null, "Event A");
+        // (username, selectedStatus, eventId, eventPhoto, eventName)
+        Notification n = new Notification("alice", false, "N1", null, "Event A");
 
         assertFalse(n.getSelectedStatus());
         assertNull(n.getEventPhoto());
@@ -23,9 +23,10 @@ public class NotificationModelTest {
 
     @Test
     public void toString_contains_key_fields() {
-        Notification n = new Notification(true, null, "Event Z");
+        Notification n = new Notification("bob", true, "N2", null, "Event Z");
         String s = n.toString();
         assertTrue(s.contains("selectedStatus"));
         assertTrue(s.contains("Event Z"));
     }
 }
+

@@ -70,7 +70,6 @@ public class AdminEventAdapterBindingTest {
 
     @Test
     public void backButton_finishesActivity_withoutResumedActivity() {
-        // Ensure we're RESUMED before clicking back
         onView(withId(R.id.list_admin_events)).check(matches(isDisplayed()));
         assertTrue(rule.getScenario().getState() == Lifecycle.State.RESUMED);
 
