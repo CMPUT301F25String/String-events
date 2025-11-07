@@ -1,56 +1,96 @@
 package com.example.string_events;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ImageManagementActivity extends AppCompatActivity {
-
-    private ImageListAdapter adapter;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
+    private ArrayList<AdminImageAdapter.EventImage> eventImages;
+    private AdminImageAdapter.EventImage selectedImage;
+    private AdminImageAdapter adapter;
+    private Button btnDelete;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_image_management_screen);
 
-        ImageButton back = findViewById(R.id.btn_back);
-        back.setOnClickListener(v -> finish());
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+        eventImages = new ArrayList<>();
 
-        // 示例数据：三张相同图片（你后续可替换为真实数据/从数据库读取）
-        List<Integer> images = new ArrayList<>(Arrays.asList(
-                R.drawable.sample_event,
-                R.drawable.sample_event,
-                R.drawable.sample_event
-        ));
+        RecyclerView recycler = findViewById(R.id.recycler_images);
+        recycler.setLayoutManager(new LinearLayoutManager(this));
 
-        ListView listView = findViewById(R.id.image_list_view);
-        adapter = new ImageListAdapter(this, images);
-        listView.setAdapter(adapter);
+        btnDelete = findViewById(R.id.btn_delete);
+        btnDelete.setEnabled(false);
 
-        // 点击选择要删除的图片
-        listView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) ->
-                adapter.setSelectedPosition(position)
-        );
+        adapter = new AdminImageAdapter(this, eventImages, image -> {
+            selectedImage = image;
+            btnDelete.setEnabled(true);
+        });
+        recycler.setAdapter(adapter);
 
-        Button delete = findViewById(R.id.btn_delete);
-        delete.setOnClickListener(v -> {
-            if (adapter.getSelectedPosition() == -1) {
-                Toast.makeText(this, "Please tap an image to select, then delete.", Toast.LENGTH_SHORT).show();
-            } else {
-                adapter.removeSelected();
-                Toast.makeText(this, "Image deleted.", Toast.LENGTH_SHORT).show();
+        ImageButton backButton = findViewById(R.id.btn_back);
+        backButton.setOnClickListener(v -> finish());
+
+        loadImages();
+        setupDeleteButton();
+    }
+
+    private void loadImages() {
+        db.collection("events").get()
+                .addOnSuccessListener(snapshot -> {
+                    eventImages.clear();
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        String id = doc.getId();
+                        String title = doc.getString("title");
+                        String imageUrl = doc.getString("imageUrl");
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            eventImages.add(new AdminImageAdapter.EventImage(id, title, imageUrl));
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed to load images", Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupDeleteButton() {
+        btnDelete.setOnClickListener(v -> {
+            if (selectedImage == null) {
+                Toast.makeText(this, "Select an image first", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            StorageReference ref = storage.getReferenceFromUrl(selectedImage.imageUrl);
+
+            // Delete image from Firebase Storage
+            ref.delete().addOnSuccessListener(unused -> {
+                // Remove imageUrl from Firestore
+                db.collection("events").document(selectedImage.id)
+                        .update("imageUrl", null)
+                        .addOnSuccessListener(unused2 -> {
+                            Toast.makeText(this, "Image deleted successfully", Toast.LENGTH_SHORT).show();
+                            selectedImage = null;
+                            btnDelete.setEnabled(false);
+                            loadImages();
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(this, "Failed to update Firestore", Toast.LENGTH_SHORT).show());
+            }).addOnFailureListener(e ->
+                    Toast.makeText(this, "Failed to delete image from Storage", Toast.LENGTH_SHORT).show());
         });
     }
 }

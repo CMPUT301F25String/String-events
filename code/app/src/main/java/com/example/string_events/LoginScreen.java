@@ -154,7 +154,7 @@ public class LoginScreen extends AppCompatActivity {
                         .addOnSuccessListener(q -> {
                             if (q.isEmpty()) {
                                 setLoading(false);
-                                toast("No account found — create one");
+                                toast("No account found go create one");
                                 return;
                             }
                             handleLoginResult(q.getDocuments().get(0), pass);

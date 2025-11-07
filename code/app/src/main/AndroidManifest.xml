@@ -28,6 +28,27 @@
             android:exported="false" />
 
         <activity
+            android:name=".AdminEventManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminEventDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ImageManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminProfileManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminAllUserProfileActivity"
+            android:exported="false" />
+
+
+        <activity
             android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
@@ -41,8 +62,9 @@
         <activity android:name=".ParticipatingUsersActivity" />
         <activity android:name=".WaitlistUsersActivity" />
         <activity android:name=".LotteryActivity" />
-        <activity android:name=".AdminEventManagementActivity" />
         <activity android:name=".AdminProfileScreen" />
+
+
 
         <activity
             android:name=".EditInformationActivity"

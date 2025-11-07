@@ -66,10 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private void show(Screen s) {
         currentScreen = s;
         switch (s) {
-            case ADMIN_HOME:
-                setContentView(R.layout.admin_dashboard);
-                wireCommon();
-                break;
+
 
             case USER_HOME:
                 setContentView(R.layout.events_screen);
@@ -111,6 +108,29 @@ public class MainActivity extends AppCompatActivity {
 
                 new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
+
+
+            case ADMIN_HOME:
+                setContentView(R.layout.admin_dashboard);
+                wireCommon();
+
+
+                onClick(R.id.btnEvents, () -> {
+                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnImages, () -> {
+                    Intent intent = new Intent(this, ImageManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnProfiles, () -> {
+                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
+                });
+
+                break;
+
         }
     }
 
