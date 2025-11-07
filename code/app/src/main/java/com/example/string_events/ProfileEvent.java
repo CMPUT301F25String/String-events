@@ -1,49 +1,63 @@
 package com.example.string_events;
 
-import android.widget.TextView;
+import android.net.Uri;
+
+import java.time.ZonedDateTime;
 
 public class ProfileEvent {
-    int profileImage;
-    TextView profileName;
-    TextView profileEmail;
-    boolean getNotifications;
+    String profileEventPhotoUrl;
+    String profileEventName;
+    ZonedDateTime profileEventStartDateTime;
+    ZonedDateTime profileEventEndDateTime;
+    String profileEventLocation;
 
-    public ProfileEvent(int profileImage, TextView profileName, TextView profileEmail, boolean getNotifications) {
-        this.profileImage = profileImage;
-        this.profileName = profileName;
-        this.profileEmail = profileEmail;
-        this.getNotifications = getNotifications;
+    public ProfileEvent(String profileEventPhotoUrl, String profileEventName,
+                        ZonedDateTime profileEventStartDateTime, ZonedDateTime profileEventEndDateTime,
+                        String location) {
+        this.profileEventPhotoUrl = profileEventPhotoUrl;
+        this.profileEventName = profileEventName;
+        this.profileEventStartDateTime = profileEventStartDateTime;
+        this.profileEventEndDateTime = profileEventEndDateTime;
+        this.profileEventLocation = location;
     }
 
-    public int getProfileImage() {
-        return profileImage;
+    public String getProfileEventPhotoUrl() {
+        return profileEventPhotoUrl;
     }
 
-    public void setProfileImage(int profileImage) {
-        this.profileImage = profileImage;
+    public void setProfileEventPhotoUrl(String profileEventPhotoUrl) {
+        this.profileEventPhotoUrl = profileEventPhotoUrl;
     }
 
-    public TextView getProfileName() {
-        return profileName;
+    public String getProfileEventName() {
+        return profileEventName;
     }
 
-    public void setProfileName(TextView profileName) {
-        this.profileName = profileName;
+    public void setProfileEventName(String profileEventName) {
+        this.profileEventName = profileEventName;
     }
 
-    public TextView getProfileEmail() {
-        return profileEmail;
+    public ZonedDateTime getProfileEventStartDateTime() {
+        return profileEventStartDateTime;
     }
 
-    public void setProfileEmail(TextView profileEmail) {
-        this.profileEmail = profileEmail;
+    public void setProfileEventStartDateTime(ZonedDateTime profileEventStartDateTime) {
+        this.profileEventStartDateTime = profileEventStartDateTime;
     }
 
-    public boolean isGetNotifications() {
-        return getNotifications;
+    public ZonedDateTime getProfileEventEndDateTime() {
+        return profileEventEndDateTime;
     }
 
-    public void setNotifications(boolean getNotifications) {
-        this.getNotifications = getNotifications;
+    public void setProfileEventEndDateTime(ZonedDateTime profileEventEndDateTime) {
+        this.profileEventEndDateTime = profileEventEndDateTime;
+    }
+
+    public String getProfileEventLocation() {
+        return profileEventLocation;
+    }
+
+    public void setProfileEventLocation(String profileEventLocation) {
+        this.profileEventLocation = profileEventLocation;
     }
 }
