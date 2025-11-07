@@ -9,7 +9,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-/** 匹配 RecyclerView 某一行的根视图。 */
 public class RecyclerViewChildMatcher {
     private final int recyclerId;
 
