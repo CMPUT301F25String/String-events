@@ -46,7 +46,6 @@ public class ProfileScreen extends AppCompatActivity {
         ImageButton cameraButton = findViewById(R.id.btnCamera);
         ImageButton notificationsButton = findViewById(R.id.btnNotification);
 
-
         // get the user's username, full name, and email to be displayed
         Intent intent = getIntent();
         String username = intent.getStringExtra("user");
@@ -61,6 +60,16 @@ public class ProfileScreen extends AppCompatActivity {
         // display name and email immediately
         nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
         emailTextView.setText("Email: " + (email != null ? email : ""));
+
+        logOutTextView.setOnClickListener(view -> {
+            SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+            sp.edit().clear().apply();
+            Intent i = new Intent(ProfileScreen.this, WelcomeActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finishAffinity();
+            overridePendingTransition(0, 0);
+        });
 
         homeButton.setOnClickListener(view -> {
             if (currentRole.equals("entrant")) {

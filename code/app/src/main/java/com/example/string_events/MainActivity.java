@@ -77,21 +77,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case NOTIFICATIONS:
-                setContentView(R.layout.notification_screen);
+//                setContentView(R.layout.notification_screen);
                 wireCommon();
-                onClick(R.id.btnHome, () -> show(Screen.USER_HOME));
-                onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
-                loadNotificationsIntoRecycler();
+                startActivity(new Intent(this, NotificationScreen.class));
+//                onClick(R.id.btnHome, () -> show(Screen.USER_HOME));
+//                onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
+//                loadNotificationsIntoRecycler();
                 break;
 
             case PROFILE:
                 wireCommon();
 
-                Intent intent = new Intent(this, ProfileScreen.class);
-                intent.putExtra("user", username);
-                intent.putExtra("fullName", fullName);
-                intent.putExtra("email", email);
-                startActivity(intent);
+                Intent profileIntent = new Intent(this, ProfileScreen.class);
+                profileIntent.putExtra("user", username);
+                profileIntent.putExtra("fullName", fullName);
+                profileIntent.putExtra("email", email);
+                startActivity(profileIntent);
 
 
 
