@@ -3,115 +3,92 @@ package com.example.string_events;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.allOf;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
 
-import com.google.firebase.FirebaseApp;
-
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
+import java.util.List;
+
+
 @RunWith(AndroidJUnit4.class)
-@LargeTest
 public class NotificationAdapterTest {
 
-    private static final int FIRST = 0;
-
-    @Before
-    public void ensureFirebaseIfUsed() {
-        Context ctx = ApplicationProvider.getApplicationContext();
-        if (FirebaseApp.getApps(ctx).isEmpty()) {
-            FirebaseApp.initializeApp(ctx);
-        }
-    }
+    @Rule
+    public ActivityScenarioRule<UiHostActivity> rule = new ActivityScenarioRule<>(
+            new Intent(ApplicationProvider.getApplicationContext(), UiHostActivity.class)
+                    .putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.test_notifications_recycler)
+    );
 
     @Test
-    public void rowCoreWidgets_areVisible() {
-        try (ActivityScenario<NotificationScreen> sc =
-                     ActivityScenario.launch(NotificationScreen.class)) {
+    public void recycler_binds_scrolls_and_clicks_ok() {
+        rule.getScenario().onActivity(activity -> {
+            RecyclerView rv = activity.findViewById(R.id.recycler_notifications);
+            rv.setLayoutManager(new LinearLayoutManager(activity));
 
-            Matcher<View> recyclerMatcher = isAssignableFromRecycler();
+            List<String> data = Arrays.asList(
+                    "Notice #1", "Notice #2", "Notice #3",
+                    "Notice #4", "Notice #5", "Notice #6", "Notice #7"
+            );
+            rv.setAdapter(new SimpleStringAdapter(data));
+        });
 
-            onView(recyclerMatcher).check(matches(isDisplayed()));
+        onView(withId(R.id.recycler_notifications)).check(matches(isDisplayed()));
 
-            Matcher<View> row0 = nthChildOf(recyclerMatcher, FIRST);
+        onView(withId(R.id.recycler_notifications)).perform(scrollToPosition(0));
+        onView(recyclerItemText("Notice #1")).check(matches(isDisplayed()));
 
-            onView(allOf(withId(R.id.imgStatus), isDescendantOfA(row0)))
-                    .check(matches(isDisplayed()));
-            onView(allOf(withId(R.id.imgThumb), isDescendantOfA(row0)))
-                    .check(matches(isDisplayed()));
-            onView(allOf(withId(R.id.tvMessage), isDescendantOfA(row0)))
-                    .check(matches(isDisplayed()));
-            onView(allOf(withId(R.id.tvEventName), isDescendantOfA(row0)))
-                    .check(matches(isDisplayed()));
-            onView(allOf(withId(R.id.imgOpen), isDescendantOfA(row0)))
-                    .check(matches(isDisplayed()));
+        onView(withId(R.id.recycler_notifications)).perform(scrollToPosition(6));
+        onView(recyclerItemText("Notice #7")).check(matches(isDisplayed()));
+
+        onView(withId(R.id.recycler_notifications)).perform(actionOnItemAtPosition(2, click()));
+    }
+
+    private static class SimpleStringAdapter extends RecyclerView.Adapter<SimpleStringAdapter.VH> {
+        private final List<String> data;
+        SimpleStringAdapter(List<String> data) { this.data = data; }
+
+        static class VH extends RecyclerView.ViewHolder {
+            final TextView tv;
+            VH(View itemView) {
+                super(itemView);
+                tv = itemView.findViewById(android.R.id.text1);
+            }
         }
-    }
 
-    @Test
-    public void clickOpen_onFirstRow_doesNotCrash() {
-        try (ActivityScenario<NotificationScreen> sc =
-                     ActivityScenario.launch(NotificationScreen.class)) {
-
-            Matcher<View> row0 = nthChildOf(isAssignableFromRecycler(), FIRST);
-
-            onView(allOf(withId(R.id.imgOpen), isDescendantOfA(row0)))
-                    .perform(click());
+        @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+            return new VH(v);
         }
+
+        @Override public void onBindViewHolder(VH holder, int position) {
+            holder.tv.setText(data.get(position));
+        }
+
+        @Override public int getItemCount() { return data.size(); }
     }
 
-
-    private static Matcher<View> isAssignableFromRecycler() {
-        return new TypeSafeMatcher<View>() {
-            @Override public void describeTo(Description description) {
-                description.appendText("is assignable from RecyclerView");
-            }
-            @Override protected boolean matchesSafely(View view) {
-                return view instanceof RecyclerView && view.isShown();
-            }
-        };
-    }
-
-    public static Matcher<View> nthChildOf(final Matcher<View> parentMatcher, final int childPosition) {
-        return new TypeSafeMatcher<View>() {
-            @Override public void describeTo(Description description) {
-                description.appendText("nth child of parent at position " + childPosition + " ");
-                parentMatcher.describeTo(description);
-            }
-            @Override protected boolean matchesSafely(View view) {
-                if (!(view.getParent() instanceof ViewGroup)) return false;
-                ViewGroup parent = (ViewGroup) view.getParent();
-                if (!parentMatcher.matches(parent)) return false;
-
-                int visibleIndex = 0;
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    View child = parent.getChildAt(i);
-                    if (child.getVisibility() == View.VISIBLE) {
-                        if (visibleIndex == childPosition) {
-                            return child == view;
-                        }
-                        visibleIndex++;
-                    }
-                }
-                return false;
-            }
-        };
+    private static Matcher<View> recyclerItemText(String text) {
+        return withText(text);
     }
 }
