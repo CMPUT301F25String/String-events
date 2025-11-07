@@ -46,16 +46,13 @@ public class ProfileScreen extends AppCompatActivity {
         ImageButton cameraButton = findViewById(R.id.btnCamera);
         ImageButton notificationsButton = findViewById(R.id.btnNotification);
 
-        // get the user's username, full name, and email to be displayed
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("user");
-        String fullName = intent.getStringExtra("fullName");
-        String email = intent.getStringExtra("email");
-
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
-        // get the current role of the user and switch it to either entrant or organizer
+        // get the user's role, username, full name, and email to be displayed
         String currentRole = sharedPreferences.getString("role", null);
         assert currentRole != null;
+        String username = sharedPreferences.getString("user", null);
+        String fullName = sharedPreferences.getString("fullName", null);
+        String email = sharedPreferences.getString("email", null);
 
         // display name and email immediately
         nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
@@ -92,7 +89,7 @@ public class ProfileScreen extends AppCompatActivity {
                 editor.apply();
                 openOrganizerEventScreen();
             } else {
-                editor.putString("role", "organizer");
+                editor.putString("role", "entrant");
                 editor.apply();
                 openEntrantEventScreen();
             }
@@ -152,11 +149,13 @@ public class ProfileScreen extends AppCompatActivity {
 
     public void openOrganizerEventScreen() {
         Intent myIntent = new Intent(ProfileScreen.this, OrganizerEventScreen.class);
+        finish();
         startActivity(myIntent);
     }
 
     public void openEntrantEventScreen() {
         Intent myIntent = new Intent(ProfileScreen.this, MainActivity.class);
+        finish();
         startActivity(myIntent);
     }
 }
