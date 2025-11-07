@@ -22,7 +22,7 @@
             android:id="@+id/btn_back"
             style="@style/BackButtonStyle"
             android:contentDescription="@string/back"
-            android:src="@drawable/backbutton"
+            android:src="@drawable/back_button"
             android:padding="0dp"
             android:layout_marginStart="0dp"/>
 

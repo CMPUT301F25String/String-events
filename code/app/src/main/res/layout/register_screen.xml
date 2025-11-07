@@ -36,7 +36,7 @@
         app:title="Register"
         app:titleCentered="true"
         app:titleTextColor="#222222"
-        app:navigationIcon="@drawable/backbutton"
+        app:navigationIcon="@drawable/back_button"
         app:navigationIconTint="#9E9E9E" />
 
         <LinearLayout

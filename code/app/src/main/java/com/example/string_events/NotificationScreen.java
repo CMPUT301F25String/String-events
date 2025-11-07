@@ -1,7 +1,9 @@
 package com.example.string_events;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +28,16 @@ public class NotificationScreen extends AppCompatActivity {
         ImageButton cameraImageButton = findViewById(R.id.btnCamera);
         ImageButton notificationImageButton = findViewById(R.id.btnNotification);
         ImageButton profileImageButton = findViewById(R.id.btnProfile);
+
+        homeImageButton.setOnClickListener(view -> {
+            Intent intent = new Intent(NotificationScreen.this, MainActivity.class);
+            startActivity(intent);
+        });
+
+        profileImageButton.setOnClickListener(view -> {
+            Intent intent = new Intent(NotificationScreen.this, ProfileScreen.class);
+            startActivity(intent);
+        });
 
 //        // testing data
 //        notificationsList = new ArrayList<>();

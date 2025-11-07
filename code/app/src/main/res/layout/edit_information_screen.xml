@@ -24,7 +24,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/backbutton"
+            android:src="@drawable/back_button"
             app:tint="@null"
             android:contentDescription="@string/back" />
 

@@ -26,7 +26,7 @@
             android:layout_height="28dp"
             android:layout_marginStart="6dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/backbutton"
+            android:src="@drawable/back_button"
             android:contentDescription="@string/back"
             android:scaleType="centerInside" />
 

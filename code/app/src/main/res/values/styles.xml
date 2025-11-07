@@ -18,7 +18,7 @@
         <item name="android:layout_height">24dp</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:contentDescription">@string/back</item>
-        <item name="android:src">@drawable/backbutton</item>
+        <item name="android:src">@drawable/back_button</item>
     </style>
     <style name="YellowRoundedButton" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">match_parent</item>
