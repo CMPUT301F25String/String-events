@@ -23,7 +23,7 @@
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="16dp"
-            android:src="@drawable/backbutton" />
+            android:src="@drawable/back_button" />
 
         <TextView
             android:layout_width="wrap_content"

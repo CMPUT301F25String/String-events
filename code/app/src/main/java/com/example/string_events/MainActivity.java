@@ -63,10 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private void show(Screen s) {
         currentScreen = s;
         switch (s) {
-            case ADMIN_HOME:
-                setContentView(R.layout.admin_dashboard);
-                wireCommon();
-                break;
+
 
             case USER_HOME:
                 setContentView(R.layout.events_screen);
@@ -77,21 +74,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case NOTIFICATIONS:
-                setContentView(R.layout.notification_screen);
+//                setContentView(R.layout.notification_screen);
                 wireCommon();
-                onClick(R.id.btnHome, () -> show(Screen.USER_HOME));
-                onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
-                loadNotificationsIntoRecycler();
+                startActivity(new Intent(this, NotificationScreen.class));
+//                onClick(R.id.btnHome, () -> show(Screen.USER_HOME));
+//                onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
+//                loadNotificationsIntoRecycler();
                 break;
 
             case PROFILE:
                 wireCommon();
 
-                Intent intent = new Intent(this, ProfileScreen.class);
-                intent.putExtra("user", username);
-                intent.putExtra("fullName", fullName);
-                intent.putExtra("email", email);
-                startActivity(intent);
+                Intent profileIntent = new Intent(this, ProfileScreen.class);
+                profileIntent.putExtra("user", username);
+                profileIntent.putExtra("fullName", fullName);
+                profileIntent.putExtra("email", email);
+                startActivity(profileIntent);
 
 
 
@@ -113,6 +111,29 @@ public class MainActivity extends AppCompatActivity {
 
 //                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
+
+
+            case ADMIN_HOME:
+                setContentView(R.layout.admin_dashboard);
+                wireCommon();
+
+
+                onClick(R.id.btnEvents, () -> {
+                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnImages, () -> {
+                    Intent intent = new Intent(this, ImageManagementActivity.class);
+                    startActivity(intent);
+                });
+
+                onClick(R.id.btnProfiles, () -> {
+                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
+                });
+
+                break;
+
         }
     }
 

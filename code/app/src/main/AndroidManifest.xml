@@ -75,12 +75,37 @@
             android:exported="false" />
 
         <activity
+            android:name=".CreateEventScreen"
+            android:exported="false"/>
+
+        <activity
             android:name=".AdminEventManagementActivity"
             android:exported="false"/>
 
         <activity
             android:name=".AdminProfileScreen"
             android:exported="false"/>
+
+        <activity
+            android:name=".AdminEventManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminEventDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ImageManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminProfileManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminAllUserProfileActivity"
+            android:exported="false" />
+
 
         <activity
             android:name=".WelcomeActivity"
@@ -90,6 +115,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".OrganizerEventDetails" />
+        <activity android:name=".CanceledUsersActivity" />
+        <activity android:name=".ParticipatingUsersActivity" />
+        <activity android:name=".WaitlistUsersActivity" />
+        <activity android:name=".LotteryDrawActivity" />
+        <activity android:name=".AdminProfileScreen" />
+
+        <activity
+            android:name=".EditInformationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".LotteryInformationActivity"
+            android:exported="false" />
 
     </application>
 </manifest>
