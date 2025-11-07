@@ -16,10 +16,6 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.action.GeneralLocation;
-import androidx.test.espresso.action.GeneralSwipeAction;
-import androidx.test.espresso.action.Press;
-import androidx.test.espresso.action.Swipe;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.FirebaseApp;
@@ -36,7 +32,7 @@ public class EventDetailActivityTest {
         Context ctx = ApplicationProvider.getApplicationContext();
         return new Intent(ctx, EventDetailActivity.class)
                 .putExtra("fromTest", true)
-                .putExtra("event_id", "test-event"); // 与 Activity 一致
+                .putExtra("event_id", "test-event");
     }
 
     @Before
@@ -47,37 +43,31 @@ public class EventDetailActivityTest {
         sp.edit().putString("user", "ui-tester").apply();
     }
 
-    // 等待窗口获得焦点 & 稍作 idle
-    private static ViewAction waitForWindowFocus(final long timeoutMs) {
+//    // 等待窗口获得焦点 & 稍作 idle
+    private static ViewAction waitForWindowFocus() {
         return new ViewAction() {
             @Override public Matcher<View> getConstraints() { return isRoot(); }
             @Override public String getDescription() { return "wait for window focus"; }
             @Override public void perform(UiController ui, View view) {
-                long end = System.currentTimeMillis() + timeoutMs;
+                long end = System.currentTimeMillis() + (long) 4000;
                 while (!view.getRootView().hasWindowFocus() && System.currentTimeMillis() < end) {
                     ui.loopMainThreadForAtLeast(50);
                 }
             }
         };
     }
-    private static ViewAction waitForIdle(final long ms) {
+    private static ViewAction waitForIdle() {
         return new ViewAction() {
             @Override public Matcher<View> getConstraints() { return isRoot(); }
             @Override public String getDescription() { return "wait for idle"; }
             @Override public void perform(UiController ui, View view) {
-                ui.loopMainThreadForAtLeast(ms);
+                ui.loopMainThreadForAtLeast(200);
             }
         };
     }
     private void ensureReady() {
-        onView(isRoot()).perform(waitForWindowFocus(4000));
-        onView(isRoot()).perform(waitForIdle(200));
-    }
-
-    private void swipeUp() {
-        onView(isRoot()).perform(new GeneralSwipeAction(
-                Swipe.SLOW, GeneralLocation.BOTTOM_CENTER,
-                GeneralLocation.TOP_CENTER, Press.FINGER));
+        onView(isRoot()).perform(waitForWindowFocus());
+        onView(isRoot()).perform(waitForIdle());
     }
 
     @Test
@@ -90,11 +80,9 @@ public class EventDetailActivityTest {
             onView(withId(R.id.ivEventImage)).check(matches(isDisplayed()));
             onView(withId(R.id.spots_taken)).check(matches(isDisplayed()));
             onView(withId(R.id.waiting_list)).check(matches(isDisplayed()));
-            swipeUp();
             onView(withId(R.id.tvDateLine)).check(matches(isDisplayed()));
             onView(withId(R.id.tvTimeLine)).check(matches(isDisplayed()));
             onView(withId(R.id.tvAddress)).check(matches(isDisplayed()));
-            swipeUp();
             onView(withId(R.id.tvDescription)).check(matches(isDisplayed()));
             onView(withId(R.id.apply_button)).check(matches(isDisplayed()));
         }
@@ -112,10 +100,8 @@ public class EventDetailActivityTest {
     public void applyButton_doesNotCrash() {
         try (ActivityScenario<EventDetailActivity> sc = ActivityScenario.launch(makeIntent())) {
             ensureReady();
-            swipeUp();
             onView(withId(R.id.apply_button)).perform(click());
-            // 点击后不给 Toast，窗口始终保持焦点；再稍微等一下稳定
-            onView(isRoot()).perform(waitForIdle(200));
+            onView(isRoot()).perform(waitForIdle());
         }
     }
 }

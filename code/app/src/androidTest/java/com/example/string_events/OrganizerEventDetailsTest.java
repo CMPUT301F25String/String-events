@@ -2,7 +2,6 @@ package com.example.string_events;
 
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -15,7 +14,6 @@ import android.content.Intent;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.NoActivityResumedException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -39,7 +37,7 @@ public class OrganizerEventDetailsTest {
                 .putExtra("eventId", "evt-test-001");
     }
 
-    private static ViewAction waitMs(long ms) {
+    private static ViewAction waitMs() {
         return new ViewAction() {
             @Override
             public Matcher<android.view.View> getConstraints() {
@@ -48,18 +46,18 @@ public class OrganizerEventDetailsTest {
 
             @Override
             public String getDescription() {
-                return "wait " + ms + "ms";
+                return "wait " + (long) 120 + "ms";
             }
 
             @Override
             public void perform(UiController ui, android.view.View v) {
-                ui.loopMainThreadForAtLeast(ms);
+                ui.loopMainThreadForAtLeast(120);
             }
         };
     }
 
     private static void idle() {
-        onView(isRoot()).perform(waitMs(120));
+        onView(isRoot()).perform(waitMs());
     }
 
     @Before
@@ -93,38 +91,26 @@ public class OrganizerEventDetailsTest {
 
     @Test
     public void clickButtons_doNotCrash() {
+        // this test takes a long time (around 1 min)
         try (ActivityScenario<OrganizerEventDetails> sc =
                      ActivityScenario.launch(makeIntent())) {
-            idle();
-
-            // Roll
             clickIfExistsByIds(R.id.btnRoll);
-
-            // Canceled / Cancel / Cancelled
             clickIfExistsByIdsOrNames(
                     new int[]{R.id.btnCanceled},
                     new String[]{"btnCancel", "btnCancelled"}
             );
-
-            // Participating / Participants / Participate
             clickIfExistsByIdsOrNames(
                     new int[]{R.id.btnParticipating},
                     new String[]{"btnParticipants", "btnParticipate"}
             );
-
-            // Waitlist / WaitingList
             clickIfExistsByIdsOrNames(
                     new int[]{R.id.btnWaitlist},
                     new String[]{"btnWaitingList"}
             );
-
-            // WaitlistMap / WaitingMap / Map
             clickIfExistsByIdsOrNames(
                     new int[]{R.id.btnWaitlistMap},
                     new String[]{"btnWaitingMap", "btnMap"}
             );
-
-            idle();
         }
     }
 

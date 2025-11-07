@@ -44,8 +44,8 @@ public class AdminEventManagementActivityTest {
     @Test
     public void showsBasicUi() {
         onView(withId(R.id.btn_back)).check(matches(isDisplayed()));
-        onView(withId(R.id.tv_title)).check(matches(isDisplayed()));
-        onView(withId(R.id.list_admin_events)).check(matches(isDisplayed()));
+        onView(withId(R.id.event_management_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.recyclerView)).check(matches(isDisplayed()));
     }
 }
 
