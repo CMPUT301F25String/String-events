@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 public class NotificationModelTest {
 
+    //Simple POJO test for Notification model
     @Test
     public void ctor_and_getters_setters_work() {
         Notification n = new Notification(false, null, "Event A");

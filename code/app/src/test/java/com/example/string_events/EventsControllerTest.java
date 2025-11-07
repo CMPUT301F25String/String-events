@@ -1,38 +1,80 @@
 package com.example.string_events;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import java.util.*;
 
-public class EventsControllerTest {
+import static org.junit.Assert.*;
 
+public class EventsControllerTest {
+    // all passed
     @Test
-    public void updateTitle_persists() {
+    public void updateTitle_persists_to_repository() {
         InMemoryRepo repo = new InMemoryRepo();
         Event e = TestFactory.event("Old");
         repo.save(e);
 
-        EventEditor editor = new EventEditor(repo);
+        SimpleEventEditor editor = new SimpleEventEditor(repo);
         editor.updateTitle(e.getEventId(), "New");
 
-        assertEquals("New", repo.getById(e.getEventId()).getTitle());
+        Event saved = repo.getById(e.getEventId());
+        assertNotNull(saved);
+        assertEquals("New", saved.getTitle());
     }
 
-    // Minimal controller + repo for unit test
-    static final class EventEditor {
-        private final InMemoryRepo repo;
-        EventEditor(InMemoryRepo repo) { this.repo = repo; }
-        void updateTitle(String id, String title) {
-            Event e = repo.getById(id);
-            e.setTitle(title);
-            repo.save(e);
-        }
+    //Failure path: unknown id
+    @Test(expected = NullPointerException.class)
+    public void updateTitle_withUnknownId_throws() {
+        InMemoryRepo repo = new InMemoryRepo();
+        SimpleEventEditor editor = new SimpleEventEditor(repo);
+        editor.updateTitle("missing-id", "New");
     }
 
+    //Edge cases: invalid args OR unknown id
+    @Test
+    public void updateTitle_withInvalidArgs_orUnknownId_returnsFalse_andNoChange() {
+        InMemoryRepo repo = new InMemoryRepo();
+        Event e = TestFactory.event("Old");
+        repo.save(e);
+
+        SafeEventEditor editor = new SafeEventEditor(repo);
+
+        assertFalse(editor.updateTitle(null, "X"));
+        assertFalse(editor.updateTitle(e.getEventId(), null));
+        assertFalse(editor.updateTitle(e.getEventId(), ""));
+        assertFalse(editor.updateTitle("missing", "X"));
+
+        assertEquals("Old", repo.getById(e.getEventId()).getTitle());
+    }
+
+    //JVM tests
     static final class InMemoryRepo {
         private final Map<String, Event> store = new HashMap<>();
         Event getById(String id) { return store.get(id); }
         void save(Event e) { store.put(e.getEventId(), e); }
+    }
+
+    static final class SimpleEventEditor {
+        private final InMemoryRepo repo;
+        SimpleEventEditor(InMemoryRepo repo) { this.repo = repo; }
+        void updateTitle(String id, String newTitle) {
+            Event e = repo.getById(id);
+            e.setTitle(newTitle);
+            repo.save(e);
+        }
+    }
+
+    static final class SafeEventEditor {
+        private final InMemoryRepo repo;
+        SafeEventEditor(InMemoryRepo repo) { this.repo = repo; }
+        boolean updateTitle(String id, String newTitle) {
+            if (id == null || newTitle == null || newTitle.isEmpty()) return false;
+            Event e = repo.getById(id);
+            if (e == null) return false;
+            e.setTitle(newTitle);
+            repo.save(e);
+            return true;
+        }
     }
 
     static final class TestFactory {
