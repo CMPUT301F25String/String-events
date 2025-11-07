@@ -7,7 +7,7 @@
 * Ao Lu（alu9）
 
 * [Team Meetings](https://github.com/CMPUT301F25String/String-events/wiki/Team-Meetings)
-
+* [App Description](https://github.com/CMPUT301F25String/String-events/wiki/App-Description)
 
 #
 **Project Part 2 Deliverables**
