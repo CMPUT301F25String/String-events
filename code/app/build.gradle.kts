@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-
     id("com.google.gms.google-services")
 }
 
@@ -14,6 +13,8 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -26,12 +27,10 @@ android {
         }
     }
 
-    // <- This fixes Java 8+ language features (lambdas, etc) in your Java code
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
 }
 
 dependencies {
@@ -44,9 +43,19 @@ dependencies {
     implementation(libs.firebase.common)
     implementation(libs.recyclerview)
     implementation(libs.firebase.storage)
-    // these dependencies are for loading the image from the database back into the app
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    debugImplementation ("androidx.fragment:fragment-testing:1.6.2")
+    debugImplementation       ("androidx.fragment:fragment-testing:1.6.2")
+
+    testImplementation("junit:junit:4.13.2")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.12.2")
     testImplementation("androidx.test:core:1.6.1")
