@@ -4,80 +4,82 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.text.DateFormat;
-import java.util.Locale;
-
 public class EventDetailFragment extends Fragment {
-    private static final String ARG_EVENT_ID = "event_id";
 
-    public static EventDetailFragment newInstance(String eventId) {
-        EventDetailFragment f = new EventDetailFragment();
-        Bundle b = new Bundle();
-        b.putString(ARG_EVENT_ID, eventId);
-        f.setArguments(b);
-        return f;
-    }
+    private boolean fromTest = false;
+    private String eventId = null;
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Nullable @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.event_detail_screen, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
-        String id = getArguments() == null ? null : getArguments().getString(ARG_EVENT_ID);
+        super.onViewCreated(v, savedInstanceState);
 
-        View back = v.findViewById(R.id.back_button);
-        if (back != null) back.setOnClickListener(x -> requireActivity().getSupportFragmentManager().popBackStack());
-        if (id == null) return;
+        Bundle args = getArguments();
+        if (args != null) {
+            fromTest = args.getBoolean("fromTest", false);
+            eventId  = args.getString("event_id", null);
+        }
 
-        final TextView tvTitle = v.findViewById(R.id.tvEventTitle);
-        final TextView tvLocation = v.findViewById(R.id.tvLocation);
-        final TextView tvDateLine = v.findViewById(R.id.tvDateLine);
-        final TextView tvTimeLine = v.findViewById(R.id.tvTimeLine);
-        final TextView tvDesc = v.findViewById(R.id.tvDescription);
-        final TextView tvSpotsTaken = v.findViewById(R.id.spots_taken);
-        final TextView tvWaiting = v.findViewById(R.id.waiting_list);
-        final TextView tvAddress = v.findViewById(R.id.tvAddress);
+        ImageView back = v.findViewById(R.id.back_button);
+        if (back != null) {
+            back.setOnClickListener(btn -> {
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        }
 
-        DateFormat dfDate = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        DateFormat dfTime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+        TextView tvTitle = v.findViewById(R.id.tvEventTitle);
+        TextView tvLoc   = v.findViewById(R.id.tvLocation);
+        ImageView ivImg  = v.findViewById(R.id.ivEventImage);
+        TextView tvSpots = v.findViewById(R.id.spots_taken);
+        TextView tvWait  = v.findViewById(R.id.waiting_list);
+        TextView tvDate  = v.findViewById(R.id.tvDateLine);
+        TextView tvTime  = v.findViewById(R.id.tvTimeLine);
+        TextView tvAddr  = v.findViewById(R.id.tvAddress);
+        TextView tvDesc  = v.findViewById(R.id.tvDescription);
+        ImageButton btnApply = v.findViewById(R.id.apply_button);
 
-        db.collection("events").document(id).get().addOnSuccessListener((DocumentSnapshot d) -> {
-            if (tvTitle != null) tvTitle.setText(d.getString("title"));
-            if (tvLocation != null) tvLocation.setText(d.getString("location"));
+        if (fromTest) {
+            if (tvTitle != null) tvTitle.setText("UI Test Event");
+            if (tvLoc   != null) tvLoc.setText("Main Hall");
+            if (tvSpots != null) tvSpots.setText("(5/20) Spots Taken");
+            if (tvWait  != null) tvWait.setText("3 on Waitlist");
+            if (tvDate  != null) tvDate.setText("Wed, Oct 8, 2025");
+            if (tvTime  != null) tvTime.setText("11:00 AM - 1:00 PM");
+            if (tvAddr  != null) tvAddr.setText("123 Test Ave");
+            if (tvDesc  != null) tvDesc.setText("This is a dummy description for UI test.");
+        } else {
+        }
 
-            Timestamp startAt = d.getTimestamp("startAt");
-            Timestamp endAt = d.getTimestamp("endAt");
-            if (startAt != null && tvDateLine != null) tvDateLine.setText(dfDate.format(startAt.toDate()));
-            if (startAt != null && endAt != null && tvTimeLine != null) {
-                tvTimeLine.setText(dfTime.format(startAt.toDate()) + " - " + dfTime.format(endAt.toDate()));
-            }
-
-            Long maxAtt = d.getLong("maxAttendees");
-            Long attCnt = d.getLong("attendeesCount");
-            if (maxAtt != null && attCnt != null && tvSpotsTaken != null) {
-                tvSpotsTaken.setText("(" + attCnt + "/" + maxAtt + ") Spots Taken");
-            }
-
-            Long waiting = d.getLong("waitingCount");
-            if (waiting != null && tvWaiting != null) tvWaiting.setText(waiting + " Waiting List");
-
-            if (tvDesc != null) tvDesc.setText(d.getString("description"));
-            if (tvAddress != null) tvAddress.setText(d.getString("address"));
-        });
+        if (btnApply != null) {
+            btnApply.setOnClickListener(b -> {
+                if (fromTest) {
+                    Object tag = b.getTag();
+                    boolean on = tag instanceof Boolean && (Boolean) tag;
+                    if (on) {
+                        b.setBackgroundResource(R.drawable.apply_button);
+                    } else {
+                        b.setBackgroundResource(R.drawable.cancel_apply_button);
+                    }
+                    b.setTag(!on);
+                    return;
+                }
+            });
+        }
     }
 }

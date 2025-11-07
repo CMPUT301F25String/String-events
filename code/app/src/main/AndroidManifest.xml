@@ -12,8 +12,20 @@
             android:exported="false"/>
 
         <activity
+            android:name=".ImageManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CreateEventScreen"
+            android:exported="false"/>
+
+        <activity
             android:name=".LoginScreen"
             android:exported="false"/>
+
+        <activity
+            android:name=".UiHostActivity"
+            android:exported="false" />
 
         <activity
             android:name=".RegisterScreen"
