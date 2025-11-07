@@ -6,23 +6,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class ProfileScreen extends AppCompatActivity {
 
-    ArrayList<ProfileEvent> profileEventsList;
+    ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -128,7 +133,32 @@ public class ProfileScreen extends AppCompatActivity {
                     .addOnFailureListener(e ->
                             Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
-
+        // setup recyclerview in profile screen with events
+        if (username != null && !username.isEmpty()) {
+            db.collection("events")
+                    .whereArrayContains("waitlist", username)
+                    // .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap.isEmpty()) {
+                            Log.d("Firestore", "no events found with waitlists that contain user:" + username);
+                        }
+                        for (QueryDocumentSnapshot d : snap) {
+                            String imageUrl = d.getString("imageUrl");
+                            String name = d.getString("title");
+                            // String startDateTime = d.getString("startAt");
+                            // String endDateTime = d.getString("endAt");
+                            String location = d.getString("location");
+                            ProfileEvent profileEvent = new ProfileEvent(imageUrl, name, null, null, location);
+                            profileEventsList.add(profileEvent);
+                        }
+                        setupRecyclerView(profileEventsList);
+                    })
+                    .addOnFailureListener(e -> {
+                        // It's crucial to handle query failures
+                        Log.e("Firestore", "error getting waitlisted events", e);
+                    });
+        }
     }
 
     public void openNotificationsScreen() {
@@ -157,5 +187,12 @@ public class ProfileScreen extends AppCompatActivity {
         Intent myIntent = new Intent(ProfileScreen.this, MainActivity.class);
         finish();
         startActivity(myIntent);
+    }
+
+    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList) {
+        RecyclerView profileEventRecyclerview = findViewById(R.id.profile_events_recyclerView);
+        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
+        profileEventRecyclerview.setAdapter(profileEventsAdapter);
+        profileEventRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }
 }
