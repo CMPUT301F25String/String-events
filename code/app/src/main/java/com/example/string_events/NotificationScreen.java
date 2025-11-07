@@ -1,6 +1,7 @@
 package com.example.string_events;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +30,10 @@ public class NotificationScreen extends AppCompatActivity {
         ImageButton notificationImageButton = findViewById(R.id.btnNotification);
         ImageButton profileImageButton = findViewById(R.id.btnProfile);
 
+        // get the username of the user using the app
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        String username = sharedPreferences.getString("user", null);
+
         homeImageButton.setOnClickListener(view -> {
             Intent intent = new Intent(NotificationScreen.this, MainActivity.class);
             startActivity(intent);
@@ -48,16 +53,18 @@ public class NotificationScreen extends AppCompatActivity {
 
         ArrayList<Notification> notificationsList = new ArrayList<>();
         db.collection("notifications")
+                .whereEqualTo("username", username)
 //                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(snap -> {
                     notificationsList.clear();
                     for (QueryDocumentSnapshot d : snap) {
                         boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+                        String eventId = d.getString("eventId");
                         String name = d.getString("eventName");
                         String imageUrl = d.getString("imageUrl");
                         Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
-                        notificationsList.add(new Notification(selected, photo, name));
+                        notificationsList.add(new Notification(username, selected, eventId, photo, name));
                     }
                     setupRecyclerView(notificationsList);
                 });

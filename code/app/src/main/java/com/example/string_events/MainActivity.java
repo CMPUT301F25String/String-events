@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private String username;
     private String fullName;
     private String email;
+    private Screen currentScreen = Screen.USER_HOME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void show(Screen s) {
+        currentScreen = s;
         switch (s) {
             case ADMIN_HOME:
                 setContentView(R.layout.admin_dashboard);

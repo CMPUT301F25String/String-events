@@ -25,6 +25,7 @@ public class Event {
     boolean geolocationRequirement;
     boolean visibility;
 
+    ArrayList<User> attendees;
     ArrayList<User> waitlist;
 
     public Event(String eventCreator, String title, Uri photo, String description, ArrayList<String> tags,
@@ -48,6 +49,7 @@ public class Event {
 
         // generates a unique random id for the new event
         this.eventId = UUID.randomUUID().toString();
+        this.attendees = new ArrayList<>(); // when creating a new event, an empty attendees list is created
         this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created
     }
 

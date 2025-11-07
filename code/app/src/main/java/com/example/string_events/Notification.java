@@ -5,14 +5,26 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 
 public class Notification {
+    String username;
     boolean selectedStatus;
+    String eventId;
     Uri eventPhoto; // eventPhoto needs to be of type Uri because it is a user uploaded image
     String eventName;
 
-    public Notification(boolean selectedStatus, Uri eventPhoto, String eventName) {
+    public Notification(String username, boolean selectedStatus, String eventId, Uri eventPhoto, String eventName) {
+        this.username = username;
         this.selectedStatus = selectedStatus;
+        this.eventId = eventId;
         this.eventPhoto = eventPhoto;
         this.eventName = eventName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public boolean getSelectedStatus() {
@@ -21,6 +33,14 @@ public class Notification {
 
     public void setSelectedStatus(boolean selectedStatus) {
         this.selectedStatus = selectedStatus;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public Uri getEventPhoto() {
