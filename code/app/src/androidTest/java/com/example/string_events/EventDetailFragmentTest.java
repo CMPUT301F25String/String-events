@@ -108,7 +108,7 @@ public class EventDetailFragmentTest {
     public void apply_doesNotCrash() {
         try (FragmentScenario<EventDetailFragment> ignored = launch()) {
             ensureReady();
-            swipeToReveal(R.id.apply_button, 4); // 把按钮“滚”到屏幕中
+            swipeToReveal(R.id.apply_button, 4);
             onView(withId(R.id.apply_button)).perform(click());
             onView(isRoot()).perform(waitForIdle(150));
         }
