@@ -12,7 +12,7 @@
             android:exported="false"/>
 
         <activity
-            android:name=".ImageManagementActivity"
+            android:name=".AdminImageManagementActivity"
             android:exported="false" />
 
         <activity
@@ -95,7 +95,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ImageManagementActivity"
+            android:name=".AdminImageManagementActivity"
             android:exported="false" />
 
         <activity
@@ -106,7 +106,6 @@
             android:name=".AdminAllUserProfileActivity"
             android:exported="false" />
 
-
         <activity
             android:name=".WelcomeActivity"
             android:exported="true">
@@ -115,21 +114,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".OrganizerEventDetails" />
-        <activity android:name=".CanceledUsersActivity" />
-        <activity android:name=".ParticipatingUsersActivity" />
-        <activity android:name=".WaitlistUsersActivity" />
-        <activity android:name=".LotteryDrawActivity" />
-        <activity android:name=".AdminProfileScreen" />
-
-        <activity
-            android:name=".EditInformationActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".LotteryInformationActivity"
-            android:exported="false" />
 
     </application>
 </manifest>

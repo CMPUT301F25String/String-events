@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 onClick(R.id.btnImages, () -> {
-                    Intent intent = new Intent(this, ImageManagementActivity.class);
+                    Intent intent = new Intent(this, AdminImageManagementActivity.class);
                     startActivity(intent);
                 });
 

@@ -3,7 +3,6 @@ package com.example.string_events;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,7 +31,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_event_detail_screen);
+        setContentView(R.layout.admin_event_details_screen);
 
         // Initialize Firestore and get event ID
         db = FirebaseFirestore.getInstance();

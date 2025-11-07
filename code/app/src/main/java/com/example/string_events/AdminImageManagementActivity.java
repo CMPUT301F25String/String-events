@@ -13,7 +13,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 
-public class ImageManagementActivity extends AppCompatActivity {
+public class AdminImageManagementActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseStorage storage;
     private ArrayList<AdminImageAdapter.EventImage> eventImages;

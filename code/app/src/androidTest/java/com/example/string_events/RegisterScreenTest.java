@@ -67,6 +67,7 @@ public class RegisterScreenTest {
 
     @Test
     public void clickSignIn_doNotCrash_andBackSafe() {
+        // this test takes a long time to complete (around 45 seconds)
         try (ActivityScenario<RegisterScreen> sc = ActivityScenario.launch(makeIntent())) {
             onView(withId(R.id.btnSignIn)).perform(click());
             try { pressBack(); } catch (Throwable ignored) {}

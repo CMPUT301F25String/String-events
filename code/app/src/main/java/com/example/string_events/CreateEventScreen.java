@@ -263,6 +263,7 @@ public class CreateEventScreen extends AppCompatActivity {
         doc.put("regEndAt", Date.from(event.getRegistrationEndDateTime().toInstant()));
         doc.put("attendeesCount", -1);
         doc.put("maxAttendees", event.getMaxAttendees());
+        doc.put("waitlist", event.getWaitlist()); // when creating a new event, this waitlist is empty
         doc.put("waitlistLimit", event.getWaitlistLimit());
         doc.put("geolocationReq", event.getGeolocationRequirement());
         doc.put("visibility", event.getEventVisibility());

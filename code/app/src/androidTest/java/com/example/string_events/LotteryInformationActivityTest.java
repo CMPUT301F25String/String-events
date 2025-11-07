@@ -31,14 +31,14 @@ public class LotteryInformationActivityTest {
                 .putExtra("fromTest", true);
     }
 
-    private static ViewAction waitMs(long ms) {
+    private static ViewAction waitMs() {
         return new ViewAction() {
             @Override public Matcher<View> getConstraints() { return isRoot(); }
-            @Override public String getDescription() { return "wait " + ms + " ms"; }
-            @Override public void perform(UiController ui, View v) { ui.loopMainThreadForAtLeast(ms); }
+            @Override public String getDescription() { return "wait " + (long) 120 + " ms"; }
+            @Override public void perform(UiController ui, View v) { ui.loopMainThreadForAtLeast(120); }
         };
     }
-    private static void idle() { onView(isRoot()).perform(waitMs(120)); }
+    private static void idle() { onView(isRoot()).perform(waitMs()); }
 
     @Test
     public void showsCoreWidgets() {
@@ -54,10 +54,8 @@ public class LotteryInformationActivityTest {
     @Test
     public void back_doNotCrash() {
         try (ActivityScenario<LotteryInformationActivity> sc = ActivityScenario.launch(makeIntent())) {
-            idle();
             try {
                 onView(withId(R.id.btn_back)).perform(click());
-                idle();
             } catch (NoActivityResumedException ignored) {
             }
         }

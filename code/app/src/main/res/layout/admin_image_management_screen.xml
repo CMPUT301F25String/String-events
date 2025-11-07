@@ -5,7 +5,7 @@
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ImageManagementActivity">
+    tools:context=".AdminImageManagementActivity">
 
     <!-- Header with back button -->
     <LinearLayout
@@ -22,6 +22,7 @@
             android:src="@drawable/ic_arrow_back" />
 
         <TextView
+            android:id="@+id/image_management_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Image Management"

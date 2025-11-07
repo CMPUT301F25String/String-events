@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class EventsScreenTest {
 
-    private static Class<?> LAUNCHER = MainActivity.class;
+    private static final Class<?> LAUNCHER = MainActivity.class;
 
     private Intent makeIntent() {
         Context ctx = ApplicationProvider.getApplicationContext();

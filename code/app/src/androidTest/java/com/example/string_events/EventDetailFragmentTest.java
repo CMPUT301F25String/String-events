@@ -63,7 +63,6 @@ public class EventDetailFragmentTest {
         }
         onView(withId(viewId)).check(matches(isDisplayed()));
     }
-    // ---------------------------------------------------
 
     private FragmentScenario<EventDetailFragment> launch() {
         Bundle args = new Bundle();

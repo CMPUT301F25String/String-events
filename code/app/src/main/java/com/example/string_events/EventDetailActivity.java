@@ -36,11 +36,9 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView back = findViewById(getId("back_button"));
         if (back != null) back.setOnClickListener(v -> finish());
 
-        // --------- 测试兜底 ----------
         Intent it = getIntent();
         fromTest = it != null && it.getBooleanExtra("fromTest", false);
 
-        // 本页实际读取的是 "event_id"
         eventId = (it != null) ? it.getStringExtra("event_id") : null;
 
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
@@ -57,7 +55,6 @@ public class EventDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
-        // ---------------------------
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsCollectionRef = db.collection("events");
@@ -65,7 +62,7 @@ public class EventDetailActivity extends AppCompatActivity {
         eventsCollectionRef.document(eventId).get()
                 .addOnSuccessListener(this::bind)
                 .addOnFailureListener(e -> {
-                    if (!fromTest) finish();  // 测试下不要直接退出
+                    if (!fromTest) finish();
                 });
 
         ImageButton applyButton = findViewById(R.id.apply_button);
@@ -92,7 +89,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         applyButton.setOnClickListener(view -> {
             if (fromTest) {
-                // ❗测试模式：不要弹 Toast（会产生无焦点窗口），只做 UI 切换
                 if (!userInEventWaitlist.get()) {
                     userInEventWaitlist.set(true);
                     applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
@@ -103,7 +99,6 @@ public class EventDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            // 真实逻辑（保留 Toast）
             if (!userInEventWaitlist.get()) {
                 eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
                 Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
@@ -144,7 +139,7 @@ public class EventDetailActivity extends AppCompatActivity {
         setText(getId("tvAddress"),     addr);
         setText(getId("tvDateLine"),    dateLine);
         setText(getId("tvTimeLine"),    timeLine);
-        setText(getId("tvAddress"),     loc);      // 维持你原有的写法
+        setText(getId("tvAddress"),     loc);
         setText(getId("tvDescription"), desc);
 
         setText(getId("spots_taken"),  "(" + taken + "/" + max + ") Spots Taken");
