@@ -43,7 +43,6 @@ public class EventDetailActivityTest {
         sp.edit().putString("user", "ui-tester").apply();
     }
 
-//    // 等待窗口获得焦点 & 稍作 idle
     private static ViewAction waitForWindowFocus() {
         return new ViewAction() {
             @Override public Matcher<View> getConstraints() { return isRoot(); }

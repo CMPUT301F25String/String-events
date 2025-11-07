@@ -242,7 +242,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_btn_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -251,13 +251,34 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+        
+        <ImageButton
+            android:id="@+id/accept_invite_button"
+            android:layout_width="140dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/accept_invite_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/decline_invite_button"
+            android:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/decline_invite_button"
+            android:layout_width="140dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/decline_invite_button"
+            app:layout_constraintStart_toEndOf="@id/accept_invite_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/apply_button"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@drawable/apply_button" />
+            android:background="@drawable/apply_button"
+            android:visibility="visible"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

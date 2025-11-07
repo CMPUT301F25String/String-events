@@ -1,6 +1,9 @@
 package com.example.string_events;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
@@ -49,13 +53,15 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.notificationPhoto.setImageResource(R.drawable.event_image);
         holder.notificationEventName.setText(notification.getEventName());
 
-        holder.notificationExpandButton.setOnClickListener(new View.OnClickListener() {
+        holder.notificationItemLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO open new fragment of event detail
+                Intent intent = new Intent(context, EventDetailActivity.class);
+                intent.putExtra("selectedStatus", String.valueOf(notification.getSelectedStatus()));
+                intent.putExtra("event_id", notification.getEventId());
+                context.startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -66,6 +72,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public static class notificationViewHolder extends RecyclerView.ViewHolder {
         // taking the views from the item layout and assigning them to variables
+        ConstraintLayout notificationItemLayout;
         ImageView notificationStatus;
         ShapeableImageView notificationPhoto;
         TextView notificationMessage;
@@ -74,6 +81,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         public notificationViewHolder(@NonNull View itemView) {
             super(itemView);
+            notificationItemLayout = itemView.findViewById(R.id.item_layout);
             notificationStatus = itemView.findViewById(R.id.imgStatus);
             notificationPhoto = itemView.findViewById(R.id.imgThumb);
             notificationMessage = itemView.findViewById(R.id.tvMessage);
