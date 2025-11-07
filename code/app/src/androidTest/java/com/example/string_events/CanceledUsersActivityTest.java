@@ -26,8 +26,8 @@ public class CanceledUsersActivityTest {
     private static Intent makeIntent() {
         Context ctx = ApplicationProvider.getApplicationContext();
         return new Intent(ctx, CanceledUsersActivity.class)
-                .putExtra("fromTest", true)            // 告知页面：测试模式
-                .putExtra("eventId", "test-event")     // 你们常用的 key 兜上
+                .putExtra("fromTest", true)            
+                .putExtra("eventId", "test-event")     
                 .putExtra("organizerId", "org-123");
     }
 
