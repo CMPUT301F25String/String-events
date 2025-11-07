@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    // google-services is applied conditionally at the bottom
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -24,6 +24,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            // set to true only if you need coverage
+            isTestCoverageEnabled = false
+        }
     }
 
     compileOptions {
@@ -35,6 +39,18 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+        // animationsDisabled = true
+    }
+
+    packagingOptions {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE*",
+                "META-INF/NOTICE*",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
     }
 }
 
@@ -43,29 +59,26 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation(libs.firebase.common)
+    implementation(libs.firebase.storage)
 
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
-    testImplementation("androidx.test:core:1.6.1")
-
-
-    implementation(libs.firebase.common)
     implementation(libs.recyclerview)
-    implementation(libs.firebase.storage)
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.6.1")
     testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.6.1")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
-}
-
-if (file("google-services.json").exists() || file("src/debug/google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
 }
