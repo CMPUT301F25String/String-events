@@ -52,11 +52,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
-    debugImplementation ("androidx.fragment:fragment-testing:1.6.2")
+    androidTestImplementation ("androidx.fragment:fragment-testing:1.6.2")
+    androidTestImplementation ("androidx.test.espresso:espresso-contrib:3.5.1")
     debugImplementation       ("androidx.fragment:fragment-testing:1.6.2")
-
     testImplementation("junit:junit:4.13.2")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.12.2")
-    testImplementation("androidx.test:core:1.6.1")
 }
