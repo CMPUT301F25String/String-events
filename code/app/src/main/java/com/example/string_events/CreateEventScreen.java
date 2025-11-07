@@ -3,6 +3,7 @@ package com.example.string_events;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -101,21 +102,32 @@ public class CreateEventScreen extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 // get the intent of the result
-                Intent intent = result.getData();
-                if (result.getResultCode() == Activity.RESULT_OK && intent != null) {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent intent = result.getData();
                     // get the actual uri stored in the intent
-                    Uri selectedImageUri = intent.getData();
-                    eventPhotoImageView.setImageURI(selectedImageUri);
-                    eventPhotoImageView.setTag(selectedImageUri);
+                    Uri selectedImageUri = null;
+                    if (intent != null) {
+                        // sometimes the image is handled with Data and sometimes with ClipData
+                        if (intent.getData() != null) {
+                            selectedImageUri = intent.getData();
+                        }
+                        else if (intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
+                            ClipData clipData = intent.getClipData();
+                            selectedImageUri = clipData.getItemAt(0).getUri();
+                        }
+                        if (selectedImageUri != null) {
+                            eventPhotoImageView.setImageURI(selectedImageUri);
+                            eventPhotoImageView.setTag(selectedImageUri);
+                        }
+                    }
                 }
-            }
-        );
+            });
 
         addEventPhotoButton.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
             // call the ActivityResultLauncher with the intent to pick an image
-            imagePickerLauncher.launch(intent);
+            imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"));
         });
 
         eventVisibilityPublic.setOnClickListener(view -> visibility.set(true));

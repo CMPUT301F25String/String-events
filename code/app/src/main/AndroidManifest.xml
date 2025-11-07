@@ -63,19 +63,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".OrganizerEventDetails"
-            android:exported="false"/>
-
-        <activity
-            android:name=".CanceledUsersActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".ParticipatingUsersActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".WaitlistUsersActivity"
+            android:name=".CreateEventScreen"
             android:exported="false"/>
 
         <activity
