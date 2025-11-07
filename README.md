@@ -16,3 +16,7 @@
 * [Storyboard Sequences](https://github.com/CMPUT301F25String/String-events/wiki/Storyboard-Sequences)
 * [Object-Oriented Analysis (CRC Cards)](https://github.com/CMPUT301F25String/String-events/wiki/Object%E2%80%90Oriented-Analysis-(CRC-Cards))
 * [Work Distribution](https://github.com/CMPUT301F25String/String-events/wiki/Project-Part-2-Work-Distribution)
+
+
+
+**Project Part 3 Deliverables**
