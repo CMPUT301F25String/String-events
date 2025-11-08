@@ -13,14 +13,35 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 
+/**
+ * Administration screen for listing event images and deleting a selected one.
+ * <p>
+ * Images are loaded from Firestore {@code events} documents (field {@code imageUrl});
+ * deletion removes the underlying file from Firebase Storage and clears the
+ * {@code imageUrl} field in Firestore.
+ * </p>
+ *
+ * @since 1.0
+ */
 public class AdminImageManagementActivity extends AppCompatActivity {
+    /** Firestore database handle. */
     private FirebaseFirestore db;
+    /** Firebase Storage handle. */
     private FirebaseStorage storage;
+    /** Backing list of images shown in the RecyclerView. */
     private ArrayList<AdminImageAdapter.EventImage> eventImages;
+    /** Currently selected image (nullable). */
     private AdminImageAdapter.EventImage selectedImage;
+    /** Adapter that renders and handles selection. */
     private AdminImageAdapter adapter;
+    /** Delete button UI control. */
     private Button btnDelete;
 
+    /**
+     * Initializes UI, wires adapter and actions, and loads images from Firestore.
+     *
+     * @param savedInstanceState state bundle; may be {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +70,10 @@ public class AdminImageManagementActivity extends AppCompatActivity {
         setupDeleteButton();
     }
 
+    /**
+     * Fetches all events from Firestore and populates the list with those having a non-empty {@code imageUrl}.
+     * Updates the adapter once data is collected.
+     */
     private void loadImages() {
         db.collection("events").get()
                 .addOnSuccessListener(snapshot -> {
@@ -67,6 +92,14 @@ public class AdminImageManagementActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to load images", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Wires the delete button to remove the selected image from Storage and clear its reference in Firestore.
+     * <ul>
+     *   <li>Deletes the file at {@code selectedImage.imageUrl} via {@link FirebaseStorage}.</li>
+     *   <li>Sets the corresponding event document's {@code imageUrl} field to {@code null}.</li>
+     *   <li>Refreshes the list on success.</li>
+     * </ul>
+     */
     private void setupDeleteButton() {
         btnDelete.setOnClickListener(v -> {
             if (selectedImage == null) {

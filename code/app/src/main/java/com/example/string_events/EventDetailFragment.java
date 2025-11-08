@@ -12,11 +12,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+/**
+ * Fragment that displays event details.
+ * <p>
+ * When launched with {@code fromTest=true}, the UI is populated with placeholder
+ * values and the apply button toggles its background without backend calls.
+ * The target event can be provided via the {@code event_id} argument.
+ */
 public class EventDetailFragment extends Fragment {
 
     private boolean fromTest = false;
     private String eventId = null;
 
+    /**
+     * Inflates the event detail layout for this fragment.
+     *
+     * @param inflater  layout inflater
+     * @param container parent view group
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     * @return the inflated event detail view
+     */
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -24,6 +39,14 @@ public class EventDetailFragment extends Fragment {
         return inflater.inflate(R.layout.event_detail_screen, container, false);
     }
 
+    /**
+     * Binds views, reads fragment arguments ({@code fromTest}, {@code event_id}),
+     * wires back navigation and apply button behavior, and optionally populates
+     * placeholder data when running in test mode.
+     *
+     * @param v the fragment root view
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);

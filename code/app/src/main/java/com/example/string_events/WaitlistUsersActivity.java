@@ -7,14 +7,23 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.string_events.UserAdapter;
-import com.example.string_events.UserItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Screen for organizers to view users on the waitlist.
+ * <p>
+ * Populates a {@link ListView} using {@link UserAdapter} with mock data and provides
+ * a demo action to send messages to waitlisted users.
+ */
 public class WaitlistUsersActivity extends AppCompatActivity {
 
+    /**
+     * Inflates the layout, wires the back button, sets up the list adapter
+     * with mock waitlist data, and binds a demo click handler.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +40,12 @@ public class WaitlistUsersActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Provides sample waitlist entries for UI demonstration.
+     *
+     * @param status the {@link UserItem.Status} to apply to all mocked users
+     * @return a list of mocked {@link UserItem}
+     */
     private List<UserItem> mockUsers(UserItem.Status status) {
         List<UserItem> data = new ArrayList<>();
         data.add(new UserItem("Grace", "grace@mail.com", status));

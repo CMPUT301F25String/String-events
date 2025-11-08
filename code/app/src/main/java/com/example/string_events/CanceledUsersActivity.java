@@ -13,8 +13,18 @@ import com.example.string_events.UserItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Displays a list of users with CANCELED status and provides a demo action
+ * to send a message to those users.
+ */
 public class CanceledUsersActivity extends AppCompatActivity {
 
+    /**
+     * Sets up UI components, wires the back button, binds the list view with a demo adapter,
+     * and attaches a click listener to trigger a sample toast.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +41,12 @@ public class CanceledUsersActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Builds a demo list of {@link UserItem} entries with the given status.
+     *
+     * @param status the status to assign to each mocked user
+     * @return a list of sample users for display purposes
+     */
     private List<UserItem> mockUsers(UserItem.Status status) {
         List<UserItem> data = new ArrayList<>();
         data.add(new UserItem("Alice", "alice@mail.com", status));

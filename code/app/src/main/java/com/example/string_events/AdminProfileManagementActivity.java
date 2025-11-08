@@ -11,6 +11,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
+/**
+ * Admin screen that lists all user profiles and allows navigation to a detail view.
+ * <p>
+ * Data is loaded from Firestore ("users" collection, documents where {@code role == "user"}).
+ * Tapping a row opens {@link AdminAllUserProfileActivity}; the back button returns to
+ * {@link AdminDashboardActivity}.
+ */
 public class AdminProfileManagementActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -18,6 +25,11 @@ public class AdminProfileManagementActivity extends AppCompatActivity {
     private final ArrayList<AdminProfiles> profiles = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Initializes the UI, wires the adapter and triggers profile loading.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +62,10 @@ public class AdminProfileManagementActivity extends AppCompatActivity {
         loadProfiles();
     }
 
+    /**
+     * Queries Firestore for user profiles (role = "user"), updates the backing list,
+     * and refreshes the adapter. Logs success or failure for diagnostics.
+     */
     private void loadProfiles() {
         db.collection("users")
                 .whereEqualTo("role", "user")
