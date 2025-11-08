@@ -12,12 +12,31 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+/**
+ * ArrayAdapter that renders {@link UserItem} rows showing name, email, and a status badge
+ * (canceled/participating/waitlist/invited) when available.
+ */
 public class UserAdapter extends ArrayAdapter<UserItem> {
 
+    /**
+     * Creates an adapter backed by a list of {@link UserItem}.
+     *
+     * @param context host context used to inflate views
+     * @param data    list of items to display
+     */
     public UserAdapter(@NonNull Context context, @NonNull List<UserItem> data) {
         super(context, 0, data);
     }
 
+    /**
+     * Inflates/binds {@code item_user_row} and sets the row fields:
+     * name, email, and a visible status badge when {@link UserItem.Status} is present.
+     *
+     * @param position    adapter position
+     * @param convertView recycled view, if any
+     * @param parent      parent view group
+     * @return bound row {@link View}
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -62,5 +81,3 @@ public class UserAdapter extends ArrayAdapter<UserItem> {
         return v;
     }
 }
-
-

@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Activity that performs a lottery draw for an event's waitlist to fill
+ * available attendee slots. Shows a header before the draw and an
+ * after-state summary upon completion.
+ */
 public class LotteryDrawActivity extends AppCompatActivity {
     private static final String COL_EVENTS = "events";
     private static final String SUB_WAITLIST = "waitlist";
@@ -39,6 +44,13 @@ public class LotteryDrawActivity extends AppCompatActivity {
 
     private final DateFormat dfTime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
+    /**
+     * Reads the target {@code event_id} from the intent, inflates the
+     * "before roll" layout, binds header views, loads event header data,
+     * and wires the Roll button to trigger {@link #performRoll()}.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +63,9 @@ public class LotteryDrawActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Binds header views and sets the back button to finish the activity.
+     */
     private void bindHeaderViews() {
         btnBack = findViewById(R.id.btnBack);
         tvEventName = findViewById(R.id.tvEventName);
@@ -60,6 +75,10 @@ public class LotteryDrawActivity extends AppCompatActivity {
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
     }
 
+    /**
+     * Loads event title, location, and start time from Firestore and
+     * populates the header fields.
+     */
     private void loadEventHeader() {
         if (eventId == null) return;
         DocumentReference eventRef = db.collection(COL_EVENTS).document(eventId);
@@ -74,6 +93,15 @@ public class LotteryDrawActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Executes the lottery:
+     * <ol>
+     *   <li>Determines available slots from {@code maxAttendees - attendeesCount}.</li>
+     *   <li>Fetches the waitlist subcollection and randomly shuffles it.</li>
+     *   <li>Selects winners up to available slots, moves them to participants, and removes them from waitlist in a batch.</li>
+     *   <li>Updates event counters and timestamps, then switches UI to the "after roll" state.</li>
+     * </ol>
+     */
     private void performRoll() {
         if (eventId == null) return;
 
@@ -128,6 +156,12 @@ public class LotteryDrawActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Switches the layout to the "after roll" screen, rebinds and reloads
+     * the header, and shows the number of selected participants.
+     *
+     * @param selectedCount number of participants chosen by the draw
+     */
     private void switchToAfter(int selectedCount) {
         setContentView(R.layout.lottery_after_roll);
         bindHeaderViews();
@@ -144,6 +178,12 @@ public class LotteryDrawActivity extends AppCompatActivity {
         if (tvNotified != null) { }
     }
 
+    /**
+     * Parses an arbitrary object into an {@code int}, returning 0 on null or failure.
+     *
+     * @param o value to parse
+     * @return parsed integer or 0 if not parsable
+     */
     private int safeInt(Object o) {
         if (o == null) return 0;
         if (o instanceof Number) return ((Number) o).intValue();

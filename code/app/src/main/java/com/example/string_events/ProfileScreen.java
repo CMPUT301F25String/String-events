@@ -25,11 +25,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+/**
+ * Profile screen for entrants/organizers.
+ * <p>
+ * Shows basic user info, allows switching roles, logging out, and navigating to
+ * notifications and edit-information screens. Also lists events in which the
+ * current user is on the waitlist.
+ */
 public class ProfileScreen extends AppCompatActivity {
 
     ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Inflates the profile UI, binds buttons, loads user info from
+     * {@code SharedPreferences}, sets up role switching and logout,
+     * and queries waitlisted events to populate the horizontal carousel.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,34 +175,56 @@ public class ProfileScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Opens the notifications screen.
+     */
     public void openNotificationsScreen() {
         Intent myIntent = new Intent(ProfileScreen.this, NotificationScreen.class);
         startActivity(myIntent);
     }
 
+    /**
+     * Opens the edit-information screen for the current user.
+     *
+     * @param username username used to locate the user document
+     */
     public void openEditInformationScreen(String username) {
         Intent intent = new Intent(ProfileScreen.this, EditInformationActivity.class);
         intent.putExtra("user", username);
         startActivity(intent);
     }
 
+    /**
+     * Opens the static lottery information screen.
+     */
     public void openLotteryInformationScreen() {
         Intent intent = new Intent(ProfileScreen.this, LotteryInformationActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Switches to the organizer home flow.
+     */
     public void openOrganizerEventScreen() {
         Intent myIntent = new Intent(ProfileScreen.this, OrganizerEventScreen.class);
         finish();
         startActivity(myIntent);
     }
 
+    /**
+     * Switches to the entrant (user) home flow.
+     */
     public void openEntrantEventScreen() {
         Intent myIntent = new Intent(ProfileScreen.this, MainActivity.class);
         finish();
         startActivity(myIntent);
     }
 
+    /**
+     * Configures the profile events carousel with a horizontal {@link LinearLayoutManager}.
+     *
+     * @param profileEventsList list of events to render
+     */
     private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList) {
         RecyclerView profileEventRecyclerview = findViewById(R.id.profile_events_recyclerView);
         ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
