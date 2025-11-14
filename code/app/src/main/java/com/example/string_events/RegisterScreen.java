@@ -18,12 +18,24 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Registration screen for creating a new user account.
+ * <p>
+ * Collects basic profile fields, validates them, and persists a user document
+ * to Firestore under the {@code users} collection. On success, navigates to
+ * {@link MainActivity}.
+ */
 public class RegisterScreen extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextInputEditText etFullName, etEmail, etPassword, etPhone;
     private FrameLayout btnRegister;
     private MaterialButton btnSignIn;
 
+    /**
+     * Inflates the registration UI, wires buttons, and initializes Firestore.
+     *
+     * @param savedInstanceState previously saved state, or {@code null}
+     */
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_screen);
@@ -50,16 +62,38 @@ public class RegisterScreen extends AppCompatActivity {
         });
     }
 
+    /**
+     * Enables/disables UI to reflect a loading state.
+     *
+     * @param loading {@code true} to disable inputs while saving
+     */
     private void setLoading(boolean loading) {
         btnRegister.setEnabled(!loading);
     }
 
+    /**
+     * Safely extracts trimmed text from a {@link TextInputEditText}.
+     *
+     * @param et input field
+     * @return trimmed text or an empty string if null
+     */
     private String safe(TextInputEditText et) {
         return et.getText() == null ? "" : et.getText().toString().trim();
     }
 
+    /**
+     * Lowercases and trims a string using {@link Locale#US}.
+     *
+     * @param s input string
+     * @return lowercased string or empty string if null
+     */
     private String lower(String s) { return s == null ? "" : s.trim().toLowerCase(Locale.US); }
 
+    /**
+     * Validates inputs, constructs a user document, writes it to Firestore,
+     * and routes to {@link MainActivity} on success.
+     * Shows a toast on validation or network errors.
+     */
     private void register() {
         String name  = safe(etFullName);
         String email = lower(safe(etEmail));
@@ -99,6 +133,10 @@ public class RegisterScreen extends AppCompatActivity {
                 });
     }
 
-
+    /**
+     * Shows a short {@link Toast} message.
+     *
+     * @param msg message text
+     */
     private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 }

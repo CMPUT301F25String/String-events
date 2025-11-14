@@ -33,11 +33,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Entry activity that routes users to different app sections depending on role.
+ * <p>
+ * Supported screens:
+ * <ul>
+ *   <li>ADMIN_HOME – admin dashboard</li>
+ *   <li>USER_HOME – public events list</li>
+ *   <li>NOTIFICATIONS – notifications screen</li>
+ *   <li>PROFILE – profile screen</li>
+ * </ul>
+ */
 public class MainActivity extends AppCompatActivity {
+    /** App sections this activity can display. */
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Reads role/user extras, persists basic user info to {@code SharedPreferences},
+     * and navigates to admin or user home accordingly.
+     *
+     * @param savedInstanceState previously saved state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
         String email = getIntent().getStringExtra("email");
 
         if (username != null) {
-            // this is to store the user's role and their username between activities
-            // it serves as an easier way to access those variables without passing intents through each activity
+            // store user info for cross-activity access
             SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("role", "entrant");
@@ -65,7 +82,11 @@ public class MainActivity extends AppCompatActivity {
         loadEventsIntoList();
     }
 
-
+    /**
+     * Switches the UI to the requested section and wires section-specific handlers.
+     *
+     * @param s target screen
+     */
     private void show(Screen s) {
         switch (s) {
 //            case USER_HOME:
@@ -77,39 +98,16 @@ public class MainActivity extends AppCompatActivity {
 //                break;
 
             case NOTIFICATIONS:
-//                setContentView(R.layout.notification_screen);
+                // open notifications screen as a separate activity
                 wireCommon();
                 startActivity(new Intent(this, NotificationScreen.class));
-//                onClick(R.id.btnHome, () -> show(Screen.USER_HOME));
-//                onClick(R.id.btnProfile, () -> show(Screen.PROFILE));
-//                loadNotificationsIntoRecycler();
                 break;
 
             case PROFILE:
                 wireCommon();
-
+                // open profile screen as a separate activity
                 Intent profileIntent = new Intent(this, ProfileScreen.class);
                 startActivity(profileIntent);
-
-
-
-//                // display name and email immediately
-//                TextView nameTextView = findViewById(R.id.name_textView);
-//                TextView emailTextView = findViewById(R.id.email_textView);
-//                nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
-//                emailTextView.setText("Email: " + (email != null ? email : ""));
-//
-//                onClick(R.id.edit_textView, () -> {
-//                    Intent intent = new Intent(this, EditInformationActivity.class);
-//                    intent.putExtra("user", username);
-//                    startActivity(intent);
-//                });
-
-//                onClick(R.id.info_imageButton, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
-//                onClick(R.id.info_textView, () -> startActivity(new Intent(this, LotteryInformationActivity.class)));
-
-
-//                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
 
 //            case ADMIN_HOME:
@@ -135,20 +133,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Wires common actions shared across screens (e.g., logout).
+     */
     private void wireCommon() {
         onClick(R.id.btnLogout, this::logoutAndGoToSignIn);
     }
 
+    /**
+     * Helper to set an onClick listener if the view exists.
+     *
+     * @param viewId resource ID of the view
+     * @param action runnable to execute on click
+     */
     private void onClick(int viewId, Runnable action) {
         if (viewId == 0) return;
         View v = findViewById(viewId);
         if (v != null) v.setOnClickListener(_v -> action.run());
     }
 
+    /**
+     * Resolves a view ID by name in the {@code id} resource type.
+     *
+     * @param name resource entry name
+     * @return integer ID or {@code 0} if not found
+     */
     private int getId(String name) {
         return getResources().getIdentifier(name, "id", getPackageName());
     }
 
+    /**
+     * Clears auth state and navigates back to the welcome/sign-in screen.
+     */
     private void logoutAndGoToSignIn() {
         SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
         sp.edit().clear().apply();
@@ -183,6 +199,10 @@ public class MainActivity extends AppCompatActivity {
 //                });
 //    }
 
+    /**
+     * Loads events from Firestore, binds them to the ListView, and opens
+     * {@link EventDetailActivity} on item click.
+     */
     private void loadEventsIntoList() {
         final ListView lv = findViewById(R.id.list);
         if (lv == null) return;
@@ -221,6 +241,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Parses an arbitrary object into an {@code int}, returning 0 on null or parse failure.
+     *
+     * @param o value to parse
+     * @return parsed int or 0 if not parsable
+     */
     private int asInt(Object o) {
         if (o == null) return 0;
         if (o instanceof Number) return ((Number) o).intValue();
@@ -231,6 +257,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Lightweight container used to present event summaries in the list.
+     */
     private static class EventItem {
         String imageUrl;
         String id;
@@ -240,18 +269,33 @@ public class MainActivity extends AppCompatActivity {
         int maxAttendees, attendeesCount;
     }
 
+    /**
+     * Adapter that renders {@link EventItem} rows for the events list.
+     */
     private class EventAdapter extends BaseAdapter {
         private final List<EventItem> items;
         private final DateFormat timeFmt = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
+        /**
+         * Creates an adapter over a mutable list of items.
+         *
+         * @param items backing data list
+         */
         EventAdapter(List<EventItem> items) {
             this.items = items;
         }
 
+        /** @return number of rows. */
         @Override public int getCount() { return items.size(); }
+        /** @return item at position. */
         @Override public EventItem getItem(int position) { return items.get(position); }
+        /** @return stable ID (here: position). */
         @Override public long getItemId(int position) { return position; }
 
+        /**
+         * Inflates/binds an event row view with cover image, title, place, time,
+         * remaining spots, and a status chip (Scheduled/In Progress/Finished).
+         */
         @Override
         public View getView(int pos, View convertView, android.view.ViewGroup parent) {
             View v = convertView;
@@ -313,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
             return v;
         }
 
+        /** View holder for an event row. */
         class Holder {
             ImageView imgCover;
             TextView tvTitle, tvTime, tvSpots, tvPlace;

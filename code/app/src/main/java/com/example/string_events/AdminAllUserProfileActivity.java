@@ -10,11 +10,32 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Admin screen for viewing a single user's profile and deleting that profile from Firestore.
+ * <p>
+ * Expects the launching {@link android.content.Intent} to include the following extras:
+ * <ul>
+ *   <li><b>"name"</b> — user's display name</li>
+ *   <li><b>"email"</b> — user's email address</li>
+ *   <li><b>"password"</b> — user's password (as currently stored)</li>
+ *   <li><b>"role"</b> — user's role label (optional, currently unused)</li>
+ *   <li><b>"docId"</b> — Firestore document ID under the {@code users} collection</li>
+ * </ul>
+ * The delete action removes the document {@code users/{docId}} and finishes the Activity on success.
+ *
+ * @author group
+ * @since 1.0
+ */
 public class AdminAllUserProfileActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String docId;
 
+    /**
+     * Inflates the UI, binds views, reads Intent extras, and wires back/delete actions.
+     *
+     * @param savedInstanceState optional saved state provided by Android; may be {@code null}
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +60,6 @@ public class AdminAllUserProfileActivity extends AppCompatActivity {
         name.setText("Name: " + nameStr);
         email.setText("Email: " + emailStr);
         password.setText("Password: " + passwordStr);
-
 
         backButton.setOnClickListener(v -> onBackPressed());
 

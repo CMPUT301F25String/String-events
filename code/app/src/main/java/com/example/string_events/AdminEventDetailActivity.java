@@ -19,15 +19,32 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.util.Locale;
 
+/**
+ * Admin detail screen that displays full event information fetched from Firestore.
+ * <p>Shows cover image, title, location, registration window, capacity/waitlist,
+ * status (scheduled/in-progress/finished), and timing. Provides quick actions such as
+ * delete, back navigation, QR code placeholder, and event link placeholder.</p>
+ *
+ * @since 1.0
+ */
 public class AdminEventDetailActivity extends AppCompatActivity {
 
+    /** Firestore entry point. */
     private FirebaseFirestore db;
+    /** Event document id passed via intent extra "event_id". */
     private String eventId;
 
+    /** Event cover image view. */
     private ImageView imgEvent;
+    /** Title, location, registration start/end, waitlist, attendees, description, status, date range. */
     private TextView tvTitle, tvLocation, tvRegStart, tvRegEnd, tvWaitlist, tvAttendees,
             tvDescription, tvStatus, tvEventDates, tvCategory, tvVisibility, tvGeo, tvCreator;
 
+    /**
+     * Initializes the UI, wires button handlers, and starts loading event details.
+     *
+     * @param savedInstanceState initialization bundle, may be {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +66,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tvStatus);
         tvEventDates = findViewById(R.id.tvEventDates);
 
-
-
         ImageButton btnBack = findViewById(R.id.btnBack);
         ImageButton btnDelete = findViewById(R.id.btnDelete);
         ImageButton btnQRCode = findViewById(R.id.btnQRCode);
@@ -66,6 +81,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         loadEventDetails();
     }
 
+    /**
+     * Loads event fields from Firestore and populates the view.
+     * Handles null/missing fields defensively.
+     */
     private void loadEventDetails() {
         if (eventId == null) {
             Toast.makeText(this, "Invalid event", Toast.LENGTH_SHORT).show();
@@ -102,7 +121,8 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     Timestamp regEnd = doc.getTimestamp("regEndAt");
 
                     // --- Format ---
-                    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
+                    DateFormat df = DateFormat.getDateTimeInstance(
+                            DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
 
                     // --- Display data ---
                     tvTitle.setText(title != null ? title : "(No title)");
@@ -152,11 +172,13 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                                 conn.setDoInput(true);
                                 conn.connect();
-                                InputStream input = conn.getInputStream();
-                                Bitmap bmp = BitmapFactory.decodeStream(input);
-                                imgEvent.post(() -> imgEvent.setImageBitmap(bmp));
+                                try (InputStream input = conn.getInputStream()) {
+                                    Bitmap bmp = BitmapFactory.decodeStream(input);
+                                    imgEvent.post(() -> imgEvent.setImageBitmap(bmp));
+                                }
                             } catch (Exception e) {
-                                imgEvent.post(() -> imgEvent.setImageResource(android.R.drawable.ic_menu_report_image));
+                                imgEvent.post(() ->
+                                        imgEvent.setImageResource(android.R.drawable.ic_menu_report_image));
                             }
                         }).start();
                     } else {
@@ -168,6 +190,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to load event", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Deletes the current event document from Firestore.
+     * Shows a toast on success/failure and finishes the screen on success.
+     */
     private void deleteEvent() {
         if (eventId == null) return;
 

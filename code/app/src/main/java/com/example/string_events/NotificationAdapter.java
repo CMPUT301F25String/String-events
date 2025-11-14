@@ -19,15 +19,28 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 
+/**
+ * RecyclerView adapter for rendering event notifications and navigating
+ * to {@link EventDetailActivity} when an item is tapped.
+ */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.notificationViewHolder> {
     Context context;
     ArrayList<Notification> notificationList;
 
+    /**
+     * Creates an adapter backed by a list of {@link Notification}.
+     *
+     * @param context Android context used to inflate views and start activities
+     * @param notificationsList backing data for the adapter
+     */
     public NotificationAdapter(Context context, ArrayList<Notification> notificationsList) {
         this.context = context;
         this.notificationList = notificationsList;
     }
 
+    /**
+     * Inflates {@code item_notification} row view.
+     */
     @NonNull
     @Override
     public notificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +49,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return new NotificationAdapter.notificationViewHolder(itemView);
     }
 
+    /**
+     * Binds a {@link Notification} to the row views: selection icon/message,
+     * thumbnail, event name, and click action to open details.
+     */
     @Override
     public void onBindViewHolder(@NonNull notificationViewHolder holder, int position) {
         // assigning values to the items in the recyclerView as they are being inflated
@@ -45,8 +62,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.notificationMessage.setText("Congratulations,\nyou were selected for:");
         }
         else {
-           holder.notificationStatus.setImageResource(R.drawable.not_selected_status);
-           holder.notificationMessage.setText("Unfortunately,\nyou weren't selected for:");
+            holder.notificationStatus.setImageResource(R.drawable.not_selected_status);
+            holder.notificationMessage.setText("Unfortunately,\nyou weren't selected for:");
         }
 
 //        holder.notificationPhoto.setImageURI(notification.getEventPhoto()); // TODO use this line once URIs are setup
@@ -63,12 +80,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         });
     }
 
+    /**
+     * @return number of notifications to display
+     */
     @Override
     public int getItemCount() {
         // get the number of items to be displayed
         return notificationList.size();
     }
 
+    /**
+     * ViewHolder that caches row subviews for a notification item.
+     */
     public static class notificationViewHolder extends RecyclerView.ViewHolder {
         // taking the views from the item layout and assigning them to variables
         ConstraintLayout notificationItemLayout;
@@ -78,6 +101,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         TextView notificationEventName;
         ImageButton notificationExpandButton;
 
+        /**
+         * Binds subviews from {@code item_notification}.
+         *
+         * @param itemView root row view
+         */
         public notificationViewHolder(@NonNull View itemView) {
             super(itemView);
             notificationItemLayout = itemView.findViewById(R.id.item_layout);

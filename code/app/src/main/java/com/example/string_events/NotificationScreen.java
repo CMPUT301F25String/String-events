@@ -17,9 +17,23 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Screen that lists notifications for the signed-in user.
+ * <p>
+ * Fetches documents from the {@code notifications} collection filtered by username
+ * and displays them in a {@link RecyclerView}.
+ */
 public class NotificationScreen extends AppCompatActivity {
+    /** Firestore client used to query notifications. */
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Inflates the layout, wires basic navigation buttons, retrieves the current
+     * username from {@code SharedPreferences}, queries notifications for that user,
+     * and renders them in a {@link RecyclerView}.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +58,6 @@ public class NotificationScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
-//        // testing data
-//        notificationsList = new ArrayList<>();
-//        Notification testNotification1 = new Notification(true, Uri.EMPTY, "New Event1");
-//        Notification testNotification2 = new Notification(false, Uri.EMPTY, "New Event2");
-//        notificationsList.add(testNotification1);
-//        notificationsList.add(testNotification2);
-
         ArrayList<Notification> notificationsList = new ArrayList<>();
         db.collection("notifications")
                 .whereEqualTo("username", username)
@@ -70,6 +77,12 @@ public class NotificationScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Configures the notifications {@link RecyclerView} with an adapter and a
+     * vertical {@link LinearLayoutManager}.
+     *
+     * @param notificationsList list of notifications to display
+     */
     private void setupRecyclerView(ArrayList<Notification> notificationsList) {
         RecyclerView notificationRecyclerview = findViewById(R.id.notifications_recyclerView);
         NotificationAdapter notificationAdapter = new NotificationAdapter(this, notificationsList);

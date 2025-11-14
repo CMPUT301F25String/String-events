@@ -19,17 +19,40 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * RecyclerView adapter for rendering a list of admin-visible event cards.
+ * <p>
+ * Each row shows title, location, organizer label, a human-readable start time,
+ * a status "chip" (Scheduled / In Progress / Finished), and an optional cover image
+ * fetched from a Firebase Storage URL.
+ * Tapping a card opens {@link AdminEventDetailActivity} for the selected event.
+ *
+ * @since 1.0
+ */
 public class AdminDetailEventAdapter extends RecyclerView.Adapter<AdminDetailEventAdapter.EventViewHolder> {
 
     private final ArrayList<AdminEventManagementActivity.EventItem> events;
     private final AdminEventManagementActivity context;
     private final DateFormat timeFmt = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
+    /**
+     * Creates an adapter for admin event details.
+     *
+     * @param events  data source of events to display (non-null)
+     * @param context hosting activity used for inflating views and starting intents
+     */
     public AdminDetailEventAdapter(ArrayList<AdminEventManagementActivity.EventItem> events, AdminEventManagementActivity context) {
         this.events = events;
         this.context = context;
     }
 
+    /**
+     * Inflates the event card layout.
+     *
+     * @param parent   RecyclerView parent
+     * @param viewType unused single view type
+     * @return a new {@link EventViewHolder}
+     */
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,6 +60,18 @@ public class AdminDetailEventAdapter extends RecyclerView.Adapter<AdminDetailEve
         return new EventViewHolder(v);
     }
 
+    /**
+     * Binds an event item to the row views:
+     * <ul>
+     *   <li>Sets title, location, organizer label, and formatted time</li>
+     *   <li>Computes and shows a status label based on current time vs. start/end</li>
+     *   <li>Loads the cover image from {@code imageUrl} on a background thread</li>
+     *   <li>Sets a click listener to open {@link AdminEventDetailActivity}</li>
+     * </ul>
+     *
+     * @param holder   view holder for the row
+     * @param position adapter position
+     */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         AdminEventManagementActivity.EventItem e = events.get(position);
@@ -96,15 +131,26 @@ public class AdminDetailEventAdapter extends RecyclerView.Adapter<AdminDetailEve
         });
     }
 
+    /**
+     * @return the number of events to render
+     */
     @Override
     public int getItemCount() {
         return events.size();
     }
 
+    /**
+     * View holder for a single admin event card row.
+     */
     static class EventViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCover;
         TextView tvTitle, tvTime, tvLocation, tvOrganizer, chipStatus;
 
+        /**
+         * Binds row view references.
+         *
+         * @param itemView the inflated row view
+         */
         EventViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCover = itemView.findViewById(R.id.imgCover);

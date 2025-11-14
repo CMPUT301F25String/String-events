@@ -25,12 +25,23 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Displays details of a single event and lets the current user apply/cancel,
+ * or accept/decline an invite. Event data is loaded from Firestore.
+ */
 public class EventDetailActivity extends AppCompatActivity {
 
     private String username;
     private final AtomicBoolean userInEventWaitlist = new AtomicBoolean();
     private final AtomicBoolean userInEventAttendees = new AtomicBoolean();
 
+    /**
+     * Initializes UI, resolves intent extras, fetches the event document,
+     * configures action buttons (apply / accept / decline), and sets up
+     * membership state checks for attendees and waitlist.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_detail_screen);
@@ -94,6 +105,12 @@ public class EventDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Populates UI fields with document values and formats date/time and waitlist
+     * counters for display.
+     *
+     * @param s Firestore document snapshot of the event
+     */
     private void bind(DocumentSnapshot s) {
         String title = s.getString("title");
         String description = s.getString("description");
@@ -131,16 +148,34 @@ public class EventDetailActivity extends AppCompatActivity {
             setText(getId("waiting_list"), currentWaitCount + " on Waitlist");
     }
 
+    /**
+     * Safely sets text on a {@link TextView} identified by ID.
+     *
+     * @param id    resource id of the target view
+     * @param value text to display; empty string used if {@code null}
+     */
     private void setText(int id, String value) {
         if (id == 0) return;
         TextView tv = findViewById(id);
         if (tv != null) tv.setText(value == null ? "" : value);
     }
 
+    /**
+     * Resolves a view ID by name using {@link android.content.res.Resources#getIdentifier}.
+     *
+     * @param name id name in the "id" resource type
+     * @return resolved identifier or {@code 0} if not found
+     */
     private int getId(String name) {
         return getResources().getIdentifier(name, "id", getPackageName());
     }
 
+    /**
+     * Converts an arbitrary object to an {@code int} with safe fallbacks.
+     *
+     * @param o object to convert (may be {@link Number} or parsable string)
+     * @return parsed integer value or {@code 0} on failure/null
+     */
     private int asInt(Object o) {
         if (o == null) return 0;
         if (o instanceof Number) return ((Number) o).intValue();
