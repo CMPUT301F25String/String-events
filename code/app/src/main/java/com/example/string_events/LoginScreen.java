@@ -227,6 +227,14 @@ public class LoginScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Navigates to {@link MainActivity} and finishes this screen.
+     *
+     * @param role     role string to pass forward ("user" or "admin")
+     * @param username username to include (nullable for admin)
+     * @param fullName full name (nullable)
+     * @param email    email (nullable)
+     */
     private void openNextScreen(String role, String username, String fullName, String email) {
         setLoading(false);
         Intent i;
