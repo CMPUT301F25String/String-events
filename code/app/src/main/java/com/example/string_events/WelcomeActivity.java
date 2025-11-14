@@ -24,10 +24,18 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen);
 
-        ((MaterialButton) findViewById(R.id.btnSignIn))
-                .setOnClickListener(v -> startActivity(new Intent(this, LoginScreen.class)));
-        ((MaterialButton) findViewById(R.id.btnRegister))
-                .setOnClickListener(v -> startActivity(new Intent(this, RegisterScreen.class)));
+        MaterialButton signInButton = findViewById(R.id.btnSignIn);
+        MaterialButton registerButton = findViewById(R.id.btnRegister);
+
+        signInButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginScreen.class));
+            finish();
+        });
+
+        registerButton.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterScreen.class));
+            finish();
+        });
     }
 
     /**
