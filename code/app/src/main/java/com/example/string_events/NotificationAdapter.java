@@ -53,14 +53,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.notificationPhoto.setImageResource(R.drawable.event_image);
         holder.notificationEventName.setText(notification.getEventName());
 
-        holder.notificationItemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, EventDetailActivity.class);
-                intent.putExtra("selectedStatus", String.valueOf(notification.getSelectedStatus()));
-                intent.putExtra("event_id", notification.getEventId());
-                context.startActivity(intent);
-            }
+        // TODO remove the notification from the notification list once clicked to solve some issues
+        holder.notificationItemLayout.setOnClickListener(view -> {
+            Intent intent = new Intent(context, EventDetailActivity.class);
+            intent.putExtra("source", "notification");
+            intent.putExtra("selectedStatus", String.valueOf(notification.getSelectedStatus()));
+            intent.putExtra("event_id", notification.getEventId());
+            context.startActivity(intent);
         });
     }
 

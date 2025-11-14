@@ -31,16 +31,7 @@ public class EventDetailActivityTest {
     private static Intent makeIntent() {
         Context ctx = ApplicationProvider.getApplicationContext();
         return new Intent(ctx, EventDetailActivity.class)
-                .putExtra("fromTest", true)
                 .putExtra("event_id", "test-event");
-    }
-
-    @Before
-    public void setup() {
-        Context ctx = ApplicationProvider.getApplicationContext();
-        if (FirebaseApp.getApps(ctx).isEmpty()) FirebaseApp.initializeApp(ctx);
-        SharedPreferences sp = ctx.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        sp.edit().putString("user", "ui-tester").apply();
     }
 
     private static ViewAction waitForWindowFocus() {

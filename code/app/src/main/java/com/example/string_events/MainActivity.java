@@ -41,8 +41,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.events_screen);
+        wireCommon();
 
-        String role = getIntent().getStringExtra("role");
         String username = getIntent().getStringExtra("user");
         String fullName = getIntent().getStringExtra("name");
         String email = getIntent().getStringExtra("email");
@@ -59,25 +60,21 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        // users that sign in as admins have very different app flows
-        if ("admin".equalsIgnoreCase(role)) {
-            show(Screen.ADMIN_HOME);
-        }
-        else {
-            show(Screen.USER_HOME);
-        }
+        onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
+        onClick(R.id.nav_person, () -> show(Screen.PROFILE));
+        loadEventsIntoList();
     }
 
 
     private void show(Screen s) {
         switch (s) {
-            case USER_HOME:
-                setContentView(R.layout.events_screen);
-                wireCommon();
-                onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
-                onClick(R.id.nav_person, () -> show(Screen.PROFILE));
-                loadEventsIntoList();
-                break;
+//            case USER_HOME:
+//                setContentView(R.layout.events_screen);
+//                wireCommon();
+//                onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
+//                onClick(R.id.nav_person, () -> show(Screen.PROFILE));
+//                loadEventsIntoList();
+//                break;
 
             case NOTIFICATIONS:
 //                setContentView(R.layout.notification_screen);
@@ -115,28 +112,26 @@ public class MainActivity extends AppCompatActivity {
 //                new ProfileScreen().setupProfileScreen(this, username, fullName, email);
                 break;
 
-
-            case ADMIN_HOME:
-                setContentView(R.layout.admin_dashboard);
-                wireCommon();
-
-
-                onClick(R.id.btnEvents, () -> {
-                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
-                    startActivity(intent);
-                });
-
-                onClick(R.id.btnImages, () -> {
-                    Intent intent = new Intent(this, AdminImageManagementActivity.class);
-                    startActivity(intent);
-                });
-
-                onClick(R.id.btnProfiles, () -> {
-                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
-                });
-
-                break;
-
+//            case ADMIN_HOME:
+//                setContentView(R.layout.admin_dashboard);
+//                wireCommon();
+//
+//
+//                onClick(R.id.btnEvents, () -> {
+//                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
+//                    startActivity(intent);
+//                });
+//
+//                onClick(R.id.btnImages, () -> {
+//                    Intent intent = new Intent(this, AdminImageManagementActivity.class);
+//                    startActivity(intent);
+//                });
+//
+//                onClick(R.id.btnProfiles, () -> {
+//                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
+//                });
+//
+//                break;
         }
     }
 

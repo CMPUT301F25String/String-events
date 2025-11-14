@@ -16,6 +16,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class LoginScreen extends AppCompatActivity {
 
@@ -97,7 +98,7 @@ public class LoginScreen extends AppCompatActivity {
                         }
                         String storedPw = q.getDocuments().get(0).getString("password");
                         if (storedPw != null && storedPw.equals(pass)) {
-                            goHome("admin", null, null, null);
+                            openNextScreen("admin", null, null, null);
                         } else {
                             setLoading(false);
                             toast("wrong admin password");
@@ -175,20 +176,28 @@ public class LoginScreen extends AppCompatActivity {
             String fullName = snapshot.getString("name");
             String userEmail = snapshot.getString("email");
 
-            goHome("user", realUsername, fullName, userEmail);
+            openNextScreen("user", realUsername, fullName, userEmail);
         } else {
             setLoading(false);
             toast("Wrong password");
         }
     }
 
-    private void goHome(String role, String username, String fullName, String email) {
+    private void openNextScreen(String role, String username, String fullName, String email) {
         setLoading(false);
-        Intent i = new Intent(this, MainActivity.class);
-        i.putExtra("role", role);
-        i.putExtra("user", username);
-        i.putExtra("name", fullName);
-        i.putExtra("email", email);
+        Intent i;
+        // if logging in as a user, open the user events screen and put useful information in putExtra
+        if (Objects.equals(role, "user")) {
+            i = new Intent(this, MainActivity.class);
+            i.putExtra("role", role);
+            i.putExtra("user", username);
+            i.putExtra("name", fullName);
+            i.putExtra("email", email);
+        }
+        // if logging in as an admin, open the admin dashboard screen
+        else {
+            i = new Intent(this, AdminDashboardActivity.class);
+        }
         startActivity(i);
         finish();
     }
