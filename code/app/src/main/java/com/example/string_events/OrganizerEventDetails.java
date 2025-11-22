@@ -11,14 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
  * Organizer-facing details screen for a specific event.
  * <p>
  * Provides navigation to participant-related lists (canceled, participating, waitlist).
- * The target event is identified via {@link #EXTRA_EVENT_ID}.
+ * The target event is identified via {@link #EVENT_ID}.
  */
 public class OrganizerEventDetails extends AppCompatActivity {
 
     /**
      * Intent extra key containing the event ID to manage.
      */
-    public static final String EXTRA_EVENT_ID = "extra_event_id";
+    public static final String EVENT_ID = "eventId";
 
     /**
      * Inflates the organizer event details UI, wires the back button, reads the
@@ -29,34 +29,37 @@ public class OrganizerEventDetails extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.org_event_details);
+        setContentView(R.layout.org_event_detail_screen);
 
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        String eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
+        // commented out for testing purposes
+        // eventId is currently set to "event3"
+//        String eventId = getIntent().getStringExtra(EVENT_ID);
+        String eventId = "07d4dd53-3efe-4613-b852-0720a924be8b";
 
-//        findViewById(R.id.btnRoll).setOnClickListener(v -> {
-//            Intent it = new Intent(this, LotteryActivity.class);
-//            it.putExtra(EXTRA_EVENT_ID, eventId);
-//            startActivity(it);
-//        });
+        findViewById(R.id.btnRoll).setOnClickListener(v -> {
+            Intent it = new Intent(this, LotteryDrawActivity.class);
+            it.putExtra(EVENT_ID, eventId);
+            startActivity(it);
+        });
 
         findViewById(R.id.btnCanceled).setOnClickListener(v -> {
             Intent it = new Intent(this, CanceledUsersActivity.class);
-            it.putExtra(EXTRA_EVENT_ID, eventId);
+            it.putExtra(EVENT_ID, eventId);
             startActivity(it);
         });
 
         findViewById(R.id.btnParticipating).setOnClickListener(v -> {
             Intent it = new Intent(this, ParticipatingUsersActivity.class);
-            it.putExtra(EXTRA_EVENT_ID, eventId);
+            it.putExtra(EVENT_ID, eventId);
             startActivity(it);
         });
 
         findViewById(R.id.btnWaitlist).setOnClickListener(v -> {
             Intent it = new Intent(this, WaitlistUsersActivity.class);
-            it.putExtra(EXTRA_EVENT_ID, eventId);
+            it.putExtra(EVENT_ID, eventId);
             startActivity(it);
         });
 

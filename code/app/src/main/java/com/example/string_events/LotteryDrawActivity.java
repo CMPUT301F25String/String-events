@@ -1,12 +1,16 @@
 package com.example.string_events;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -24,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Activity that performs a lottery draw for an event's waitlist to fill
@@ -31,66 +36,88 @@ import java.util.Map;
  * after-state summary upon completion.
  */
 public class LotteryDrawActivity extends AppCompatActivity {
-    private static final String COL_EVENTS = "events";
-    private static final String SUB_WAITLIST = "waitlist";
-    private static final String SUB_PARTICIPANTS = "participants";
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String eventId;
+    private DocumentReference eventRef;
+    private boolean lotteryRolled;
 
-    private TextView tvEventName, tvTime, tvLocation;
-    private ImageButton btnBack;
-    private MaterialButton btnRoll;
-
-    private final DateFormat dfTime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+    ConstraintLayout lotteryLayoutBlockedRoll;
+    ConstraintLayout lotteryLayoutBeforeRoll;
+    ConstraintLayout lotteryLayoutAfterRoll;
+    TextView tvSelectedCount;
+    ImageButton btnRoll;
 
     /**
      * Reads the target {@code event_id} from the intent, inflates the
      * "before roll" layout, binds header views, loads event header data,
-     * and wires the Roll button to trigger {@link #performRoll()}.
+     * and wires the Roll button to trigger {@link #runLottery()} ()}.
      *
      * @param savedInstanceState previously saved instance state, or {@code null}
      */
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        eventId = getIntent().getStringExtra("event_id");
         setContentView(R.layout.lottery_before_roll);
-        bindHeaderViews();
-        loadEventHeader();
-        if (btnRoll != null) {
-            btnRoll.setOnClickListener(v -> performRoll());
-        }
-    }
 
-    /**
-     * Binds header views and sets the back button to finish the activity.
-     */
-    private void bindHeaderViews() {
-        btnBack = findViewById(R.id.btnBack);
-        tvEventName = findViewById(R.id.tvEventName);
-        tvTime = findViewById(R.id.tvTime);
-        tvLocation = findViewById(R.id.tvLocation);
+        String eventId = getIntent().getStringExtra("eventId");
+        assert eventId != null;
+        eventRef = db.collection("events").document(eventId);
+
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        TextView tvEventName = findViewById(R.id.tvEventName);
+        TextView tvTime = findViewById(R.id.tvTime);
+        TextView tvLocation = findViewById(R.id.tvLocation);
+
+        lotteryLayoutBlockedRoll = findViewById(R.id.lottery_layout_blocked_roll);
+        lotteryLayoutBeforeRoll = findViewById(R.id.lottery_layout_before_roll);
+        lotteryLayoutAfterRoll = findViewById(R.id.lottery_layout_after_roll);
+        tvSelectedCount = findViewById(R.id.tvSelectedCount);
         btnRoll = findViewById(R.id.btnRoll);
-        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
-    }
 
-    /**
-     * Loads event title, location, and start time from Firestore and
-     * populates the header fields.
-     */
-    private void loadEventHeader() {
-        if (eventId == null) return;
-        DocumentReference eventRef = db.collection(COL_EVENTS).document(eventId);
+
         eventRef.get().addOnSuccessListener(d -> {
-            if (d == null || !d.exists()) return;
-            String title = d.getString("title");
-            String location = d.getString("location");
+            // get the event details from the database and update the screen's views with them
+            tvEventName.setText(d.getString("title"));
+            tvLocation.setText(d.getString("location"));
+            DateFormat dfTime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
             Timestamp startAt = d.getTimestamp("startAt");
-            if (tvEventName != null) tvEventName.setText(title == null ? "" : title);
-            if (tvLocation != null) tvLocation.setText(location == null ? "" : location);
-            if (tvTime != null) tvTime.setText(startAt == null ? "" : dfTime.format(startAt.toDate()));
+            assert startAt != null;
+            tvTime.setText(dfTime.format(startAt.toDate()));
+            int invitedListSize = ((ArrayList<String>)Objects.requireNonNull(d.get("invited"))).size();
+            tvSelectedCount.setText(invitedListSize + " participant(s) have been selected!");
+            lotteryRolled = Boolean.TRUE.equals(d.getBoolean("lotteryRolled"));
+
+            // if the registration time has not ended yet, the organizer cannot roll event participants
+            Timestamp registerEndTime = d.getTimestamp("regEndAt");
+            assert registerEndTime != null;
+            if (Timestamp.now().compareTo(registerEndTime) > 0) {
+                // current time is after registration deadline
+                lotteryLayoutBlockedRoll.setVisibility(View.GONE);
+                // check if this event's lottery has already been rolled
+                // if so, the organizer cannot reroll because it would be unfair for entrants
+                if (lotteryRolled) {
+                    lotteryLayoutBeforeRoll.setVisibility(View.GONE);
+                    lotteryLayoutAfterRoll.setVisibility(View.VISIBLE);
+                    btnRoll.setBackgroundResource(R.drawable.roll_button_unavailable);
+                } else {
+                    lotteryLayoutBeforeRoll.setVisibility(View.VISIBLE);
+                    lotteryLayoutAfterRoll.setVisibility(View.GONE);
+                    btnRoll.setBackgroundResource(R.drawable.roll_button_available);
+                }
+                // the roll button only does something if the event's lottery hasn't been rolled yet
+                btnRoll.setOnClickListener(v -> {
+                    if (!lotteryRolled) {
+                        runLottery();
+                    }
+                });
+            }
+            else {
+                // current time is before registration deadline
+                lotteryLayoutBlockedRoll.setVisibility(View.VISIBLE);
+                btnRoll.setBackgroundResource(R.drawable.roll_button_unavailable);
+            }
         });
+        btnBack.setOnClickListener(v -> finish());
     }
 
     /**
@@ -102,91 +129,45 @@ public class LotteryDrawActivity extends AppCompatActivity {
      *   <li>Updates event counters and timestamps, then switches UI to the "after roll" state.</li>
      * </ol>
      */
-    private void performRoll() {
-        if (eventId == null) return;
 
-        DocumentReference eventRef = db.collection(COL_EVENTS).document(eventId);
-        CollectionReference waitRef = eventRef.collection(SUB_WAITLIST);
-        CollectionReference partRef = eventRef.collection(SUB_PARTICIPANTS);
-
+    // TODO we should only be able to roll once after registration period has ended and then it should auto roll after if needed
+    @SuppressWarnings("unchecked")
+    private void runLottery() {
         eventRef.get().addOnSuccessListener(eventSnap -> {
-            if (eventSnap == null || !eventSnap.exists()) return;
+            // get the waitlist array of the event and count how many people are on it;
+            ArrayList<String> waitlist = (ArrayList<String>) eventSnap.get("waitlist");
+            assert waitlist != null;
+            int waitlistCount = waitlist.size();
+            // get the max attendees number for the event
+            int maxAttendees = Integer.parseInt(String.valueOf(eventSnap.get("maxAttendees")));
 
-            int maxAtt = safeInt(eventSnap.get("maxAttendees"));
-            int attCnt = safeInt(eventSnap.get("attendeesCount"));
-            int slots = Math.max(0, maxAtt - attCnt);
-            if (slots <= 0) {
-                switchToAfter(0);
-                return;
+            // maxAttendees >= waitlistCount means we don't need to roll at all and everyone gets an invite
+            ArrayList<String> inviteList;
+            if (maxAttendees >= waitlistCount) {
+                // add everyone to invited list and clear the waitlist
+                inviteList = new ArrayList<>(waitlist);
+                waitlist.clear();
             }
+            // otherwise, we shuffle the waitlist randomly and pick the first maxAttendees number as winners
+            else {
+                Collections.shuffle(waitlist);
+                inviteList = new ArrayList<>(waitlist.subList(0, maxAttendees));
+                waitlist.removeAll(inviteList);
+            }
+            // update the event's waitlist, invited list, and lotteryRolled boolean in the database
+            db.runTransaction(transaction -> {
+                transaction.update(eventRef, "waitlist", waitlist);
+                transaction.update(eventRef, "invited", inviteList);
+                transaction.update(eventRef, "lotteryRolled", true);
+                lotteryRolled = true;
+                return null;
+            }).addOnSuccessListener(o -> Log.d("FirestoreCheck", "database transaction successful"));
 
-            waitRef.get().addOnSuccessListener((QuerySnapshot waitSnap) -> {
-                List<DocumentSnapshot> waitDocs = waitSnap == null ? new ArrayList<>() : waitSnap.getDocuments();
-                if (waitDocs.isEmpty()) {
-                    switchToAfter(0);
-                    return;
-                }
-
-                Collections.shuffle(waitDocs);
-                int pick = Math.min(slots, waitDocs.size());
-                List<DocumentSnapshot> winners = waitDocs.subList(0, pick);
-
-                WriteBatch batch = db.batch();
-                for (DocumentSnapshot w : winners) {
-                    DocumentReference from = waitRef.document(w.getId());
-                    DocumentReference to = partRef.document(w.getId());
-                    Map<String, Object> data = w.getData();
-                    if (data != null) {
-                        data.put("selected", true);
-                        data.put("selectedAt", FieldValue.serverTimestamp());
-                        batch.set(to, data, SetOptions.merge());
-                    } else {
-                        batch.set(to, Collections.singletonMap("selected", true), SetOptions.merge());
-                        batch.update(to, "selectedAt", FieldValue.serverTimestamp());
-                    }
-                    batch.delete(from);
-                }
-                batch.update(eventRef, "attendeesCount", FieldValue.increment(pick));
-                batch.update(eventRef, "lastRolledAt", FieldValue.serverTimestamp());
-
-                batch.commit()
-                        .addOnSuccessListener(unused -> switchToAfter(pick))
-                        .addOnFailureListener(e -> { });
-            });
+            // change the look of the screen to show that rolling has been completed
+            tvSelectedCount.setText(inviteList.size() + " participant(s) have been selected!");
+            lotteryLayoutBeforeRoll.setVisibility(View.GONE);
+            lotteryLayoutAfterRoll.setVisibility(View.VISIBLE);
+            btnRoll.setBackgroundResource(R.drawable.roll_button_unavailable);
         });
-    }
-
-    /**
-     * Switches the layout to the "after roll" screen, rebinds and reloads
-     * the header, and shows the number of selected participants.
-     *
-     * @param selectedCount number of participants chosen by the draw
-     */
-    private void switchToAfter(int selectedCount) {
-        setContentView(R.layout.lottery_after_roll);
-        bindHeaderViews();
-        loadEventHeader();
-
-        TextView tvSelected = findViewById(R.id.tvSelectedCount);
-        TextView tvNotified = findViewById(R.id.tvNotified);
-        if (tvSelected != null) {
-            tvSelected.setText(selectedCount + " participants have been selected !");
-        }
-        if (btnRoll != null) {
-            btnRoll.setEnabled(false);
-        }
-        if (tvNotified != null) { }
-    }
-
-    /**
-     * Parses an arbitrary object into an {@code int}, returning 0 on null or failure.
-     *
-     * @param o value to parse
-     * @return parsed integer or 0 if not parsable
-     */
-    private int safeInt(Object o) {
-        if (o == null) return 0;
-        if (o instanceof Number) return ((Number) o).intValue();
-        try { return Integer.parseInt(String.valueOf(o)); } catch (Exception e) { return 0; }
     }
 }

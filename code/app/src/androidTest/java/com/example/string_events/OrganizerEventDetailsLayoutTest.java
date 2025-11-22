@@ -29,7 +29,7 @@ public class OrganizerEventDetailsLayoutTest {
                 androidx.test.core.app.ApplicationProvider.getApplicationContext(),
                 UiHostActivity.class
         );
-        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.org_event_details);
+        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.org_event_detail_screen);
         scenario = ActivityScenario.launch(i);
     }
 
