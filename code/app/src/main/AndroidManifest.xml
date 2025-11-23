@@ -13,12 +13,7 @@
 
         <activity
             android:name=".CreateEventScreen"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"/>
 
         <activity
             android:name=".LoginScreen"
@@ -107,8 +102,11 @@
 
         <activity
             android:name=".WelcomeActivity"
-            android:exported="false">
-
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
     </application>

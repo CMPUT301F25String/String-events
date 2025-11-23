@@ -300,6 +300,7 @@ public class CreateEventScreen extends AppCompatActivity {
         doc.put("attendees", event.getAttendees()); // when creating a new event, this attendees list is empty
         doc.put("invited", event.getInvited()); // when creating a new event, this invited list is empty
         doc.put("waitlist", event.getWaitlist()); // when creating a new event, this waitlist is empty
+        doc.put("lotteryRolled", event.isLotteryRolled()); // when creating a new event, lotteryRolled is set to false
         doc.put("waitlistLimit", event.getWaitlistLimit());
         doc.put("geolocationReq", event.getGeolocationRequirement());
         doc.put("visibility", event.getEventVisibility());
