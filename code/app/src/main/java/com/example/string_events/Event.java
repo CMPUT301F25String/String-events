@@ -31,8 +31,11 @@ public class Event {
     boolean geolocationRequirement;
     boolean visibility;
 
+
     ArrayList<User> attendees;
+    ArrayList<User> invited;
     ArrayList<User> waitlist;
+    boolean lotteryRolled;
 
     /**
      * Creates a fully specified event and initializes empty attendee/waitlist collections.
@@ -75,7 +78,9 @@ public class Event {
         // generates a unique random id for the new event
         this.eventId = UUID.randomUUID().toString();
         this.attendees = new ArrayList<>(); // when creating a new event, an empty attendees list is created
+        this.invited = new ArrayList<>(); // when creating a new event, an empty invited list is created
         this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created
+        this.lotteryRolled = false; // when creating a new event, the lottery for participants hasn't been rolled yet
     }
 
     /**
@@ -321,6 +326,22 @@ public class Event {
      */
     public ArrayList<User> getWaitlist() {
         return waitlist;
+    }
+
+    public ArrayList<User> getInvited() {
+        return invited;
+    }
+
+    public ArrayList<User> getAttendees() {
+        return attendees;
+    }
+
+    public boolean isLotteryRolled() {
+        return lotteryRolled;
+    }
+
+    public void setLotteryRolled(boolean lotteryRolled) {
+        this.lotteryRolled = lotteryRolled;
     }
 
     /**
