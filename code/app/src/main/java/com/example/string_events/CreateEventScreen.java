@@ -81,6 +81,7 @@ public class CreateEventScreen extends AppCompatActivity {
         EditText eventAttendantsEditText = findViewById(R.id.event_attendants_editText);
         EditText eventWaitlistEdittext = findViewById(R.id.event_waitlist_editText);
         SwitchCompat eventGeolocationSwitch = findViewById(R.id.geolocation_switch);
+        SwitchCompat eventAutoRollingSwitch = findViewById(R.id.auto_rolling_switch);
         ImageButton eventVisibilityPublic = findViewById(R.id.event_public_button);
         ImageButton eventVisibilityPrivate = findViewById(R.id.event_private_button);
         // needs to be atomic boolean to avoid an error
@@ -143,8 +144,16 @@ public class CreateEventScreen extends AppCompatActivity {
             imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"));
         });
 
-        eventVisibilityPublic.setOnClickListener(view -> visibility.set(true));
-        eventVisibilityPrivate.setOnClickListener(view -> visibility.set(false));
+        eventVisibilityPublic.setOnClickListener(view -> {
+            eventVisibilityPublic.setBackgroundResource(R.drawable.public_button_clicked);
+            eventVisibilityPrivate.setBackgroundResource(R.drawable.private_button);
+            visibility.set(true);
+        });
+        eventVisibilityPrivate.setOnClickListener(view -> {
+            eventVisibilityPrivate.setBackgroundResource(R.drawable.private_button_clicked);
+            eventVisibilityPublic.setBackgroundResource(R.drawable.public_button);
+            visibility.set(false);
+        });
 
         doneButton.setOnClickListener(view -> {
             String title = String.valueOf(eventTitleEditText.getText());
@@ -179,6 +188,7 @@ public class CreateEventScreen extends AppCompatActivity {
             int maxAttendees = Integer.parseInt(eventAttendantsEditText.getText().toString());
             int waitlistLimit = Integer.parseInt(eventWaitlistEdittext.getText().toString());
             boolean geolocationRequirement = eventGeolocationSwitch.isChecked();
+            boolean autoRoll = eventAutoRollingSwitch.isChecked();
 
             Event newEvent = new Event(username, title, photo, description, tags,
                     startDateTime, endDateTime, location,

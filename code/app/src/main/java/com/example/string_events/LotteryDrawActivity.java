@@ -84,7 +84,7 @@ public class LotteryDrawActivity extends AppCompatActivity {
             assert startAt != null;
             tvTime.setText(dfTime.format(startAt.toDate()));
             int invitedListSize = ((ArrayList<String>)Objects.requireNonNull(d.get("invited"))).size();
-            tvSelectedCount.setText(invitedListSize + " participant(s) have been selected!");
+            tvSelectedCount.setText(String.format(Locale.CANADA, "%d participant(s) have been selected!", invitedListSize));
             lotteryRolled = Boolean.TRUE.equals(d.getBoolean("lotteryRolled"));
 
             // if the registration time has not ended yet, the organizer cannot roll event participants
@@ -130,7 +130,6 @@ public class LotteryDrawActivity extends AppCompatActivity {
      * </ol>
      */
 
-    // TODO we should only be able to roll once after registration period has ended and then it should auto roll after if needed
     @SuppressWarnings("unchecked")
     private void runLottery() {
         eventRef.get().addOnSuccessListener(eventSnap -> {
@@ -152,6 +151,7 @@ public class LotteryDrawActivity extends AppCompatActivity {
             else {
                 Collections.shuffle(waitlist);
                 inviteList = new ArrayList<>(waitlist.subList(0, maxAttendees));
+                // TODO send notification to everyone on inviteList
                 waitlist.removeAll(inviteList);
             }
             // update the event's waitlist, invited list, and lotteryRolled boolean in the database
@@ -164,10 +164,23 @@ public class LotteryDrawActivity extends AppCompatActivity {
             }).addOnSuccessListener(o -> Log.d("FirestoreCheck", "database transaction successful"));
 
             // change the look of the screen to show that rolling has been completed
-            tvSelectedCount.setText(inviteList.size() + " participant(s) have been selected!");
+            tvSelectedCount.setText(String.format(Locale.CANADA,"%d participant(s) have been selected!", inviteList.size()));
             lotteryLayoutBeforeRoll.setVisibility(View.GONE);
             lotteryLayoutAfterRoll.setVisibility(View.VISIBLE);
             btnRoll.setBackgroundResource(R.drawable.roll_button_unavailable);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void replaceCancelledUser(DocumentReference eventRef) {
+        eventRef.get().addOnSuccessListener(eventSnap -> {
+            // get the waitlist array of the event and count how many people are on it;
+            ArrayList<String> waitlist = (ArrayList<String>) eventSnap.get("waitlist");
+            assert waitlist != null;
+            // shuffle the event's current waitlist and select the first user as the winner
+            Collections.shuffle(waitlist);
+            eventRef.update("invited", FieldValue.arrayUnion(waitlist.getFirst()));
+            // TODO send notification to the selected user
         });
     }
 }

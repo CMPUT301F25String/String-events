@@ -473,6 +473,38 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/event_auto_rolling_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/auto_rolling_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="30dp"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"
+                    app:thumbTint="@color/white"
+                    app:trackTint="@color/switch_track_colour"
+                    app:layout_constraintTop_toTopOf="@id/event_auto_rolling_layout"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <TextView
+                    android:id="@+id/auto_rolling_text"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="Automatic Lottery for attendees"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/prompt_regular"
+                    app:layout_constraintTop_toTopOf="@id/auto_rolling_switch"
+                    app:layout_constraintBottom_toBottomOf="@id/auto_rolling_switch"
+                    app:layout_constraintStart_toEndOf="@id/auto_rolling_switch"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/event_visibility_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
