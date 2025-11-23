@@ -99,6 +99,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".QrCodeActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
