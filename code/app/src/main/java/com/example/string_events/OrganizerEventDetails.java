@@ -7,10 +7,25 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Organizer-facing details screen for a specific event.
+ * <p>
+ * Provides navigation to participant-related lists (canceled, participating, waitlist).
+ * The target event is identified via {@link #EXTRA_EVENT_ID}.
+ */
 public class OrganizerEventDetails extends AppCompatActivity {
 
+    /**
+     * Intent extra key containing the event ID to manage.
+     */
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
+    /**
+     * Inflates the organizer event details UI, wires the back button, reads the
+     * event ID from the intent, and sets up navigation to related user lists.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

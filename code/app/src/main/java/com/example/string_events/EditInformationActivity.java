@@ -11,12 +11,25 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Screen that lets a user edit their profile information stored in Firestore.
+ * <p>
+ * Looks up the user by {@code username} passed via intent extras and updates
+ * name, email, password, and username (derived from the new email if provided).
+ */
 public class EditInformationActivity extends AppCompatActivity {
 
     private TextInputEditText etName, etEmail, etPassword;
     private FirebaseFirestore db;
     private String username;
 
+    /**
+     * Initializes the UI, retrieves the target username from the intent,
+     * and wires the submit action to update Firestore with merged values
+     * (new input overrides existing fields; empty input keeps old values).
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

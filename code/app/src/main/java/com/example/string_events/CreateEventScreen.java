@@ -40,9 +40,22 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Screen for creating a new event.
+ * <p>
+ * Handles user input for event details, image selection and upload to Firebase Storage,
+ * and persisting the event document to Firestore.
+ */
 public class CreateEventScreen extends AppCompatActivity {
+    /** Firestore entry point used to persist event data. */
     private FirebaseFirestore db;
 
+    /**
+     * Initializes view bindings, date/time pickers, image picker, visibility toggles,
+     * and submits the form to create and upload a new {@link Event}.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,29 +112,29 @@ public class CreateEventScreen extends AppCompatActivity {
 
         // create an ActivityResultLauncher for picking an image
         ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                // get the intent of the result
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent intent = result.getData();
-                    // get the actual uri stored in the intent
-                    Uri selectedImageUri = null;
-                    if (intent != null) {
-                        // sometimes the image is handled with Data and sometimes with ClipData
-                        if (intent.getData() != null) {
-                            selectedImageUri = intent.getData();
-                        }
-                        else if (intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
-                            ClipData clipData = intent.getClipData();
-                            selectedImageUri = clipData.getItemAt(0).getUri();
-                        }
-                        if (selectedImageUri != null) {
-                            eventPhotoImageView.setImageURI(selectedImageUri);
-                            eventPhotoImageView.setTag(selectedImageUri);
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // get the intent of the result
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                        // get the actual uri stored in the intent
+                        Uri selectedImageUri = null;
+                        if (intent != null) {
+                            // sometimes the image is handled with Data and sometimes with ClipData
+                            if (intent.getData() != null) {
+                                selectedImageUri = intent.getData();
+                            }
+                            else if (intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
+                                ClipData clipData = intent.getClipData();
+                                selectedImageUri = clipData.getItemAt(0).getUri();
+                            }
+                            if (selectedImageUri != null) {
+                                eventPhotoImageView.setImageURI(selectedImageUri);
+                                eventPhotoImageView.setTag(selectedImageUri);
+                            }
                         }
                     }
-                }
-            });
+                });
 
         addEventPhotoButton.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -142,24 +155,24 @@ public class CreateEventScreen extends AppCompatActivity {
 
             // converts the text in the editText into a LocalDateTime and then into a ZonedDateTime (has timezone)
             ZonedDateTime startDateTime = LocalDate.parse(
-                    String.valueOf(eventStartDateEditText.getText()))
+                            String.valueOf(eventStartDateEditText.getText()))
                     .atTime(LocalTime.parse(String.valueOf(eventStartTimeEditText.getText())))
                     .atZone(ZoneId.systemDefault());
 
             ZonedDateTime endDateTime = LocalDate.parse(
-                    String.valueOf(eventEndDateEditText.getText()))
+                            String.valueOf(eventEndDateEditText.getText()))
                     .atTime(LocalTime.parse(String.valueOf(eventEndTimeEditText.getText())))
                     .atZone(ZoneId.systemDefault());
 
             String location = String.valueOf(eventLocationEditText.getText());
 
             ZonedDateTime registrationStartDateTime = LocalDate.parse(
-                    String.valueOf(registrationStartDateEditText.getText()))
+                            String.valueOf(registrationStartDateEditText.getText()))
                     .atTime(LocalTime.parse(String.valueOf(registrationStartTimeEditText.getText())))
                     .atZone(ZoneId.systemDefault());
 
             ZonedDateTime registrationEndDateTime = LocalDate.parse(
-                    String.valueOf(registrationEndDateEditText.getText()))
+                            String.valueOf(registrationEndDateEditText.getText()))
                     .atTime(LocalTime.parse(String.valueOf(registrationEndTimeEditText.getText())))
                     .atZone(ZoneId.systemDefault());
 
@@ -177,6 +190,13 @@ public class CreateEventScreen extends AppCompatActivity {
         });
     }
 
+    /**
+     * Opens a {@link DatePickerDialog} and writes the selected date into the given {@link EditText}
+     * using {@code yyyy-MM-dd} formatting.
+     *
+     * @param context     dialog context
+     * @param dateEditText target input to receive the formatted date
+     */
     private void showDateDialog(Context context, EditText dateEditText) {
         // get the current date
         Calendar calendar = Calendar.getInstance();
@@ -198,6 +218,13 @@ public class CreateEventScreen extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    /**
+     * Opens a {@link TimePickerDialog} and writes the selected time into the given {@link EditText}
+     * using {@code HH:mm} formatting (24-hour).
+     *
+     * @param context      dialog context
+     * @param timeEditText target input to receive the formatted time
+     */
     private void showTimeDialog(Context context, EditText timeEditText) {
         // get the current time
         Calendar calendar = Calendar.getInstance();
@@ -218,6 +245,12 @@ public class CreateEventScreen extends AppCompatActivity {
         timePickerDialog.show();
     }
 
+    /**
+     * Uploads the event image to Firebase Storage; upon success, obtains the download URL
+     * and delegates persistence of the event document to {@link #saveEventToDatabase(Event, String)}.
+     *
+     * @param event event to be uploaded and saved
+     */
     private void uploadNewEventToDatabase(Event event) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
@@ -244,6 +277,14 @@ public class CreateEventScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Builds a Firestore document from the provided {@link Event} and stores it under
+     * the {@code events} collection using the event's ID. Shows a toast on success/failure
+     * and triggers a lightweight image retrieval test via {@link #testingImageGet(Event)}.
+     *
+     * @param event    the event whose fields populate the document
+     * @param imageUrl optional image download URL to persist (ignored if {@code null})
+     */
     // Helper function to handle saving the document to Firestore
     private void saveEventToDatabase(Event event, String imageUrl) {
         Map<String, Object> doc = new HashMap<>();
@@ -283,6 +324,12 @@ public class CreateEventScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Debug helper that fetches the event document and, if an image URL exists,
+     * loads it into the "add photo" button using Glide to confirm retrieval works.
+     *
+     * @param event the event whose document is retrieved
+     */
     public void testingImageGet(Event event) {
         // get the specified event from the database
         DocumentReference documentReference = db.collection("events").document(event.getEventId());

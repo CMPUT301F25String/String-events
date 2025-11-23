@@ -7,7 +7,18 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Organizer entry screen listing organizer actions.
+ * Provides navigation to {@link CreateEventScreen} for creating a new event.
+ */
 public class OrganizerEventScreen extends AppCompatActivity {
+
+    /**
+     * Inflates the organizer events layout and wires the create-event button
+     * to open {@link CreateEventScreen}.
+     *
+     * @param savedInstanceState previously saved state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +31,9 @@ public class OrganizerEventScreen extends AppCompatActivity {
         });
     }
 
+    /**
+     * Launches the screen for creating a new event.
+     */
     public void openCreateEventScreen() {
         Context context = OrganizerEventScreen.this;
         Intent myIntent = new Intent(context, CreateEventScreen.class);

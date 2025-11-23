@@ -13,8 +13,20 @@ import com.example.string_events.UserItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Screen for organizers to view participants of an event.
+ * <p>
+ * Populates a {@link ListView} using {@link UserAdapter} and provides demo actions
+ * to send messages or export the list.
+ */
 public class ParticipatingUsersActivity extends AppCompatActivity {
 
+    /**
+     * Inflates the layout, wires the back button, sets up the list adapter
+     * with mock data, and binds demo click handlers.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +47,12 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Provides sample participant entries for UI demonstration.
+     *
+     * @param status the {@link UserItem.Status} to apply to all mocked users
+     * @return a list of mocked {@link UserItem}
+     */
     private List<UserItem> mockUsers(UserItem.Status status) {
         List<UserItem> data = new ArrayList<>();
         data.add(new UserItem("Daisy", "daisy@mail.com", status));
