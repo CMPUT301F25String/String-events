@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">String-Events</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_camera">Camera</string>
+    <string name="nav_bell">Notifications</string>
+    <string name="nav_person">Profile</string>
+    <string name="back">Back</string>
+    <string name="edit_information">Edit Information</string>
+    <string name="new_name">New Name</string>
+    <string name="new_email">New Email</string>
+    <string name="new_password">New Password</string>
+    <string name="done">Done</string>
+    <string name="lottery_information">Lottery Information</string>
+    <string name="lottery_guidelines">Lottery Guidelines</string>
+    <string name="lottery_guidelines_text">This event sign-up process uses a fair lottery system instead of first come, first served registration. When you join an event’s waiting list, your name will be entered into a random draw that takes place after the registration period closes. Everyone on the waiting list has an equal chance of being selected. If you’re chosen, you’ll receive a notification inviting you to confirm your spot. If you decide not to accept or don’t respond, another entrant will be randomly selected in your place. This system ensures that everyone gets a fair opportunity to participate, without the pressure of rushing to sign up first.</string>
+    <string name="admin_event_management">Admin Event Management</string>
+    <string name="admin_event_details">Event Details</string>
+    <string name="search_events">Search events…</string>
+    <string name="create_event">Create Event</string>
+    <string name="delete_event">Delete Event</string>
+    <string name="sample_event_title">Community Sports Day</string>
+    <string name="sample_event_subtitle">Nov 10, 2:00 PM · UofA Gym</string>
+    <string name="sample_event_time">Nov 10, 2:00 PM – 5:00 PM</string>
+    <string name="sample_event_location">Location: UofA Gym Hall A</string>
+    <string name="description">Description</string>
+    <string name="sample_event_description">This event is open to all students. Bring your student ID to participate.</string>
+    <string name="sample_event_counts">Joined: 18 · Waitlist: 42 · Capacity: 30</string>
+
+    <string name="my_profile">My Profile</string>
+    <string name="log_out">Log Out</string>
+    <string name="admin_badge">Admin</string>
+    <string name="event_image">Event image</string>
+    <string name="time">Time</string>
+    <string name="location_logo">Location logo</string>
+    <string name="label_name">Name:</string>
+    <string name="label_email">Email:</string>
+    <string name="label_password">Password:</string>
+    <string name="placeholder_name"></string>
+    <string name="placeholder_email"></string>
+    <string name="event_management">Event Management</string>
+    <string name="sample_location">Community Centre</string>
+    <string name="sample_organizer">Organizer: XYZ</string>
+    <string name="image_management">Image Management</string>
+    <string name="delete_image">Delete Image</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_finished">Finished</string>
+    <string name="add_text_hint">Click to add text</string>
+    <string name="sample_title">Community Sports Day</string>
+    <string name="sample_time">Nov 10, 2:00 PM</string>
+    <string name="sample_status_scheduled">Scheduled</string>
+    <string name="sample_status_in_progress">In Progress</string>
+    <string name="sample_status_finished">Finished</string>
+
+</resources>

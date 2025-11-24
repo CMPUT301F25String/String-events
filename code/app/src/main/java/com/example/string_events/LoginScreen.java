@@ -1,6 +1,7 @@
 package com.example.string_events;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -150,7 +151,6 @@ public class LoginScreen extends AppCompatActivity {
             boolean looksLikeEmail = enteredInput.contains("@");
 
             if (looksLikeEmail) {
-                // === Try exact email first ===
                 db.collection("users")
                         .whereEqualTo("email", enteredInput)
                         .limit(1)
@@ -159,7 +159,6 @@ public class LoginScreen extends AppCompatActivity {
                             if (!q.isEmpty()) {
                                 handleLoginResult(q.getDocuments().get(0), pass);
                             } else {
-                                // === Try lowercase fallback ===
                                 db.collection("users")
                                         .whereEqualTo("email", idOrEmailLower)
                                         .limit(1)
@@ -184,7 +183,6 @@ public class LoginScreen extends AppCompatActivity {
                         });
 
             } else {
-                // === Login using username ===
                 db.collection("users")
                         .whereEqualTo("username", idOrEmailLower)
                         .limit(1)
@@ -238,16 +236,25 @@ public class LoginScreen extends AppCompatActivity {
     private void openNextScreen(String role, String username, String fullName, String email) {
         setLoading(false);
         Intent i;
-        // if logging in as a user, open the user events screen and put useful information in putExtra
         if (Objects.equals(role, "user")) {
+            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+            sp.edit()
+                    .putString("user", username)
+                    .putString("role", role)
+                    .apply();
+
             i = new Intent(this, MainActivity.class);
             i.putExtra("role", role);
             i.putExtra("user", username);
             i.putExtra("name", fullName);
             i.putExtra("email", email);
-        }
-        // if logging in as an admin, open the admin dashboard screen
-        else {
+        } else {
+            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+            sp.edit()
+                    .putString("user", "")
+                    .putString("role", "admin")
+                    .apply();
+
             i = new Intent(this, AdminDashboardActivity.class);
         }
         startActivity(i);
