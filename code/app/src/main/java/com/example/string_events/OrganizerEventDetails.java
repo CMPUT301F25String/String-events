@@ -37,7 +37,12 @@ public class OrganizerEventDetails extends AppCompatActivity {
         // commented out for testing purposes
         // eventId is currently set to "event3"
 //        String eventId = getIntent().getStringExtra(EVENT_ID);
-        String eventId = "07d4dd53-3efe-4613-b852-0720a924be8b";
+        String eventId = getIntent().getStringExtra(EVENT_ID);
+
+        if (eventId == null) {
+            finish();
+            return;
+        }
 
         findViewById(R.id.btnRoll).setOnClickListener(v -> {
             Intent it = new Intent(this, LotteryDrawActivity.class);
