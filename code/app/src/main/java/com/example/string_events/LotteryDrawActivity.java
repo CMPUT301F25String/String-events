@@ -1,10 +1,12 @@
 package com.example.string_events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import com.google.firebase.firestore.WriteBatch;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,7 +40,7 @@ import java.util.Objects;
  * after-state summary upon completion.
  */
 public class LotteryDrawActivity extends AppCompatActivity {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference eventRef;
     private boolean lotteryRolled;
 
@@ -146,14 +150,15 @@ public class LotteryDrawActivity extends AppCompatActivity {
                 // add everyone to invited list and clear the waitlist
                 inviteList = new ArrayList<>(waitlist);
                 waitlist.clear();
+                // TODO send notification to everyone on inviteList and waitlist
             }
             // otherwise, we shuffle the waitlist randomly and pick the first maxAttendees number as winners
             else {
                 Collections.shuffle(waitlist);
                 inviteList = new ArrayList<>(waitlist.subList(0, maxAttendees));
-                // TODO send notification to everyone on inviteList
                 waitlist.removeAll(inviteList);
             }
+            sendLotteryNotifications(eventRef, inviteList, waitlist);
             // update the event's waitlist, invited list, and lotteryRolled boolean in the database
             db.runTransaction(transaction -> {
                 transaction.update(eventRef, "waitlist", waitlist);
@@ -179,8 +184,53 @@ public class LotteryDrawActivity extends AppCompatActivity {
             assert waitlist != null;
             // shuffle the event's current waitlist and select the first user as the winner
             Collections.shuffle(waitlist);
-            eventRef.update("invited", FieldValue.arrayUnion(waitlist.getFirst()));
-            // TODO send notification to the selected user
+            eventRef.update("invited", FieldValue.arrayUnion(waitlist.get(0)));
+            eventRef.update("waitlist", FieldValue.arrayRemove(waitlist.get(0)));
+            ArrayList<String> inviteList = new ArrayList<>();
+            inviteList.add(waitlist.get(0));
+            // call sendLotteryNotifications with an inviteList of size 1 and an empty waitlist
+            // this is because we only need to send 1 notification to the winner
+            sendLotteryNotifications(eventRef, inviteList, new ArrayList<>());
+        });
+    }
+
+    private static void sendLotteryNotifications(DocumentReference eventRef, ArrayList<String> inviteList, ArrayList<String> waitList) {
+        eventRef.get().addOnSuccessListener(eventSnap -> {
+            String eventName = eventSnap.getString("title");
+            String url = eventSnap.getString("imageUrl");
+            String eventPhoto = url == null || url.isEmpty() ? null : url; // make sure photo is either a url or null
+
+            ArrayList<Notification> notificationUploadList = new ArrayList<>();
+            for (String username : inviteList) {
+                Notification newNotification = new Notification(username, true, eventRef.getId(), eventPhoto, eventName);
+                notificationUploadList.add(newNotification);
+            }
+
+            for (String username : waitList) {
+                Notification newNotification = new Notification(username, false, eventRef.getId(), eventPhoto, eventName);
+                notificationUploadList.add(newNotification);
+            }
+
+            for (Notification notification : notificationUploadList) {
+                Map<String, Object> doc = new HashMap<>();
+                doc.put("username", notification.getUsername());
+                doc.put("selectedStatus", notification.getSelectedStatus());
+                doc.put("eventId", notification.getEventId());
+                // only add the image url if it's not null
+                if (notification.getEventPhoto() != null) {
+                    doc.put("imageUrl", notification.getEventPhoto());
+                }
+                doc.put("eventName", notification.getEventName());
+
+                // creating new notification in database under collection "notifications"
+                db.collection("notifications").add(doc)
+                        .addOnSuccessListener(v -> {
+                            Log.d("FirestoreCheck", "notifications uploaded to database");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("FirestoreCheck", "couldn't upload notifications to database", e);
+                        });
+            }
         });
     }
 }
