@@ -14,12 +14,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/event_image"
         android:layout_width="141dp"
         android:layout_height="94dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/event_image"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedImage12"
         app:layout_constraintStart_toStartOf="@id/profile_background"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toTopOf="@id/profile_background"/>

@@ -21,11 +21,11 @@ import java.util.Locale;
 
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.Holder> {
 
-    private final ArrayList<OrganizerEventScreen.OrganizerEventItem> items;
+    private final ArrayList<OrganizerEvent> items;
     private final DateFormat timeFmt =
             DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 
-    OrganizerEventAdapter(ArrayList<OrganizerEventScreen.OrganizerEventItem> items) {
+    OrganizerEventAdapter(ArrayList<OrganizerEvent> items) {
         this.items = items;
     }
 
@@ -39,7 +39,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
 
     @Override
     public void onBindViewHolder(@NonNull Holder h, int position) {
-        OrganizerEventScreen.OrganizerEventItem e = items.get(position);
+        OrganizerEvent e = items.get(position);
 
         if (h.tvTitle != null) {
             h.tvTitle.setText(e.title == null ? "" : e.title);

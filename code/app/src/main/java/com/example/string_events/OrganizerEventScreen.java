@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class OrganizerEventScreen extends AppCompatActivity {
 
-    private final ArrayList<OrganizerEventItem> data = new ArrayList<>();
+    private final ArrayList<OrganizerEvent> data = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -39,7 +39,7 @@ public class OrganizerEventScreen extends AppCompatActivity {
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(data);
         rvEvents.setAdapter(adapter);
 
-        loadMyEvents();
+        loadMyEvents(adapter);
     }
 
     /**
@@ -54,7 +54,7 @@ public class OrganizerEventScreen extends AppCompatActivity {
     /**
      * Loads events from Firestore where creator == currently logged in user.
      */
-    private void loadMyEvents() {
+    private void loadMyEvents(OrganizerEventAdapter organizerEventAdapter) {
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         String currentUser = sp.getString("user", null);
 
@@ -78,7 +78,7 @@ public class OrganizerEventScreen extends AppCompatActivity {
                     }
 
                     for (QueryDocumentSnapshot d : snap) {
-                        OrganizerEventItem e = new OrganizerEventItem();
+                        OrganizerEvent e = new OrganizerEvent();
                         e.id = d.getId();
                         e.title = d.getString("title");
                         e.location = d.getString("location");
@@ -90,7 +90,7 @@ public class OrganizerEventScreen extends AppCompatActivity {
                         data.add(e);
                     }
 
-//                    adapter.notifyDataSetChanged();
+                    organizerEventAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
                         Log.e("ORG_EVENTS", "Error loading events: ", e));
@@ -104,16 +104,5 @@ public class OrganizerEventScreen extends AppCompatActivity {
         } catch (Exception ex) {
             return 0;
         }
-    }
-
-    static class OrganizerEventItem {
-        String id;
-        String title;
-        String location;
-        Timestamp startAt;
-        int maxAttendees;
-        int attendeesCount;
-        String imageUrl;
-        String creator;
     }
 }
