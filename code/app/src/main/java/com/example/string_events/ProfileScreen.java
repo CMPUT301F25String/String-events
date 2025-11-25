@@ -95,6 +95,12 @@ public class ProfileScreen extends AppCompatActivity {
             }
         });
 
+        // camera button opens ScanQrActivity
+        cameraButton.setOnClickListener(view -> {
+            Intent intent = new Intent(ProfileScreen.this, QrScanActivity.class);
+            startActivity(intent);
+        });
+
         notificationsButton.setOnClickListener(view -> openNotificationsScreen());
 
         editProfileTextView.setOnClickListener(view -> openEditInformationScreen(username));
@@ -147,6 +153,7 @@ public class ProfileScreen extends AppCompatActivity {
                     .addOnFailureListener(e ->
                             Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
+
         // setup recyclerview in profile screen with events
         if (username != null && !username.isEmpty()) {
             db.collection("events")
