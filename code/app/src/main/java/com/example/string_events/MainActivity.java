@@ -94,6 +94,10 @@ public class MainActivity extends AppCompatActivity {
 
         onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
         onClick(R.id.nav_person, () -> show(Screen.PROFILE));
+        onClick(R.id.btnCamera, () -> {
+            Intent intent = new Intent(MainActivity.this, QrScanActivity.class);
+            startActivity(intent);
+        });
         loadEventsIntoList();
     }
 
