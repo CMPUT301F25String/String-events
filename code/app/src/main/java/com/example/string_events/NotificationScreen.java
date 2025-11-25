@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -24,16 +22,9 @@ import java.util.ArrayList;
  * and displays them in a {@link RecyclerView}.
  */
 public class NotificationScreen extends AppCompatActivity {
-    /** Firestore client used to query notifications. */
+
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    /**
-     * Inflates the layout, wires basic navigation buttons, retrieves the current
-     * username from {@code SharedPreferences}, queries notifications for that user,
-     * and renders them in a {@link RecyclerView}.
-     *
-     * @param savedInstanceState previously saved instance state, or {@code null}
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +35,6 @@ public class NotificationScreen extends AppCompatActivity {
         ImageButton notificationImageButton = findViewById(R.id.btnNotification);
         ImageButton profileImageButton = findViewById(R.id.btnProfile);
 
-        // get the username of the user using the app
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         String username = sharedPreferences.getString("user", null);
 
@@ -59,30 +49,54 @@ public class NotificationScreen extends AppCompatActivity {
         });
 
         ArrayList<Notification> notificationsList = new ArrayList<>();
+
         db.collection("notifications")
                 .whereEqualTo("username", username)
-//                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(snap -> {
+
                     notificationsList.clear();
+
                     for (QueryDocumentSnapshot d : snap) {
-                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+
                         String eventId = d.getString("eventId");
-                        String name = d.getString("eventName");
+                        String eventName = d.getString("eventName");
                         String imageUrl = d.getString("imageUrl");
-                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
-                        notificationsList.add(new Notification(username, selected, eventId, photo, name));
+                        Uri photo = (imageUrl == null || imageUrl.isEmpty()) ? null : Uri.parse(imageUrl);
+
+                        boolean hasMessageField = d.contains("ismessage");
+                        boolean isMessage = hasMessageField && Boolean.TRUE.equals(d.getBoolean("ismessage"));
+                        String messageText = d.getString("message");
+
+                        Notification notif;
+
+                        if (isMessage) {
+                            notif = new Notification(
+                                    username,
+                                    eventId,
+                                    eventName,
+                                    photo,
+                                    true,
+                                    messageText
+                            );
+                        } else {
+                            boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
+                            notif = new Notification(
+                                    username,
+                                    selected,
+                                    eventId,
+                                    photo,
+                                    eventName
+                            );
+                        }
+
+                        notificationsList.add(notif);
                     }
+
                     setupRecyclerView(notificationsList);
                 });
     }
 
-    /**
-     * Configures the notifications {@link RecyclerView} with an adapter and a
-     * vertical {@link LinearLayoutManager}.
-     *
-     * @param notificationsList list of notifications to display
-     */
     private void setupRecyclerView(ArrayList<Notification> notificationsList) {
         RecyclerView notificationRecyclerview = findViewById(R.id.notifications_recyclerView);
         NotificationAdapter notificationAdapter = new NotificationAdapter(this, notificationsList);

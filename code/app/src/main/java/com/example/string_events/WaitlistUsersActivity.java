@@ -1,11 +1,14 @@
 package com.example.string_events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,44 +16,94 @@ import java.util.List;
 /**
  * Screen for organizers to view users on the waitlist.
  * <p>
- * Populates a {@link ListView} using {@link UserAdapter} with mock data and provides
- * a demo action to send messages to waitlisted users.
+ * Loads waitlist users from Firestore based on the event's waitlist array.
  */
 public class WaitlistUsersActivity extends AppCompatActivity {
 
-    /**
-     * Inflates the layout, wires the back button, sets up the list adapter
-     * with mock waitlist data, and binds a demo click handler.
-     *
-     * @param savedInstanceState previously saved instance state, or {@code null}
-     */
+    private FirebaseFirestore db;
+    private ListView listView;
+    private UserAdapter adapter;
+    private final List<UserItem> userList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waitlist_users);
 
+        db = FirebaseFirestore.getInstance();
+
         ImageButton back = findViewById(R.id.btnBack);
         back.setOnClickListener(v -> finish());
 
-        ListView list = findViewById(R.id.listWaitlist);
-        list.setAdapter(new UserAdapter(this, mockUsers(UserItem.Status.WAITLIST)));
+        listView = findViewById(R.id.listWaitlist);
+        adapter = new UserAdapter(this, userList);
+        listView.setAdapter(adapter);
 
-        findViewById(R.id.btnSendWaitlist).setOnClickListener(v ->
-                Toast.makeText(this, "Message sent to waitlist users (demo)", Toast.LENGTH_SHORT).show()
-        );
+        String eventId = getIntent().getStringExtra(OrganizerEventDetails.EVENT_ID);
+        if (eventId == null) {
+            finish();
+            return;
+        }
+
+        loadWaitlistUsers(eventId);
+
+
+        findViewById(R.id.btnSendWaitlist).setOnClickListener(v -> {
+            Intent it = new Intent(this, EventMessageActivity.class);
+            it.putExtra(OrganizerEventDetails.EVENT_ID, eventId);
+            it.putExtra("target_group", "waitlist");
+            startActivity(it);
+        });
     }
 
-    /**
-     * Provides sample waitlist entries for UI demonstration.
-     *
-     * @param status the {@link UserItem.Status} to apply to all mocked users
-     * @return a list of mocked {@link UserItem}
-     */
-    private List<UserItem> mockUsers(UserItem.Status status) {
-        List<UserItem> data = new ArrayList<>();
-        data.add(new UserItem("Grace", "grace@mail.com", status));
-        data.add(new UserItem("Henry", "henry@mail.com", status));
-        data.add(new UserItem("Ivy", "ivy@mail.com", status));
-        return data;
+    private void loadWaitlistUsers(String eventId) {
+        db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        finish();
+                        return;
+                    }
+
+                    List<String> waitlist = (List<String>) doc.get("waitlist");
+                    if (waitlist == null || waitlist.isEmpty()) {
+                        userList.clear();
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    fetchUsers(waitlist);
+                })
+                .addOnFailureListener(e -> finish());
+    }
+
+    private void fetchUsers(List<String> usernames) {
+        userList.clear();
+
+        for (String username : usernames) {
+            db.collection("users")
+                    .whereEqualTo("username", username)
+                    .get()
+                    .addOnSuccessListener(query -> {
+                        if (!query.isEmpty()) {
+                            addUserToList(query.getDocuments().get(0));
+                        }
+                    });
+        }
+    }
+
+    private void addUserToList(DocumentSnapshot doc) {
+        if (!doc.exists()) return;
+
+        String name = doc.getString("name");
+        String email = doc.getString("email");
+
+        userList.add(new UserItem(
+                name != null ? name : "",
+                email != null ? email : "",
+                UserItem.Status.WAITLIST
+        ));
+
+        adapter.notifyDataSetChanged();
     }
 }
