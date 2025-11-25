@@ -62,15 +62,15 @@ public class NotificationScreen extends AppCompatActivity {
                         String eventId = d.getString("eventId");
                         String eventName = d.getString("eventName");
                         String imageUrl = d.getString("imageUrl");
-                        Uri photo = (imageUrl == null || imageUrl.isEmpty()) ? null : Uri.parse(imageUrl);
+                        String photo = (imageUrl == null || imageUrl.isEmpty()) ? null : imageUrl;
 
                         boolean hasMessageField = d.contains("ismessage");
                         boolean isMessage = hasMessageField && Boolean.TRUE.equals(d.getBoolean("ismessage"));
-                        String messageText = d.getString("message");
 
                         Notification notif;
 
                         if (isMessage) {
+                            String messageText = d.getString("message");
                             notif = new Notification(
                                     username,
                                     eventId,

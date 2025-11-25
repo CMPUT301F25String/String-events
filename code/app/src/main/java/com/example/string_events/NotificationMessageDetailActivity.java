@@ -18,8 +18,6 @@ import java.net.URL;
 
 public class NotificationMessageDetailActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +26,7 @@ public class NotificationMessageDetailActivity extends AppCompatActivity {
         ImageView back = findViewById(R.id.back_button);
         back.setOnClickListener(v -> finish());
 
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         TextView tvEventTitle = findViewById(R.id.tvEventTitle);
         TextView tvLocation = findViewById(R.id.tvLocation);
