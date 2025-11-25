@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -32,8 +33,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EventDetailActivity extends AppCompatActivity {
 
     private String username;
-    private final AtomicBoolean userInEventWaitlist = new AtomicBoolean();
-    private final AtomicBoolean userInEventAttendees = new AtomicBoolean();
+    private final AtomicBoolean userInEventWaitlist = new AtomicBoolean(false);
+    private final AtomicBoolean userInEventInvited = new AtomicBoolean(false);
+    private final AtomicBoolean userInEventAttendees = new AtomicBoolean(false);
 
     /**
      * Initializes UI, resolves intent extras, fetches the event document,
@@ -47,8 +49,6 @@ public class EventDetailActivity extends AppCompatActivity {
         setContentView(R.layout.event_detail_screen);
 
         Intent it = getIntent();
-        // source denotes which screen opened this instance of EventDetailActivity
-        String source = it.getStringExtra("source");
         String eventId = it.getStringExtra("event_id");
         assert eventId != null;
 
@@ -73,12 +73,6 @@ public class EventDetailActivity extends AppCompatActivity {
         // set the variables userInEventWaitlist and userInEventAttendees using the database
         // also change appearance of the apply button to reflect the user's status in the event
         getUserStatusFromDatabase(applyButton, eventDocumentRef);
-
-        // check if this instance of event details was opened from a notification
-        // if so, we have to define some actions for more buttons
-        if (Objects.equals(source, "notification")) {
-            eventOpenedFromNotification(it, applyButton, eventDocumentRef);
-        }
 
         applyButton.setOnClickListener(view -> {
             // user has not applied for this event yet
@@ -182,67 +176,83 @@ public class EventDetailActivity extends AppCompatActivity {
         try { return Integer.parseInt(String.valueOf(o)); } catch (Exception e) { return 0; }
     }
 
+    @SuppressWarnings("unchecked")
     private void getUserStatusFromDatabase(ImageButton applyButton, DocumentReference eventDocumentRef) {
         // setting the value of userInEventWaitlist (checking if user is in the event's waitlist)
         // and the value of userInEventAttendees (checking if user is in the event's attendees)
         eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                @SuppressWarnings("unchecked")
-                List<String> waitlist = (List<String>) documentSnapshot.get("waitlist");
-                if (waitlist != null && waitlist.contains(username)) {
-                    Log.d("FirestoreCheck", "already in waitlist");
-                    userInEventWaitlist.set(true);
-                } else {
-                    Log.d("FirestoreCheck", "not on waitlist");
-                    userInEventWaitlist.set(false);
-                }
+            ArrayList<String> waitlist = (ArrayList<String>) documentSnapshot.get("waitlist");
+            ArrayList<String> invitedList = (ArrayList<String>) documentSnapshot.get("invited");
+            ArrayList<String> attendeesList = (ArrayList<String>) documentSnapshot.get("attendees");
 
-                @SuppressWarnings("unchecked")
-                List<String> attendeesList = (List<String>) documentSnapshot.get("attendees");
-                if (attendeesList != null && attendeesList.contains(username)) {
-                    Log.d("FirestoreCheck", "already in attendees");
-                    userInEventAttendees.set(true);
-                } else {
-                    Log.d("FirestoreCheck", "not in attendees");
-                    userInEventAttendees.set(false);
-                }
-
-                // set the appearance of the apply button based on the user's status in the event
-                if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
-                    applyButton.setBackgroundResource(R.drawable.apply_button);
-                } else {
-                    applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-                }
+            if (waitlist != null && waitlist.contains(username)) {
+                Log.d("FirestoreCheck", "already in waitlist");
+                userInEventWaitlist.set(true);
+                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+            } else if (invitedList != null && invitedList.contains(username)) {
+                // user has been invited to the event and needs to either confirm or decline attendance
+                Log.d("FirestoreCheck", "already in attendees");
+                userInEventInvited.set(true);
+                eventPendingUserConfirmation(applyButton, eventDocumentRef);
+            } else if (attendeesList != null && attendeesList.contains(username)) {
+                Log.d("FirestoreCheck", "already in attendees");
+                userInEventAttendees.set(true);
+                // TODO make this a leave event button instead of cancel apply
+                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             } else {
-                Log.d("FirestoreCheck", "document does not exist");
+                // user is not on any of the lists
+                applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
+
+//        eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+//            if (documentSnapshot.exists()) {
+//                @SuppressWarnings("unchecked")
+//                List<String> waitlist = (List<String>) documentSnapshot.get("waitlist");
+//                if (waitlist != null && waitlist.contains(username)) {
+//                    Log.d("FirestoreCheck", "already in waitlist");
+//                    userInEventWaitlist.set(true);
+//                } else {
+//                    Log.d("FirestoreCheck", "not on waitlist");
+//                    userInEventWaitlist.set(false);
+//                }
+//
+//                @SuppressWarnings("unchecked")
+//                List<String> attendeesList = (List<String>) documentSnapshot.get("attendees");
+//                if (attendeesList != null && attendeesList.contains(username)) {
+//                    Log.d("FirestoreCheck", "already in attendees");
+//                    userInEventAttendees.set(true);
+//                } else {
+//                    Log.d("FirestoreCheck", "not in attendees");
+//                    userInEventAttendees.set(false);
+//                }
+//
+//                // set the appearance of the apply button based on the user's status in the event
+//                if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
+//                    applyButton.setBackgroundResource(R.drawable.apply_button);
+//                } else {
+//                    applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+//                }
+//            } else {
+//                Log.d("FirestoreCheck", "document does not exist");
+//            }
+//        }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
     }
 
-    private void eventOpenedFromNotification(Intent it, ImageButton applyButton, DocumentReference eventDocumentRef) {
+    private void eventPendingUserConfirmation(ImageButton applyButton, DocumentReference eventDocumentRef) {
         // this instance of event details was opened from the notification screen
         ImageButton acceptInviteButton = findViewById(R.id.accept_invite_button);
         ImageButton declineInviteButton = findViewById(R.id.decline_invite_button);
 
-        String selectedStatus = it.getStringExtra("selectedStatus");
-        assert selectedStatus != null;
-        if (selectedStatus.equals("true")) {
-            applyButton.setVisibility(View.GONE);
-            acceptInviteButton.setVisibility(View.VISIBLE);
-            declineInviteButton.setVisibility(View.VISIBLE);
-        }
-        else {
-            applyButton.setVisibility(View.VISIBLE);
-            acceptInviteButton.setVisibility(View.GONE);
-            declineInviteButton.setVisibility(View.GONE);
-        }
+        applyButton.setVisibility(View.GONE);
+        acceptInviteButton.setVisibility(View.VISIBLE);
+        declineInviteButton.setVisibility(View.VISIBLE);
 
         acceptInviteButton.setOnClickListener(view -> {
             eventDocumentRef.update("attendees", FieldValue.arrayUnion(username));
-            eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
-            Toast.makeText(EventDetailActivity.this, "Confirmed your attendance!", Toast.LENGTH_SHORT).show();
+            eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
+            Toast.makeText(EventDetailActivity.this, "You've confirmed your attendance!", Toast.LENGTH_SHORT).show();
             userInEventAttendees.set(true);
-            userInEventWaitlist.set(false);
             applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             applyButton.setVisibility(View.VISIBLE);
             acceptInviteButton.setVisibility(View.GONE);
@@ -250,9 +260,8 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
         declineInviteButton.setOnClickListener(view -> {
-            eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
-            Toast.makeText(EventDetailActivity.this, "Removed from waitlist!", Toast.LENGTH_SHORT).show();
-            userInEventWaitlist.set(false);
+            eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
+            Toast.makeText(EventDetailActivity.this, "You've declined your attendance!", Toast.LENGTH_SHORT).show();
             applyButton.setBackgroundResource(R.drawable.apply_button);
             applyButton.setVisibility(View.VISIBLE);
             acceptInviteButton.setVisibility(View.GONE);

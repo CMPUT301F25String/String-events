@@ -48,7 +48,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LayoutInflater inflater = LayoutInflater.from(context);
 
         if (viewType == VIEW_TYPE_MESSAGE) {
-            View itemView = inflater.inflate(R.layout.notification_message_item, parent, false);
+            View itemView = inflater.inflate(R.layout.item_notification_message, parent, false);
             return new MessageViewHolder(itemView);
         }
 
