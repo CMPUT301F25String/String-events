@@ -81,6 +81,7 @@ public class CreateEventScreen extends AppCompatActivity {
         EditText eventAttendantsEditText = findViewById(R.id.event_attendants_editText);
         EditText eventWaitlistEdittext = findViewById(R.id.event_waitlist_editText);
         SwitchCompat eventGeolocationSwitch = findViewById(R.id.geolocation_switch);
+        SwitchCompat eventAutoRollingSwitch = findViewById(R.id.auto_rolling_switch);
         ImageButton eventVisibilityPublic = findViewById(R.id.event_public_button);
         ImageButton eventVisibilityPrivate = findViewById(R.id.event_private_button);
         // needs to be atomic boolean to avoid an error
@@ -143,8 +144,16 @@ public class CreateEventScreen extends AppCompatActivity {
             imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"));
         });
 
-        eventVisibilityPublic.setOnClickListener(view -> visibility.set(true));
-        eventVisibilityPrivate.setOnClickListener(view -> visibility.set(false));
+        eventVisibilityPublic.setOnClickListener(view -> {
+            eventVisibilityPublic.setBackgroundResource(R.drawable.public_button_clicked);
+            eventVisibilityPrivate.setBackgroundResource(R.drawable.private_button);
+            visibility.set(true);
+        });
+        eventVisibilityPrivate.setOnClickListener(view -> {
+            eventVisibilityPrivate.setBackgroundResource(R.drawable.private_button_clicked);
+            eventVisibilityPublic.setBackgroundResource(R.drawable.public_button);
+            visibility.set(false);
+        });
 
         doneButton.setOnClickListener(view -> {
             String title = String.valueOf(eventTitleEditText.getText());
@@ -179,6 +188,7 @@ public class CreateEventScreen extends AppCompatActivity {
             int maxAttendees = Integer.parseInt(eventAttendantsEditText.getText().toString());
             int waitlistLimit = Integer.parseInt(eventWaitlistEdittext.getText().toString());
             boolean geolocationRequirement = eventGeolocationSwitch.isChecked();
+            boolean autoRoll = eventAutoRollingSwitch.isChecked();
 
             Event newEvent = new Event(username, title, photo, description, tags,
                     startDateTime, endDateTime, location,
@@ -186,7 +196,6 @@ public class CreateEventScreen extends AppCompatActivity {
                     maxAttendees, waitlistLimit, geolocationRequirement, visibility.get());
 
             uploadNewEventToDatabase(newEvent);
-
         });
     }
 
@@ -247,18 +256,18 @@ public class CreateEventScreen extends AppCompatActivity {
 
     /**
      * Uploads the event image to Firebase Storage; upon success, obtains the download URL
-     * and delegates persistence of the event document to {@link #saveEventToDatabase(Event, String)}.
+     * and delegates persistence of the event document to {@link #saveEventDetailsToDatabase(Event, String)}.
      *
      * @param event event to be uploaded and saved
      */
     private void uploadNewEventToDatabase(Event event) {
+        Toast.makeText(CreateEventScreen.this, "Please wait...", Toast.LENGTH_SHORT).show();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
         StorageReference imageRef = storageRef.child("event_images/" + UUID.randomUUID().toString() + ".png");
 
         // start file upload
-        imageRef.putFile(event.getPhotoUri())
-                .addOnSuccessListener(taskSnapshot -> {
+        imageRef.putFile(event.getPhotoUri()).addOnSuccessListener(taskSnapshot -> {
                     // wait for the image to upload first before getting the download url
                     imageRef.getDownloadUrl().addOnSuccessListener(photoUri -> {
                         // get the download url of the photo
@@ -266,15 +275,9 @@ public class CreateEventScreen extends AppCompatActivity {
                         Log.d("UploadImage", "image uploaded successfully url: " + downloadUrl);
 
                         // call helper function to fill in the event details and upload event to database
-                        saveEventToDatabase(event, downloadUrl);
-
-                    }).addOnFailureListener(e -> {
-                        Log.e("UploadImage", "couldn't get download url: " + e.getMessage());
-                    });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("UploadImage", "couldn't upload image: " + e.getMessage());
-                });
+                        saveEventDetailsToDatabase(event, downloadUrl);
+                    }).addOnFailureListener(e -> Log.e("UploadImage", "couldn't get image download url: " + e.getMessage()));
+                }).addOnFailureListener(e -> Log.e("UploadImage", "couldn't upload image: " + e.getMessage()));
     }
 
     /**
@@ -286,7 +289,7 @@ public class CreateEventScreen extends AppCompatActivity {
      * @param imageUrl optional image download URL to persist (ignored if {@code null})
      */
     // Helper function to handle saving the document to Firestore
-    private void saveEventToDatabase(Event event, String imageUrl) {
+    private void saveEventDetailsToDatabase(Event event, String imageUrl) {
         Map<String, Object> doc = new HashMap<>();
         doc.put("creator", event.getEventCreator());
         doc.put("title", event.getTitle());
@@ -304,7 +307,10 @@ public class CreateEventScreen extends AppCompatActivity {
         doc.put("regEndAt", Date.from(event.getRegistrationEndDateTime().toInstant()));
         doc.put("attendeesCount", -1);
         doc.put("maxAttendees", event.getMaxAttendees());
+        doc.put("attendees", event.getAttendees()); // when creating a new event, this attendees list is empty
+        doc.put("invited", event.getInvited()); // when creating a new event, this invited list is empty
         doc.put("waitlist", event.getWaitlist()); // when creating a new event, this waitlist is empty
+        doc.put("lotteryRolled", event.isLotteryRolled()); // when creating a new event, lotteryRolled is set to false
         doc.put("waitlistLimit", event.getWaitlistLimit());
         doc.put("geolocationReq", event.getGeolocationRequirement());
         doc.put("visibility", event.getEventVisibility());
@@ -317,6 +323,10 @@ public class CreateEventScreen extends AppCompatActivity {
                     // testing function that replaces the image button on the screen with the database uploaded image
                     // this is just to test that we can get the image back from the database and use it in the app
                     testingImageGet(event);
+                    Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetails.class);
+                    intent.putExtra("eventId", event.getEventId());
+                    startActivity(intent);
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(CreateEventScreen.this, "Error creating event in database", Toast.LENGTH_SHORT).show();

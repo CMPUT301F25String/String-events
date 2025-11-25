@@ -35,7 +35,14 @@
             android:name=".ProfileScreen"
             android:exported="false"/>
 
-        <activity android:name=".OrganizerEventScreen"
+
+        <activity
+            android:name=".NotificationMessageDetailActivity"
+            android:exported="false"/>
+
+
+        <activity
+            android:name=".OrganizerEventScreen"
             android:exported="false"/>
 
         <activity
@@ -44,7 +51,16 @@
 
         <activity
             android:name=".OrganizerEventDetails"
-            android:exported="false"/>
+            android:exported="false">
+        </activity>
+
+        <activity android:name=".EventMessageActivity" />
+
+        <activity
+            android:name=".EventOverviewScreen"
+            android:exported="false">
+        </activity>
+
 
         <activity
             android:name=".CanceledUsersActivity"

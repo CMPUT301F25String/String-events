@@ -12,8 +12,11 @@ public class Notification {
     String username;
     boolean selectedStatus;
     String eventId;
-    Uri eventPhoto; // eventPhoto needs to be of type Uri because it is a user uploaded image
+    String eventPhoto; // eventPhoto needs to be of type Uri because it is a user uploaded image
     String eventName;
+
+    boolean isMessage;
+    String messageText;
 
     /**
      * Creates a notification instance.
@@ -24,12 +27,24 @@ public class Notification {
      * @param eventPhoto     event photo {@link Uri}
      * @param eventName      event display name
      */
-    public Notification(String username, boolean selectedStatus, String eventId, Uri eventPhoto, String eventName) {
+    public Notification(String username, boolean selectedStatus, String eventId, String eventPhoto, String eventName) {
         this.username = username;
         this.selectedStatus = selectedStatus;
         this.eventId = eventId;
         this.eventPhoto = eventPhoto;
         this.eventName = eventName;
+        this.isMessage = false;
+        this.messageText = null;
+    }
+
+    public Notification(String username, String eventId, String eventName, String eventPhoto, boolean isMessage, String messageText) {
+        this.username = username;
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.eventPhoto = eventPhoto;
+        this.isMessage = isMessage;
+        this.messageText = messageText;
+        this.selectedStatus = false;
     }
 
     /**
@@ -80,7 +95,7 @@ public class Notification {
     /**
      * @return event photo {@link Uri}
      */
-    public Uri getEventPhoto() {
+    public String getEventPhoto() {
         return eventPhoto;
     }
 
@@ -88,7 +103,7 @@ public class Notification {
      * Updates the event photo.
      * @param eventPhoto new photo {@link Uri}
      */
-    public void setEventPhoto(Uri eventPhoto) {
+    public void setEventPhoto(String eventPhoto) {
         this.eventPhoto = eventPhoto;
     }
 
@@ -105,6 +120,22 @@ public class Notification {
      */
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public boolean isMessage() {
+        return isMessage;
+    }
+
+    public void setMessage(boolean message) {
+        isMessage = message;
+    }
+
+    public String getMessageText() {
+        return messageText;
+    }
+
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
     /**
