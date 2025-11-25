@@ -15,6 +15,9 @@ public class Notification {
     Uri eventPhoto; // eventPhoto needs to be of type Uri because it is a user uploaded image
     String eventName;
 
+    boolean isMessage;
+    String messageText;
+
     /**
      * Creates a notification instance.
      *
@@ -30,6 +33,18 @@ public class Notification {
         this.eventId = eventId;
         this.eventPhoto = eventPhoto;
         this.eventName = eventName;
+        this.isMessage = false;
+        this.messageText = null;
+    }
+
+    public Notification(String username, String eventId, String eventName, Uri eventPhoto, boolean isMessage, String messageText) {
+        this.username = username;
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.eventPhoto = eventPhoto;
+        this.isMessage = isMessage;
+        this.messageText = messageText;
+        this.selectedStatus = false;
     }
 
     /**
@@ -105,6 +120,22 @@ public class Notification {
      */
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public boolean isMessage() {
+        return isMessage;
+    }
+
+    public void setMessage(boolean message) {
+        isMessage = message;
+    }
+
+    public String getMessageText() {
+        return messageText;
+    }
+
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
     /**
