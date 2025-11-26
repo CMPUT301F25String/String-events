@@ -40,6 +40,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.graphics.Bitmap;
+
+import java.io.ByteArrayOutputStream;
+
+import com.google.zxing.WriterException;
+
 /**
  * Screen for creating a new event.
  * <p>
@@ -323,6 +329,10 @@ public class CreateEventScreen extends AppCompatActivity {
                     // testing function that replaces the image button on the screen with the database uploaded image
                     // this is just to test that we can get the image back from the database and use it in the app
                     testingImageGet(event);
+
+                    generateAndUploadQrCode(event);
+
+
                     Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetails.class);
                     intent.putExtra("eventId", event.getEventId());
                     startActivity(intent);
@@ -359,4 +369,43 @@ public class CreateEventScreen extends AppCompatActivity {
             }
         });
     }
+
+    private void generateAndUploadQrCode(Event event) {
+        String qrContent = "stringevents://event/" + event.getEventId();
+
+        Bitmap qrBitmap;
+        try {
+            qrBitmap = QRUtils.generateQrCode(qrContent, 800, 800);
+        } catch (WriterException e) {
+            Log.e("UploadQR", "Failed to generate QR bitmap", e);
+            return;
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference rootRef = storage.getReference();
+        StorageReference qrRef = rootRef.child("qr_code/" + event.getEventId() + ".png");
+
+        UploadTask uploadTask = qrRef.putBytes(data);
+        uploadTask.addOnSuccessListener(taskSnapshot ->
+                qrRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String qrUrl = uri.toString();
+                    Log.d("UploadQR", "QR uploaded successfully, url: " + qrUrl);
+
+                    db.collection("events")
+                            .document(event.getEventId())
+                            .update("qrCodeUrl", qrUrl)
+                            .addOnSuccessListener(v ->
+                                    Log.d("UploadQR", "qrCodeUrl saved to event document"))
+                            .addOnFailureListener(e ->
+                                    Log.e("UploadQR", "Failed to save qrCodeUrl", e));
+                }).addOnFailureListener(e ->
+                        Log.e("UploadQR", "Failed to get QR download url", e))
+        ).addOnFailureListener(e ->
+                Log.e("UploadQR", "Failed to upload QR image", e));
+    }
+
 }
