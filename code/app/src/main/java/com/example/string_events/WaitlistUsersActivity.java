@@ -2,13 +2,13 @@ package com.example.string_events;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,94 +16,67 @@ import java.util.List;
 /**
  * Screen for organizers to view users on the waitlist.
  * <p>
- * Loads waitlist users from Firestore based on the event's waitlist array.
+ * Populates a {@link ListView} using {@link UserAdapter} with mock data and provides
+ * a demo action to send messages to waitlisted users.
  */
 public class WaitlistUsersActivity extends AppCompatActivity {
-
-    private FirebaseFirestore db;
-    private ListView listView;
-    private UserAdapter adapter;
-    private final List<UserItem> userList = new ArrayList<>();
-
+    private List<UserItem> data;
+    /**
+     * Inflates the layout, wires the back button, sets up the list adapter
+     * with mock waitlist data, and binds a demo click handler.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waitlist_users);
 
-        db = FirebaseFirestore.getInstance();
+
+        data = mockUsers(UserItem.Status.WAITLIST);
+        ListView list = findViewById(R.id.listWaitlist);
+        list.setAdapter(new UserAdapter(this, data));
+
+        Button openMap = findViewById(R.id.btn_open_waitlist_map);
+        final String eventId = getIntent().getStringExtra("event_id");
+
+        openMap.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                Intent i = new Intent(WaitlistUsersActivity.this, WaitlistMapActivity.class);
+                i.putExtra(WaitlistMapActivity.EXTRA_EVENT_ID, eventId);
+
+                ArrayList<String> names = new ArrayList<>();
+                for (UserItem u : data) {
+                    names.add(u.getName());
+                }
+                i.putStringArrayListExtra(WaitlistMapActivity.EXTRA_WAITLIST_NAMES, names);
+
+                startActivity(i);
+            }
+        });
 
         ImageButton back = findViewById(R.id.btnBack);
         back.setOnClickListener(v -> finish());
 
-        listView = findViewById(R.id.listWaitlist);
-        adapter = new UserAdapter(this, userList);
-        listView.setAdapter(adapter);
+        list.setAdapter(new UserAdapter(this, mockUsers(UserItem.Status.WAITLIST)));
 
-        String eventId = getIntent().getStringExtra(OrganizerEventDetails.EVENT_ID);
-        if (eventId == null) {
-            finish();
-            return;
-        }
-
-        loadWaitlistUsers(eventId);
-
-
-        findViewById(R.id.btnSendWaitlist).setOnClickListener(v -> {
-            Intent it = new Intent(this, EventMessageActivity.class);
-            it.putExtra(OrganizerEventDetails.EVENT_ID, eventId);
-            it.putExtra("target_group", "waitlist");
-            startActivity(it);
-        });
+        findViewById(R.id.btnSendWaitlist).setOnClickListener(v ->
+                Toast.makeText(this, "Message sent to waitlist users (demo)", Toast.LENGTH_SHORT).show()
+        );
     }
 
-    private void loadWaitlistUsers(String eventId) {
-        db.collection("events").document(eventId)
-                .get()
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) {
-                        finish();
-                        return;
-                    }
-
-                    List<String> waitlist = (List<String>) doc.get("waitlist");
-                    if (waitlist == null || waitlist.isEmpty()) {
-                        userList.clear();
-                        adapter.notifyDataSetChanged();
-                        return;
-                    }
-
-                    fetchUsers(waitlist);
-                })
-                .addOnFailureListener(e -> finish());
+    /**
+     * Provides sample waitlist entries for UI demonstration.
+     *
+     * @param status the {@link UserItem.Status} to apply to all mocked users
+     * @return a list of mocked {@link UserItem}
+     */
+    private List<UserItem> mockUsers(UserItem.Status status) {
+        List<UserItem> data = new ArrayList<>();
+        data.add(new UserItem("Grace", "grace@mail.com", status));
+        data.add(new UserItem("Henry", "henry@mail.com", status));
+        data.add(new UserItem("Ivy", "ivy@mail.com", status));
+        return data;
     }
 
-    private void fetchUsers(List<String> usernames) {
-        userList.clear();
-
-        for (String username : usernames) {
-            db.collection("users")
-                    .whereEqualTo("username", username)
-                    .get()
-                    .addOnSuccessListener(query -> {
-                        if (!query.isEmpty()) {
-                            addUserToList(query.getDocuments().get(0));
-                        }
-                    });
-        }
-    }
-
-    private void addUserToList(DocumentSnapshot doc) {
-        if (!doc.exists()) return;
-
-        String name = doc.getString("name");
-        String email = doc.getString("email");
-
-        userList.add(new UserItem(
-                name != null ? name : "",
-                email != null ? email : "",
-                UserItem.Status.WAITLIST
-        ));
-
-        adapter.notifyDataSetChanged();
-    }
 }

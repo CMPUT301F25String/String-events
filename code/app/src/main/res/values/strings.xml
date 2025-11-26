@@ -51,5 +51,6 @@
     <string name="sample_status_scheduled">Scheduled</string>
     <string name="sample_status_in_progress">In Progress</string>
     <string name="sample_status_finished">Finished</string>
+    <string name="google_maps_key">YOUR_API_KEY_HERE</string>
 
 </resources>
