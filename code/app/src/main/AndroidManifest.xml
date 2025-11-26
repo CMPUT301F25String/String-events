@@ -12,10 +12,6 @@
             android:exported="false"/>
 
         <activity
-            android:name=".AdminImageManagementActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".CreateEventScreen"
             android:exported="false"/>
 
@@ -39,7 +35,14 @@
             android:name=".ProfileScreen"
             android:exported="false"/>
 
-        <activity android:name=".OrganizerEventScreen"
+
+        <activity
+            android:name=".NotificationMessageDetailActivity"
+            android:exported="false"/>
+
+
+        <activity
+            android:name=".OrganizerEventScreen"
             android:exported="false"/>
 
         <activity
@@ -48,7 +51,16 @@
 
         <activity
             android:name=".OrganizerEventDetails"
-            android:exported="false"/>
+            android:exported="false">
+        </activity>
+
+        <activity android:name=".EventMessageActivity" />
+
+        <activity
+            android:name=".EventOverviewScreen"
+            android:exported="false">
+        </activity>
+
 
         <activity
             android:name=".CanceledUsersActivity"
@@ -75,24 +87,12 @@
             android:exported="false" />
 
         <activity
-            android:name=".CreateEventScreen"
+            android:name=".AdminDashboardActivity"
             android:exported="false"/>
 
         <activity
             android:name=".AdminEventManagementActivity"
             android:exported="false"/>
-
-        <activity
-            android:name=".AdminProfileScreen"
-            android:exported="false"/>
-
-        <activity
-            android:name=".AdminEventManagementActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".AdminEventDetailActivity"
-            android:exported="false" />
 
         <activity
             android:name=".AdminImageManagementActivity"
@@ -100,6 +100,14 @@
 
         <activity
             android:name=".AdminProfileManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminProfileScreen"
+            android:exported="false"/>
+
+        <activity
+            android:name=".AdminEventDetailActivity"
             android:exported="false" />
 
         <activity

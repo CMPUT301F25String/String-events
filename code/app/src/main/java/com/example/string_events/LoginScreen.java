@@ -1,6 +1,7 @@
 package com.example.string_events;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Login screen supporting two roles (user/admin) and simple credential checks
@@ -134,7 +136,7 @@ public class LoginScreen extends AppCompatActivity {
                         }
                         String storedPw = q.getDocuments().get(0).getString("password");
                         if (storedPw != null && storedPw.equals(pass)) {
-                            goHome("admin", null, null, null);
+                            openNextScreen("admin", null, null, null);
                         } else {
                             setLoading(false);
                             toast("wrong admin password");
@@ -149,7 +151,6 @@ public class LoginScreen extends AppCompatActivity {
             boolean looksLikeEmail = enteredInput.contains("@");
 
             if (looksLikeEmail) {
-                // === Try exact email first ===
                 db.collection("users")
                         .whereEqualTo("email", enteredInput)
                         .limit(1)
@@ -158,7 +159,6 @@ public class LoginScreen extends AppCompatActivity {
                             if (!q.isEmpty()) {
                                 handleLoginResult(q.getDocuments().get(0), pass);
                             } else {
-                                // === Try lowercase fallback ===
                                 db.collection("users")
                                         .whereEqualTo("email", idOrEmailLower)
                                         .limit(1)
@@ -183,7 +183,6 @@ public class LoginScreen extends AppCompatActivity {
                         });
 
             } else {
-                // === Login using username ===
                 db.collection("users")
                         .whereEqualTo("username", idOrEmailLower)
                         .limit(1)
@@ -219,7 +218,7 @@ public class LoginScreen extends AppCompatActivity {
             String fullName = snapshot.getString("name");
             String userEmail = snapshot.getString("email");
 
-            goHome("user", realUsername, fullName, userEmail);
+            openNextScreen("user", realUsername, fullName, userEmail);
         } else {
             setLoading(false);
             toast("Wrong password");
@@ -234,13 +233,30 @@ public class LoginScreen extends AppCompatActivity {
      * @param fullName full name (nullable)
      * @param email    email (nullable)
      */
-    private void goHome(String role, String username, String fullName, String email) {
+    private void openNextScreen(String role, String username, String fullName, String email) {
         setLoading(false);
-        Intent i = new Intent(this, MainActivity.class);
-        i.putExtra("role", role);
-        i.putExtra("user", username);
-        i.putExtra("name", fullName);
-        i.putExtra("email", email);
+        Intent i;
+        if (Objects.equals(role, "user")) {
+            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+            sp.edit()
+                    .putString("user", username)
+                    .putString("role", role)
+                    .apply();
+
+            i = new Intent(this, MainActivity.class);
+            i.putExtra("role", role);
+            i.putExtra("user", username);
+            i.putExtra("name", fullName);
+            i.putExtra("email", email);
+        } else {
+            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+            sp.edit()
+                    .putString("user", "")
+                    .putString("role", "admin")
+                    .apply();
+
+            i = new Intent(this, AdminDashboardActivity.class);
+        }
         startActivity(i);
         finish();
     }

@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
 
 
 import org.w3c.dom.Text;
@@ -79,7 +80,7 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
         holder.itemLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO open new fragment of event detail
+                // TODO open new event detail screen
             }
         });
     }
@@ -98,7 +99,7 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
     public static class profileEventsViewHolder extends RecyclerView.ViewHolder {
         // taking the views from the item layout and assigning them to variables
         ConstraintLayout itemLayout;
-        ImageView eventPhoto;
+        ShapeableImageView eventPhoto;
         TextView eventName;
         TextView eventDate;
         TextView eventTime;

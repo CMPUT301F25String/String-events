@@ -60,7 +60,7 @@
             android:layout_marginEnd="12dp"
             android:text="Congratulations,\nyou were selected for:"
             android:textColor="#111111"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:fontFamily="@font/prompt_regular"
             app:layout_constraintStart_toEndOf="@id/imgThumb"
             app:layout_constraintEnd_toStartOf="@id/imgOpen"
