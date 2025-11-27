@@ -157,6 +157,7 @@ public class ProfileScreen extends AppCompatActivity {
                             Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
         // setup recyclerview in profile screen with either joined events or created events
+        // TODO simplify this logic without too much repeated code
         if (username != null && !username.isEmpty()) {
             ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
             if (currentRole.equals("entrant")) {
@@ -179,7 +180,7 @@ public class ProfileScreen extends AppCompatActivity {
                                 ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
                                 profileEventsList.add(profileEvent);
                             }
-                            setupRecyclerView(profileEventsList);
+                            setupRecyclerView(profileEventsList, sharedPreferences);
                         })
                         .addOnFailureListener(e -> {
                             Log.e("Firestore", "error getting waitlisted events", e);
@@ -203,7 +204,7 @@ public class ProfileScreen extends AppCompatActivity {
                                 ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
                                 profileEventsList.add(profileEvent);
                             }
-                            setupRecyclerView(profileEventsList);
+                            setupRecyclerView(profileEventsList, sharedPreferences);
                         })
                         .addOnFailureListener(e -> {
                             Log.e("Firestore", "error getting waitlisted events", e);
@@ -262,9 +263,9 @@ public class ProfileScreen extends AppCompatActivity {
      *
      * @param profileEventsList list of events to render
      */
-    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList) {
+    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList, SharedPreferences sharedPreferences) {
         RecyclerView profileEventRecyclerview = findViewById(R.id.profile_events_recyclerView);
-        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
+        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList, sharedPreferences);
         profileEventRecyclerview.setAdapter(profileEventsAdapter);
         profileEventRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }

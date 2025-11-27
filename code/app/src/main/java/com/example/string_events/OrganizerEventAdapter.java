@@ -88,7 +88,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         }
 
         h.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), EventOverviewScreen.class);
+            Intent intent = new Intent(v.getContext(), OrganizerEventOverviewScreen.class);
             intent.putExtra("event_id", e.id);
             v.getContext().startActivity(intent);
         });
