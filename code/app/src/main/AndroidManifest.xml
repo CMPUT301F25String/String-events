@@ -33,6 +33,19 @@
             android:exported="false" />
 
         <activity
+            android:name=".AdminProfileActivity"
+            android:exported="false" />
+
+
+        <activity
+            android:name=".AdminNotificationDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminNotificationsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".RegisterScreen"
             android:exported="false"/>
 
