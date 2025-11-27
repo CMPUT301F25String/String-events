@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.CheckBox;            // ADDED
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class LoginScreen extends AppCompatActivity {
     private MaterialButton btnUser, btnAdmin, btnSignUp;
     private TextInputEditText etEmail, etPassword;
     private FrameLayout btnSignIn;
+    private CheckBox chkRemember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class LoginScreen extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnSignIn = findViewById(R.id.btnSignIn);
         btnSignUp = findViewById(R.id.btnSignUp);
+        chkRemember = findViewById(R.id.chkRemember);
 
         setRole(Role.USER);
 
@@ -188,9 +191,14 @@ public class LoginScreen extends AppCompatActivity {
     private void openNextScreen(String role, String username, String fullName, String email) {
         setLoading(false);
         Intent i;
+
+        boolean rememberMe = chkRemember != null && chkRemember.isChecked();
+
         if (Objects.equals(role, "user")) {
             SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
             sp.edit()
+                    .putBoolean("remember", rememberMe)
+                    .putString("username", username)
                     .putString("user", username)
                     .putString("role", role)
                     .apply();
@@ -203,6 +211,8 @@ public class LoginScreen extends AppCompatActivity {
         } else {
             SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
             sp.edit()
+                    .putBoolean("remember", rememberMe)
+                    .putString("username", username)
                     .putString("user", "")
                     .putString("role", "admin")
                     .apply();
@@ -217,8 +227,12 @@ public class LoginScreen extends AppCompatActivity {
 
         setLoading(false);
 
+        boolean rememberMe = chkRemember != null && chkRemember.isChecked();  // ADDED
+
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit()
+                .putBoolean("remember", rememberMe)
+                .putString("username", adminUsername)
                 .putString("user", adminUsername)
                 .putString("role", "admin")
                 .putString("adminUsername", adminUsername)

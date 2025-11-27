@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
      * Clears auth state and navigates back to the welcome/sign-in screen.
      */
     private void logoutAndGoToSignIn() {
-        SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
         Intent i = new Intent(this, WelcomeActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
