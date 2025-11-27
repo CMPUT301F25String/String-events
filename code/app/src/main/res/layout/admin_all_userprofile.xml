@@ -1,146 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
-
-    <!-- Theme Header (Yellow) -->
-    <View
-        android:id="@+id/header_bg"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:background="#FFD165"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:background="#FFFFFF"
+    android:padding="24dp">
 
     <!-- Back Button -->
     <ImageButton
         android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="@drawable/back_button"
         android:contentDescription="Back"
-        android:padding="12dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/back_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Profile Icon -->
+    <ImageView
+        android:id="@+id/profile_photo"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:src="@drawable/profile"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" />
 
     <!-- Title -->
     <TextView
         android:id="@+id/profile_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/prompt_regular"
         android:text="Profile"
-        android:textColor="#101114"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/btnBack"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/profile_photo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnBack" />
-
-    <!-- Profile Photo Container (Circular with Shadow) -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_photo_container"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="55dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/header_bg"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_bg">
+        android:layout_marginTop="8dp" />
 
-        <ImageView
-            android:id="@+id/profile_photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="2dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/profile" />
-    </androidx.cardview.widget.CardView>
-
-    <!-- Info Section -->
-    <LinearLayout
-        android:id="@+id/info_container"
-        android:layout_width="match_parent"
+    <!-- Name -->
+    <TextView
+        android:id="@+id/profile_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="40dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/cv_photo_container">
+        android:text="Name: Kevin Zou"
+        android:textSize="18sp"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/profile_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp" />
 
-        <!-- Name -->
-        <TextView
-            android:id="@+id/profile_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_profile_input"
-            android:drawablePadding="12dp"
-            android:fontFamily="@font/prompt_regular"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp"
-            android:text="Name: Kevin Zou"
-            android:textColor="#101114"
-            android:textSize="16sp"
-            app:drawableStartCompat="@drawable/ic_location_logo"
-            app:drawableTint="#FFD165" />
-        <!-- Note: Replaced drawableStart with location logo as placeholder icon
-             if you don't have a specific user icon, or remove drawableStart entirely -->
+    <!-- Email -->
+    <TextView
+        android:id="@+id/profile_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email: zou"
+        android:textSize="18sp"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/profile_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
-        <!-- Email -->
-        <TextView
-            android:id="@+id/profile_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_profile_input"
-            android:drawablePadding="12dp"
-            android:fontFamily="@font/prompt_regular"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp"
-            android:text="Email: zou"
-            android:textColor="#101114"
-            android:textSize="16sp" />
-
-        <!-- Password -->
-        <TextView
-            android:id="@+id/profile_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_profile_input"
-            android:drawablePadding="12dp"
-            android:fontFamily="@font/prompt_regular"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp"
-            android:text="Password: 123"
-            android:textColor="#101114"
-            android:textSize="16sp" />
-
-    </LinearLayout>
+    <!-- Password -->
+    <TextView
+        android:id="@+id/profile_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Password: 123"
+        android:textSize="18sp"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/profile_email"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
     <!-- Delete Button -->
     <Button
         android:id="@+id/btnDeleteProfile"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="#FFD165"
-        android:fontFamily="@font/prompt_regular"
-        android:letterSpacing="0.05"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="Delete Profile"
-        android:textColor="#101114"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="16dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF7043"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginBottom="32dp"
+        android:paddingVertical="10dp"
+        android:fontFamily="@font/prompt_regular"
+        android:background="@drawable/admineventdelete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

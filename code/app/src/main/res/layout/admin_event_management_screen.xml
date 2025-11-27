@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".AdminEventManagementActivity">
 
-
+    <!-- Back button and title -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

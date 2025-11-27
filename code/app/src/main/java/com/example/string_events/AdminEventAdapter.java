@@ -9,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.Timestamp;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,16 +19,37 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * RecyclerView adapter for displaying admin-facing event cards.
+ * <p>
+ * Each item shows cover image, title, time, location, organizer, and a status chip.
+ * Clicking an item navigates to {@link AdminEventDetailActivity} with the event id.
+ *
+ * @since 1.0
+ */
 public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.ViewHolder> {
 
     private final ArrayList<AdminEventManagementActivity.EventItem> events;
     private final Context context;
 
+    /**
+     * Creates an adapter for admin event cards.
+     *
+     * @param events  list of event items to bind (non-null)
+     * @param context host context used for inflating layouts and launching intents
+     */
     public AdminEventAdapter(ArrayList<AdminEventManagementActivity.EventItem> events, Context context) {
         this.events = events;
         this.context = context;
     }
 
+    /**
+     * Inflates the event card view holder.
+     *
+     * @param parent   parent view group
+     * @param viewType ignored, single view type
+     * @return a new {@link ViewHolder}
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,14 +58,21 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds event data to a view holder.
+     *
+     * @param holder   view holder to populate
+     * @param position item position
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdminEventManagementActivity.EventItem e = events.get(position);
 
         holder.tvTitle.setText(e.title != null ? e.title : "(No Title)");
         holder.tvLocation.setText(e.location != null ? e.location : "(No Location)");
-        holder.tvOrganizer.setText("Organizer: " + (e.creator != null ? e.creator : "Unknown"));
+        holder.tvOrganizer.setText("Organizer: XYZ");
 
+        // Format start time
         if (e.startAt != null) {
             DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
             holder.tvTime.setText(df.format(e.startAt.toDate()));
@@ -55,6 +80,7 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
             holder.tvTime.setText("--:--");
         }
 
+        // Load image from URL in background
         if (e.imageUrl != null && !e.imageUrl.isEmpty()) {
             new Thread(() -> {
                 try {
@@ -74,6 +100,7 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
             holder.imgCover.setImageResource(android.R.drawable.ic_menu_report_image);
         }
 
+        // Determine event status
         long now = System.currentTimeMillis();
         long start = e.startAt != null ? e.startAt.toDate().getTime() : Long.MAX_VALUE;
         long end = e.endAt != null ? e.endAt.toDate().getTime() : Long.MAX_VALUE;
@@ -89,6 +116,7 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
             holder.tvStatus.setBackgroundColor(0xFFF1A428);
         }
 
+        // Click to open the detail screen
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, AdminEventDetailActivity.class);
             intent.putExtra("event_id", e.id);
@@ -96,15 +124,26 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
         });
     }
 
+    /**
+     * @return number of items in the adapter
+     */
     @Override
     public int getItemCount() {
         return events.size();
     }
 
+    /**
+     * View holder for an admin event card.
+     */
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCover;
         TextView tvTitle, tvTime, tvLocation, tvOrganizer, tvStatus;
 
+        /**
+         * Creates a view holder and binds view references.
+         *
+         * @param itemView root item view
+         */
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCover = itemView.findViewById(R.id.imgCover);
