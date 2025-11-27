@@ -1,6 +1,7 @@
 package com.example.string_events;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,11 +78,10 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
 //        holder.eventTime.setText(profileEvent.getProfileEventStartDateTime());
         holder.eventLocation.setText(profileEvent.getProfileEventLocation());
 
-        holder.itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO open new event detail screen
-            }
+        holder.itemLayout.setOnClickListener(view -> {
+            Intent intent = new Intent(context, EventDetailActivity.class);
+            intent.putExtra("event_id", profileEvent.getEventId());
+            context.startActivity(intent);
         });
     }
 
