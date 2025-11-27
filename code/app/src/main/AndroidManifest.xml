@@ -72,14 +72,14 @@
             android:exported="false"/>
 
         <activity
-            android:name=".OrganizerEventDetails"
+            android:name=".OrganizerEventDetailScreen"
             android:exported="false">
         </activity>
 
         <activity android:name=".EventMessageActivity" />
 
         <activity
-            android:name=".EventOverviewScreen"
+            android:name=".OrganizerEventOverviewScreen"
             android:exported="false">
         </activity>
 

@@ -123,7 +123,8 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:background="@drawable/info_button"
-                tools:ignore="MissingConstraints" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -176,21 +177,20 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@android:color/white"
-        android:gravity="center"
         android:orientation="horizontal"
+        android:gravity="center"
         android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/btnHome"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            android:layout_marginStart="25dp"
             android:layout_weight="1"
+            android:layout_marginStart="25dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Home"
-            android:src="@drawable/calendar" />
+            android:src="@drawable/calendar"
+            android:contentDescription="Home"/>
 
         <ImageButton
             android:id="@+id/btnCamera"
@@ -198,8 +198,8 @@
             android:layout_height="36dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:contentDescription="Camera"
-            android:src="@drawable/camera" />
+            android:src="@drawable/camera"
+            android:contentDescription="Camera"/>
 
         <ImageButton
             android:id="@+id/btnNotification"
@@ -207,18 +207,18 @@
             android:layout_height="36dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:contentDescription="Notifications"
-            android:src="@drawable/notification" />
+            android:src="@drawable/notification"
+            android:contentDescription="Notifications"/>
 
         <ImageButton
             android:id="@+id/btnProfile"
             android:layout_width="0dp"
-            android:layout_height="22dp"
-            android:layout_marginEnd="25dp"
+            android:layout_height="36dp"
             android:layout_weight="1"
+            android:layout_marginEnd="25dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Profile"
-            android:src="@drawable/profile_clicked" />
+            android:src="@drawable/profile_clicked"
+            android:contentDescription="Profile"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

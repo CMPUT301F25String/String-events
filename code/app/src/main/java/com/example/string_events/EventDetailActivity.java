@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * or accept/decline an invite. Event data is loaded from Firestore.
  */
 public class EventDetailActivity extends AppCompatActivity {
-
+    private final LotteryHelper lotteryHelper = new LotteryHelper();
     private String username;
     private String eventId; 
 
@@ -70,8 +70,7 @@ public class EventDetailActivity extends AppCompatActivity {
         assert eventId != null;
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventsCollectionRef = db.collection("events");
-        DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
+        DocumentReference eventDocumentRef = db.collection("events").document(eventId);
 
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         username = sp.getString("user", null);
@@ -117,6 +116,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 eventDocumentRef.update("attendees", FieldValue.arrayRemove(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from attendees!", Toast.LENGTH_SHORT).show();
                 userInEventAttendees.set(false);
+                // when an attendee for an event cancels, the lottery automatically selects a replacement user from the waitlist
+                lotteryHelper.replaceCancelledUser(eventDocumentRef);
                 applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         });
@@ -264,6 +265,8 @@ public class EventDetailActivity extends AppCompatActivity {
         declineInviteButton.setOnClickListener(view -> {
             eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
             Toast.makeText(EventDetailActivity.this, "You've declined your attendance!", Toast.LENGTH_SHORT).show();
+            // when an invited user for an event declines, the lottery automatically selects a replacement user from the waitlist
+            lotteryHelper.replaceCancelledUser(eventDocumentRef);
             applyButton.setBackgroundResource(R.drawable.apply_button);
             applyButton.setVisibility(View.VISIBLE);
             acceptInviteButton.setVisibility(View.GONE);
@@ -333,98 +336,5 @@ public class EventDetailActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void getUserStatusFromDatabase(ImageButton applyButton, DocumentReference eventDocumentRef) {
-        // setting the value of userInEventWaitlist (checking if user is in the event's waitlist)
-        // and the value of userInEventAttendees (checking if user is in the event's attendees)
-        eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
-            ArrayList<String> waitlist = (ArrayList<String>) documentSnapshot.get("waitlist");
-            ArrayList<String> invitedList = (ArrayList<String>) documentSnapshot.get("invited");
-            ArrayList<String> attendeesList = (ArrayList<String>) documentSnapshot.get("attendees");
-
-            if (waitlist != null && waitlist.contains(username)) {
-                Log.d("FirestoreCheck", "already in waitlist");
-                userInEventWaitlist.set(true);
-                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            } else if (invitedList != null && invitedList.contains(username)) {
-                // user has been invited to the event and needs to either confirm or decline attendance
-                Log.d("FirestoreCheck", "already in attendees");
-                userInEventInvited.set(true);
-                eventPendingUserConfirmation(applyButton, eventDocumentRef);
-            } else if (attendeesList != null && attendeesList.contains(username)) {
-                Log.d("FirestoreCheck", "already in attendees");
-                userInEventAttendees.set(true);
-                // TODO make this a leave event button instead of cancel apply
-                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            } else {
-                // user is not on any of the lists
-                applyButton.setBackgroundResource(R.drawable.apply_button);
-            }
-        }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
-
-//        eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
-//            if (documentSnapshot.exists()) {
-//                @SuppressWarnings("unchecked")
-//                List<String> waitlist = (List<String>) documentSnapshot.get("waitlist");
-//                if (waitlist != null && waitlist.contains(username)) {
-//                    Log.d("FirestoreCheck", "already in waitlist");
-//                    userInEventWaitlist.set(true);
-//                } else {
-//                    Log.d("FirestoreCheck", "not on waitlist");
-//                    userInEventWaitlist.set(false);
-//                }
-//
-//                @SuppressWarnings("unchecked")
-//                List<String> attendeesList = (List<String>) documentSnapshot.get("attendees");
-//                if (attendeesList != null && attendeesList.contains(username)) {
-//                    Log.d("FirestoreCheck", "already in attendees");
-//                    userInEventAttendees.set(true);
-//                } else {
-//                    Log.d("FirestoreCheck", "not in attendees");
-//                    userInEventAttendees.set(false);
-//                }
-//
-//                // set the appearance of the apply button based on the user's status in the event
-//                if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
-//                    applyButton.setBackgroundResource(R.drawable.apply_button);
-//                } else {
-//                    applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-//                }
-//            } else {
-//                Log.d("FirestoreCheck", "document does not exist");
-//            }
-//        }).addOnFailureListener(e -> Log.e("FirestoreCheck", "Error fetching document", e));
-    }
-
-    private void eventPendingUserConfirmation(ImageButton applyButton, DocumentReference eventDocumentRef) {
-        // this instance of event details was opened from the notification screen
-        ImageButton acceptInviteButton = findViewById(R.id.accept_invite_button);
-        ImageButton declineInviteButton = findViewById(R.id.decline_invite_button);
-
-        applyButton.setVisibility(View.GONE);
-        acceptInviteButton.setVisibility(View.VISIBLE);
-        declineInviteButton.setVisibility(View.VISIBLE);
-
-        acceptInviteButton.setOnClickListener(view -> {
-            eventDocumentRef.update("attendees", FieldValue.arrayUnion(username));
-            eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
-            Toast.makeText(EventDetailActivity.this, "You've confirmed your attendance!", Toast.LENGTH_SHORT).show();
-            userInEventAttendees.set(true);
-            applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            applyButton.setVisibility(View.VISIBLE);
-            acceptInviteButton.setVisibility(View.GONE);
-            declineInviteButton.setVisibility(View.GONE);
-        });
-
-        declineInviteButton.setOnClickListener(view -> {
-            eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
-            Toast.makeText(EventDetailActivity.this, "You've declined your attendance!", Toast.LENGTH_SHORT).show();
-            applyButton.setBackgroundResource(R.drawable.apply_button);
-            applyButton.setVisibility(View.VISIBLE);
-            acceptInviteButton.setVisibility(View.GONE);
-            declineInviteButton.setVisibility(View.GONE);
-        });
     }
 }

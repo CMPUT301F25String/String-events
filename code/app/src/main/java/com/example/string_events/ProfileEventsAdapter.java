@@ -1,6 +1,8 @@
 package com.example.string_events;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * RecyclerView adapter that renders a user's related events inside the profile screen.
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdapter.profileEventsViewHolder> {
     Context context;
     ArrayList<ProfileEvent> profileEventsList;
+    SharedPreferences sharedPreferences;
 
     /**
      * Creates an adapter backed by a list of {@link ProfileEvent}.
@@ -33,9 +37,10 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
      * @param context Android context used for inflating rows and image loading
      * @param profileEventsList data set to display
      */
-    public ProfileEventsAdapter(Context context, ArrayList<ProfileEvent> profileEventsList) {
+    public ProfileEventsAdapter(Context context, ArrayList<ProfileEvent> profileEventsList, SharedPreferences sharedPreferences) {
         this.context = context;
         this.profileEventsList = profileEventsList;
+        this.sharedPreferences = sharedPreferences;
     }
 
     /**
@@ -60,6 +65,7 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
     public void onBindViewHolder(@NonNull profileEventsViewHolder holder, int position) {
         // assigning values to the items in the recyclerView as they are being inflated
         ProfileEvent profileEvent = profileEventsList.get(position);
+        String currentRole = sharedPreferences.getString("role", null);
 
         // no image uploaded for event
         if (profileEvent.profileEventPhotoUrl == null) {
@@ -77,11 +83,17 @@ public class ProfileEventsAdapter extends RecyclerView.Adapter<ProfileEventsAdap
 //        holder.eventTime.setText(profileEvent.getProfileEventStartDateTime());
         holder.eventLocation.setText(profileEvent.getProfileEventLocation());
 
-        holder.itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO open new event detail screen
+        holder.itemLayout.setOnClickListener(view -> {
+            // either open event details or event overview based on the user's current role (entrant or organizer)
+            Intent intent;
+            if (Objects.equals(currentRole, "entrant")) {
+                intent = new Intent(context, EventDetailActivity.class);
             }
+            else {
+                intent = new Intent(context, OrganizerEventOverviewScreen.class);
+            }
+            intent.putExtra("event_id", profileEvent.getEventId());
+            context.startActivity(intent);
         });
     }
 

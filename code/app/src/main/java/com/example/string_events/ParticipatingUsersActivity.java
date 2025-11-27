@@ -40,7 +40,7 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
         adapter = new UserAdapter(this, userList);
         listView.setAdapter(adapter);
 
-        String eventId = getIntent().getStringExtra(OrganizerEventDetails.EVENT_ID);
+        String eventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
         if (eventId == null) {
             finish();
             return;
@@ -51,7 +51,7 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
 
         findViewById(R.id.btnSendParticipating).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);
-            it.putExtra(OrganizerEventDetails.EVENT_ID, eventId);
+            it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
             it.putExtra("target_group", "participating");
             startActivity(it);
         });

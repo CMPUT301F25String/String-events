@@ -332,8 +332,7 @@ public class CreateEventScreen extends AppCompatActivity {
 
                     generateAndUploadQrCode(event);
 
-
-                    Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetails.class);
+                    Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetailScreen.class);
                     intent.putExtra("eventId", event.getEventId());
                     startActivity(intent);
                     finish();

@@ -33,8 +33,6 @@ import java.util.ArrayList;
  * current user is on the waitlist.
  */
 public class ProfileScreen extends AppCompatActivity {
-
-    ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
@@ -58,6 +56,7 @@ public class ProfileScreen extends AppCompatActivity {
         TextView nameTextView = findViewById(R.id.name_textView);
         TextView emailTextView = findViewById(R.id.email_textView);
         ConstraintLayout lotteryInfoLayout = findViewById(R.id.lottery_info_layout);
+        TextView profileEventsTextView = findViewById(R.id.profile_events_textView);
         ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
 
         // bottom bar buttons
@@ -87,18 +86,22 @@ public class ProfileScreen extends AppCompatActivity {
             overridePendingTransition(0, 0);
         });
 
+        // TODO condense all this currentRole checking into one method
+        // check if the user is currently an event entrant or an event organizer
+        if (currentRole.equals("entrant")) {
+            switchRolesButton.setBackgroundResource(R.drawable.switch_to_organizer_button);
+            profileEventsTextView.setText("Joined Events:");
+        } else {
+            switchRolesButton.setBackgroundResource(R.drawable.switch_to_entrant_button);
+            profileEventsTextView.setText("Created Events:");
+        }
+
         homeButton.setOnClickListener(view -> {
             if (currentRole.equals("entrant")) {
                 openEntrantEventScreen();
             } else {
                 openOrganizerEventScreen();
             }
-        });
-
-        // camera button opens ScanQrActivity
-        cameraButton.setOnClickListener(view -> {
-            Intent intent = new Intent(ProfileScreen.this, QrScanActivity.class);
-            startActivity(intent);
         });
 
         notificationsButton.setOnClickListener(view -> openNotificationsScreen());
@@ -153,32 +156,60 @@ public class ProfileScreen extends AppCompatActivity {
                     .addOnFailureListener(e ->
                             Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
-
-        // setup recyclerview in profile screen with events
+        // setup recyclerview in profile screen with either joined events or created events
+        // TODO simplify this logic without too much repeated code
         if (username != null && !username.isEmpty()) {
-            db.collection("events")
-                    .whereArrayContains("waitlist", username)
-                    // .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .get()
-                    .addOnSuccessListener(snap -> {
-                        if (snap.isEmpty()) {
-                            Log.d("Firestore", "no events found with waitlists that contain user:" + username);
-                        }
-                        for (QueryDocumentSnapshot d : snap) {
-                            String imageUrl = d.getString("imageUrl");
-                            String name = d.getString("title");
-                            // String startDateTime = d.getString("startAt");
-                            // String endDateTime = d.getString("endAt");
-                            String location = d.getString("location");
-                            ProfileEvent profileEvent = new ProfileEvent(imageUrl, name, null, null, location);
-                            profileEventsList.add(profileEvent);
-                        }
-                        setupRecyclerView(profileEventsList);
-                    })
-                    .addOnFailureListener(e -> {
-                        // It's crucial to handle query failures
-                        Log.e("Firestore", "error getting waitlisted events", e);
-                    });
+            ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
+            if (currentRole.equals("entrant")) {
+                db.collection("events")
+                        // TODO maybe make all users have a list of all their previous joined eventIds or search every array in each event for username
+                        .whereArrayContains("waitlist", username)
+                        // .orderBy("createdAt", Query.Direction.DESCENDING)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap.isEmpty()) {
+                                Log.d("Firestore", "no events found with waitlists that contain user:" + username);
+                            }
+                            for (QueryDocumentSnapshot d : snap) {
+                                String eventId = d.getId();
+                                String imageUrl = d.getString("imageUrl");
+                                String name = d.getString("title");
+                                // String startDateTime = d.getString("startAt");
+                                // String endDateTime = d.getString("endAt");
+                                String location = d.getString("location");
+                                ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
+                                profileEventsList.add(profileEvent);
+                            }
+                            setupRecyclerView(profileEventsList, sharedPreferences);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firestore", "error getting waitlisted events", e);
+                        });
+            } else {
+                db.collection("events")
+                        .whereEqualTo("creator", username)
+                        // .orderBy("createdAt", Query.Direction.DESCENDING)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap.isEmpty()) {
+                                Log.d("Firestore", "no events found with creator:" + username);
+                            }
+                            for (QueryDocumentSnapshot d : snap) {
+                                String eventId = d.getId();
+                                String imageUrl = d.getString("imageUrl");
+                                String name = d.getString("title");
+                                // String startDateTime = d.getString("startAt");
+                                // String endDateTime = d.getString("endAt");
+                                String location = d.getString("location");
+                                ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
+                                profileEventsList.add(profileEvent);
+                            }
+                            setupRecyclerView(profileEventsList, sharedPreferences);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firestore", "error getting waitlisted events", e);
+                        });
+            }
         }
     }
 
@@ -232,9 +263,9 @@ public class ProfileScreen extends AppCompatActivity {
      *
      * @param profileEventsList list of events to render
      */
-    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList) {
+    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList, SharedPreferences sharedPreferences) {
         RecyclerView profileEventRecyclerview = findViewById(R.id.profile_events_recyclerView);
-        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
+        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList, sharedPreferences);
         profileEventRecyclerview.setAdapter(profileEventsAdapter);
         profileEventRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }
