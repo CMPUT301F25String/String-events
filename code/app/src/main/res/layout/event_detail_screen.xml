@@ -239,6 +239,16 @@
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp"
                 android:textColor="#555555"/>
+
+            <!-- 新增：导出 CSV 按钮 -->
+            <Button
+                android:id="@+id/btn_export_csv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Export CSV"
+                android:layout_marginTop="24dp"
+                android:layout_gravity="end"/>
+
         </LinearLayout>
     </ScrollView>
 
@@ -251,7 +261,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        
+
         <ImageButton
             android:id="@+id/accept_invite_button"
             android:layout_width="140dp"
