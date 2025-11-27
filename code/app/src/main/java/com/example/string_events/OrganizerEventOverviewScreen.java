@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class EventOverviewScreen extends AppCompatActivity {
+public class OrganizerEventOverviewScreen extends AppCompatActivity {
 
     private static final String TAG = "EventOverview";
 
@@ -85,7 +85,7 @@ public class EventOverviewScreen extends AppCompatActivity {
         );
 
         btnEventDetails.setOnClickListener(v -> {
-            Intent intent = new Intent(EventOverviewScreen.this, OrganizerEventDetailScreen.class);
+            Intent intent = new Intent(OrganizerEventOverviewScreen.this, OrganizerEventDetailScreen.class);
             intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
             startActivity(intent);
         });
@@ -202,6 +202,7 @@ public class EventOverviewScreen extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finish();
     }
 }
