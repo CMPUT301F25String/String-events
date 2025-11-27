@@ -23,16 +23,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="stringevents"
-                    android:host="event" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <activity
             android:name=".CreateEventScreen"
