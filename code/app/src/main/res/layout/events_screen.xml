@@ -137,8 +137,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
-        android:layout_width="62dp"
-        android:layout_height="33dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Logout" />
 
 
@@ -163,11 +163,11 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_camera"
+            app:layout_constraintEnd_toStartOf="@id/btnCamera"
             app:layout_constraintHorizontal_chainStyle="spread" />
 
         <ImageButton
-            android:id="@+id/nav_camera"
+            android:id="@+id/btnCamera"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -189,7 +189,7 @@
             app:tint="#101114"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_camera"
+            app:layout_constraintStart_toEndOf="@id/btnCamera"
             app:layout_constraintEnd_toStartOf="@id/nav_person" />
 
         <ImageButton

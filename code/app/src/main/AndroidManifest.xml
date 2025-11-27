@@ -1,9 +1,14 @@
 <manifest package="com.example.string_events"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:label="@string/app_name"
@@ -18,7 +23,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".CreateEventScreen"
@@ -134,6 +139,18 @@
 
         <activity
             android:name=".AdminAllUserProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".QrScanActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".QrCodeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EventQrEntryActivity"
             android:exported="false" />
 
         <activity
