@@ -43,7 +43,12 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     val protoLite = "3.25.3"

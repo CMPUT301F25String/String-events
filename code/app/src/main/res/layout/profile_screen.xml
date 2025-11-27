@@ -122,7 +122,9 @@
                 android:id="@+id/info_imageButton"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="@drawable/info_button" />
+                android:background="@drawable/info_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -137,7 +139,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/joined_events_textView"
+            android:id="@+id/profile_events_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"

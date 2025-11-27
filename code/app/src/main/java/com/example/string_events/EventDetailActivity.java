@@ -334,6 +334,4 @@ public class EventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 }
