@@ -150,7 +150,6 @@ public class LotteryDrawActivity extends AppCompatActivity {
                 // add everyone to invited list and clear the waitlist
                 inviteList = new ArrayList<>(waitlist);
                 waitlist.clear();
-                // TODO send notification to everyone on inviteList and waitlist
             }
             // otherwise, we shuffle the waitlist randomly and pick the first maxAttendees number as winners
             else {
