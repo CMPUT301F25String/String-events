@@ -161,6 +161,14 @@
                         android:layout_marginBottom="20dp"
                         android:background="#BDBDBD"/>
 
+                    <CheckBox
+                        android:id="@+id/chkRemember"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="Remember me"
+                        android:textColor="#7A7A7A"
+                        android:textSize="12sp"/>
 
                     <FrameLayout
                         android:id="@+id/btnSignIn"
@@ -194,7 +202,6 @@
                             android:text="Don't have account?"
                             android:textColor="#9C9C9C"
                             android:textSize="12sp"/>
-
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSignUp"
