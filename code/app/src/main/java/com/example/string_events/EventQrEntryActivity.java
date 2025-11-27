@@ -12,9 +12,6 @@ public class EventQrEntryActivity extends AppCompatActivity {
     // Key used to pass event id into MainActivity
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
-    // Fallback to event3 if parsing fails
-    private static final String EVENT3_ID = "07d4dd53-3efe-4613-b852-0720a924be8b";
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,13 +36,10 @@ public class EventQrEntryActivity extends AppCompatActivity {
             }
         }
 
-        if (eventId == null || eventId.isEmpty()) {
-            eventId = EVENT3_ID;
-        }
-
-        // Forward user into MainActivity and pass along the event id
         Intent open = new Intent(this, MainActivity.class);
-        open.putExtra(EXTRA_EVENT_ID, eventId);
+        if (eventId != null && !eventId.isEmpty()) {
+            open.putExtra(EXTRA_EVENT_ID, eventId);
+        }
         open.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(open);
         finish();

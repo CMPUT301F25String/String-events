@@ -1,10 +1,11 @@
 package com.example.string_events;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +20,6 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 public class QrScanActivity extends AppCompatActivity {
 
     private static final int CAMERA_PERMISSION_REQUEST = 1001;
-    private static final String EVENT3_ID = "07d4dd53-3efe-4613-b852-0720a924be8b";
-
     private DecoratedBarcodeView barcodeView;
     private boolean handledResult = false;
     private boolean torchOn = false;
@@ -104,8 +103,40 @@ public class QrScanActivity extends AppCompatActivity {
             }
             handledResult = true;
 
-            // String contents = result.getText(); // not used for now
-            String eventId = EVENT3_ID;
+            String contents = result.getText();
+            if (contents == null || contents.isEmpty()) {
+                Toast.makeText(QrScanActivity.this, "Invalid QR code", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            String eventId = null;
+
+            try {
+                Uri uri = Uri.parse(contents);
+                // ex. "stringevents://event/<id>"
+                // scheme = "stringevents", host = "event", lastPathSegment = <id>
+                if ("stringevents".equals(uri.getScheme())
+                        && "event".equals(uri.getHost())) {
+
+                    String last = uri.getLastPathSegment();
+                    if (last != null && !last.isEmpty()) {
+                        eventId = last;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+
+            // fallback if contents itself is just the event id
+            if (eventId == null || eventId.isEmpty()) {
+                eventId = contents;
+            }
+
+            if (eventId == null || eventId.isEmpty()) {
+                Toast.makeText(QrScanActivity.this, "Invalid QR code", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
 
             Intent i = new Intent(QrScanActivity.this, EventDetailActivity.class);
             i.putExtra("event_id", eventId);
@@ -113,6 +144,7 @@ public class QrScanActivity extends AppCompatActivity {
             finish();
         }
     };
+
 
     @Override
     protected void onResume() {

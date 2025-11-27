@@ -44,13 +44,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EventDetailActivity extends AppCompatActivity {
     private final LotteryHelper lotteryHelper = new LotteryHelper();
     private String username;
-    private String eventId; 
+    private String eventId;
 
     private final AtomicBoolean userInEventWaitlist = new AtomicBoolean(false);
     private final AtomicBoolean userInEventInvited = new AtomicBoolean(false);
     private final AtomicBoolean userInEventAttendees = new AtomicBoolean(false);
 
-    
+
     private final List<String> csvEntrants = new ArrayList<>();
 
     /**

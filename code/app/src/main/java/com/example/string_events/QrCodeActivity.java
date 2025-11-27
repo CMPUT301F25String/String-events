@@ -20,11 +20,8 @@ import java.io.ByteArrayOutputStream;
 
 public class QrCodeActivity extends AppCompatActivity {
 
-    // Key used to receive event id from other parts of the app
+    // a key used to receive event id from other parts of the app
     public static final String EXTRA_EVENT_ID = "extra_event_id";
-
-    // Temporary hardcoded id for event3
-    private static final String EVENT3_ID = "07d4dd53-3efe-4613-b852-0720a924be8b";
 
     private FirebaseFirestore db;
 
@@ -40,15 +37,18 @@ public class QrCodeActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> onBackPressed());
 
-        // Try to get event id from intent, otherwise fall back to event3
+        // only use the event id from the intent
         String eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
         if (eventId == null || eventId.isEmpty()) {
-            eventId = EVENT3_ID;
+            Toast.makeText(this, "Missing event id", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        // Load the stored QR image from Firestore + Storage
+        // load the stored QR image from Firestore + Storage
         loadStoredQrIfAvailable(eventId, imgQr);
     }
+
 
     private void loadStoredQrIfAvailable(String eventId, ImageView imgQr) {
         db.collection("events")
@@ -76,11 +76,6 @@ public class QrCodeActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Generates a QR code for an existing event, uploads it to Firebase Storage under
-     * "qr_code/{eventId}.png", saves the download URL into the event document as "qrCodeUrl",
-     * and then displays the image using Glide.
-     */
     private void generateAndUploadQrForEvent(String eventId, ImageView imgQr) {
         String qrContent = "stringevents://event/" + eventId;
 
