@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * or accept/decline an invite. Event data is loaded from Firestore.
  */
 public class EventDetailActivity extends AppCompatActivity {
-
+    private final LotteryHelper lotteryHelper = new LotteryHelper();
     private String username;
     private String eventId; 
 
@@ -70,8 +70,7 @@ public class EventDetailActivity extends AppCompatActivity {
         assert eventId != null;
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference eventsCollectionRef = db.collection("events");
-        DocumentReference eventDocumentRef = eventsCollectionRef.document(eventId);
+        DocumentReference eventDocumentRef = db.collection("events").document(eventId);
 
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         username = sp.getString("user", null);
@@ -117,6 +116,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 eventDocumentRef.update("attendees", FieldValue.arrayRemove(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from attendees!", Toast.LENGTH_SHORT).show();
                 userInEventAttendees.set(false);
+                // when an attendee for an event cancels, the lottery automatically selects a replacement user from the waitlist
+                lotteryHelper.replaceCancelledUser(eventDocumentRef);
                 applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         });
@@ -264,6 +265,8 @@ public class EventDetailActivity extends AppCompatActivity {
         declineInviteButton.setOnClickListener(view -> {
             eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
             Toast.makeText(EventDetailActivity.this, "You've declined your attendance!", Toast.LENGTH_SHORT).show();
+            // when an invited user for an event declines, the lottery automatically selects a replacement user from the waitlist
+            lotteryHelper.replaceCancelledUser(eventDocumentRef);
             applyButton.setBackgroundResource(R.drawable.apply_button);
             applyButton.setVisibility(View.VISIBLE);
             acceptInviteButton.setVisibility(View.GONE);

@@ -25,7 +25,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -323,7 +322,7 @@ public class CreateEventScreen extends AppCompatActivity {
                     // testing function that replaces the image button on the screen with the database uploaded image
                     // this is just to test that we can get the image back from the database and use it in the app
                     testingImageGet(event);
-                    Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetails.class);
+                    Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetailScreen.class);
                     intent.putExtra("eventId", event.getEventId());
                     startActivity(intent);
                     finish();

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,7 +38,7 @@ public class CanceledUsersActivity extends AppCompatActivity {
         adapter = new UserAdapter(this, userList);
         listView.setAdapter(adapter);
 
-        String eventId = getIntent().getStringExtra(OrganizerEventDetails.EVENT_ID);
+        String eventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
         if (eventId == null) {
             finish();
             return;
@@ -49,7 +48,7 @@ public class CanceledUsersActivity extends AppCompatActivity {
 
         findViewById(R.id.btnSendCanceled).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);
-            it.putExtra(OrganizerEventDetails.EVENT_ID, eventId);
+            it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
             it.putExtra("target_group", "canceled");
             startActivity(it);
         });
