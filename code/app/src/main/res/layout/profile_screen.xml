@@ -123,7 +123,8 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:background="@drawable/info_button"
-                tools:ignore="MissingConstraints" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -138,7 +139,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/joined_events_textView"
+            android:id="@+id/profile_events_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
@@ -179,15 +180,14 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/btnHome"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            android:layout_marginStart="25dp"
             android:layout_weight="1"
+            android:layout_marginStart="25dp"
             android:background="@android:color/transparent"
             android:contentDescription="Home"
             android:src="@drawable/calendar" />
@@ -213,9 +213,9 @@
         <ImageButton
             android:id="@+id/btnProfile"
             android:layout_width="0dp"
-            android:layout_height="22dp"
-            android:layout_marginEnd="25dp"
+            android:layout_height="36dp"
             android:layout_weight="1"
+            android:layout_marginEnd="25dp"
             android:background="@android:color/transparent"
             android:contentDescription="Profile"
             android:src="@drawable/profile_clicked" />

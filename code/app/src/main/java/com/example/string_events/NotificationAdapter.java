@@ -48,7 +48,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LayoutInflater inflater = LayoutInflater.from(context);
 
         if (viewType == VIEW_TYPE_MESSAGE) {
-            View itemView = inflater.inflate(R.layout.notification_message_item, parent, false);
+            View itemView = inflater.inflate(R.layout.item_notification_message, parent, false);
             return new MessageViewHolder(itemView);
         }
 
@@ -84,7 +84,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         if (notification.getEventPhoto() != null) {
-            loadBitmapIntoView(notification.getEventPhoto().toString(), holder.notificationPhoto);
+            loadBitmapIntoView(notification.getEventPhoto(), holder.notificationPhoto);
         } else {
             holder.notificationPhoto.setImageResource(R.drawable.event_image);
         }
@@ -93,8 +93,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         holder.notificationItemLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
-            intent.putExtra("source", "notification");
-            intent.putExtra("selectedStatus", String.valueOf(notification.getSelectedStatus()));
             intent.putExtra("event_id", notification.getEventId());
             context.startActivity(intent);
         });
@@ -107,7 +105,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.notificationEventName.setText(notification.getEventName());
 
         if (notification.getEventPhoto() != null) {
-            loadBitmapIntoView(notification.getEventPhoto().toString(), holder.notificationPhoto);
+            loadBitmapIntoView(notification.getEventPhoto(), holder.notificationPhoto);
         } else {
             holder.notificationPhoto.setImageResource(R.drawable.event_image);
         }
@@ -116,7 +114,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Intent intent = new Intent(context, NotificationMessageDetailActivity.class);
             intent.putExtra("eventId", notification.getEventId());
             intent.putExtra("eventName", notification.getEventName());
-            intent.putExtra("imageUrl", notification.getEventPhoto() != null ? notification.getEventPhoto().toString() : "");
+            intent.putExtra("imageUrl", notification.getEventPhoto() != null ? notification.getEventPhoto() : "");
             intent.putExtra("messageText", notification.getMessageText());
             context.startActivity(intent);
         });

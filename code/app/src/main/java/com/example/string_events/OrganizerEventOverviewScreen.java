@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class EventOverviewScreen extends AppCompatActivity {
+public class OrganizerEventOverviewScreen extends AppCompatActivity {
 
     private static final String TAG = "EventOverview";
 
@@ -45,7 +45,6 @@ public class EventOverviewScreen extends AppCompatActivity {
     private TextView tvDescription;
     private ImageButton btnBack;
     private ImageButton btnCancelEvent; // image-style button at bottom
-    private MaterialButton btnQrCode;
 
     private final SimpleDateFormat dateTimeFmt =
             new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -71,7 +70,6 @@ public class EventOverviewScreen extends AppCompatActivity {
         btnBack           = findViewById(R.id.btnBack);
         btnCancelEvent    = findViewById(R.id.btnCancelEvent);
         MaterialButton btnEventDetails = findViewById(R.id.btnEventDetails);
-        btnQrCode         = findViewById(R.id.btnQrCode);
 
         String eventId = getIntent().getStringExtra("event_id");
         if (eventId == null || eventId.isEmpty()) {
@@ -87,14 +85,8 @@ public class EventOverviewScreen extends AppCompatActivity {
         );
 
         btnEventDetails.setOnClickListener(v -> {
-            Intent intent = new Intent(EventOverviewScreen.this, OrganizerEventDetailScreen.class);
+            Intent intent = new Intent(OrganizerEventOverviewScreen.this, OrganizerEventDetailScreen.class);
             intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
-            startActivity(intent);
-        });
-
-        btnQrCode.setOnClickListener(v -> {
-            Intent intent = new Intent(EventOverviewScreen.this, QrCodeActivity.class);
-            intent.putExtra(QrCodeActivity.EXTRA_EVENT_ID, eventId);
             startActivity(intent);
         });
 
@@ -210,6 +202,7 @@ public class EventOverviewScreen extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finish();
     }
 }

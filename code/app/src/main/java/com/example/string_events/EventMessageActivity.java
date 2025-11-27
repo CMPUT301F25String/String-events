@@ -30,7 +30,7 @@ public class EventMessageActivity extends AppCompatActivity {
 
         etMessage = findViewById(R.id.etMessage);
 
-        String eventId = getIntent().getStringExtra(OrganizerEventDetails.EVENT_ID);
+        String eventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
         String group = getIntent().getStringExtra("target_group");
 
         ImageButton btnSend = findViewById(R.id.btnSendMessage);
