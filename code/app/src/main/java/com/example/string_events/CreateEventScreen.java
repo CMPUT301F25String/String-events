@@ -45,6 +45,7 @@ import android.graphics.Bitmap;
 import java.io.ByteArrayOutputStream;
 
 import com.google.zxing.WriterException;
+import com.google.firebase.storage.UploadTask;
 
 /**
  * Screen for creating a new event.
@@ -329,9 +330,7 @@ public class CreateEventScreen extends AppCompatActivity {
                     // testing function that replaces the image button on the screen with the database uploaded image
                     // this is just to test that we can get the image back from the database and use it in the app
                     testingImageGet(event);
-
                     generateAndUploadQrCode(event);
-
                     Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetailScreen.class);
                     intent.putExtra("eventId", event.getEventId());
                     startActivity(intent);

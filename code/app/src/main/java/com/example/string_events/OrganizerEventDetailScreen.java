@@ -27,7 +27,7 @@ import java.util.Locale;
  * Provides navigation to participant-related lists (canceled, participating, waitlist).
  * The target event is identified via {@link #EVENT_ID}.
  */
-public class OrganizerEventDetails extends AppCompatActivity {
+public class OrganizerEventDetailScreen extends AppCompatActivity {
 
     /**
      * Intent extra key containing the event ID to manage.
