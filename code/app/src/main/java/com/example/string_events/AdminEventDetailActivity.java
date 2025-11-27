@@ -21,40 +21,27 @@ import java.util.Locale;
 
 /**
  * Admin detail screen that displays full event information fetched from Firestore.
- * <p>Shows cover image, title, location, registration window, capacity/waitlist,
- * status (scheduled/in-progress/finished), and timing. Provides quick actions such as
- * delete, back navigation, QR code placeholder, and event link placeholder.</p>
- *
- * @since 1.0
+ * Shows cover image, title, location, registration window, capacity/waitlist,
+ * status (scheduled/in-progress/finished), and timing.
  */
 public class AdminEventDetailActivity extends AppCompatActivity {
 
-    /** Firestore entry point. */
     private FirebaseFirestore db;
-    /** Event document id passed via intent extra "event_id". */
     private String eventId;
 
-    /** Event cover image view. */
     private ImageView imgEvent;
-    /** Title, location, registration start/end, waitlist, attendees, description, status, date range. */
     private TextView tvTitle, tvLocation, tvRegStart, tvRegEnd, tvWaitlist, tvAttendees,
-            tvDescription, tvStatus, tvEventDates, tvCategory, tvVisibility, tvGeo, tvCreator;
+            tvDescription, tvStatus, tvEventDates, tvCategory, tvVisibility, tvGeo, tvCreator,
+            tvOrganizer;
 
-    /**
-     * Initializes the UI, wires button handlers, and starts loading event details.
-     *
-     * @param savedInstanceState initialization bundle, may be {@code null}
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_event_details_screen);
 
-        // Initialize Firestore and get event ID
         db = FirebaseFirestore.getInstance();
         eventId = getIntent().getStringExtra("event_id");
 
-        // --- Find Views ---
         imgEvent = findViewById(R.id.imgEvent);
         tvTitle = findViewById(R.id.tvEventName);
         tvLocation = findViewById(R.id.tvLocation);
@@ -65,26 +52,20 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         tvDescription = findViewById(R.id.tvDescription);
         tvStatus = findViewById(R.id.tvStatus);
         tvEventDates = findViewById(R.id.tvEventDates);
+        tvOrganizer = findViewById(R.id.tvOrganizer);
 
         ImageButton btnBack = findViewById(R.id.btnBack);
         ImageButton btnDelete = findViewById(R.id.btnDelete);
-        ImageButton btnQRCode = findViewById(R.id.btnQRCode);
-        ImageButton btnEventLink = findViewById(R.id.btnEventLink);
+        com.google.android.material.button.MaterialButton btnQRCode = findViewById(R.id.btnQRCode);
 
-        // --- Buttons ---
         btnBack.setOnClickListener(v -> finish());
         btnDelete.setOnClickListener(v -> deleteEvent());
-        btnQRCode.setOnClickListener(v -> Toast.makeText(this, "QR Code clicked", Toast.LENGTH_SHORT).show());
-        btnEventLink.setOnClickListener(v -> Toast.makeText(this, "Event Link clicked", Toast.LENGTH_SHORT).show());
+        btnQRCode.setOnClickListener(v ->
+                Toast.makeText(this, "QR Code clicked", Toast.LENGTH_SHORT).show());
 
-        // Load from Firestore
         loadEventDetails();
     }
 
-    /**
-     * Loads event fields from Firestore and populates the view.
-     * Handles null/missing fields defensively.
-     */
     private void loadEventDetails() {
         if (eventId == null) {
             Toast.makeText(this, "Invalid event", Toast.LENGTH_SHORT).show();
@@ -100,7 +81,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // --- Retrieve Firestore fields ---
                     String title = doc.getString("title");
                     String location = doc.getString("location");
                     String description = doc.getString("description");
@@ -120,14 +100,15 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     Timestamp regStart = doc.getTimestamp("regStartAt");
                     Timestamp regEnd = doc.getTimestamp("regEndAt");
 
-                    // --- Format ---
                     DateFormat df = DateFormat.getDateTimeInstance(
                             DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
 
-                    // --- Display data ---
                     tvTitle.setText(title != null ? title : "(No title)");
                     tvLocation.setText(location != null ? location : "(No location)");
                     tvDescription.setText(description != null ? description : "(No description)");
+
+                    // Organizer label
+                    tvOrganizer.setText("Organizer: " + (creator != null ? creator : "Unknown"));
 
                     if (tvCategory != null)
                         tvCategory.setText("Category: " + (categories != null ? categories : "-"));
@@ -145,10 +126,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     tvRegStart.setText("Registration Start: " + (regStart != null ? df.format(regStart.toDate()) : "-"));
                     tvRegEnd.setText("Registration End: " + (regEnd != null ? df.format(regEnd.toDate()) : "-"));
 
-                    if (startAt != null && endAt != null)
+                    if (startAt != null && endAt != null) {
                         tvEventDates.setText(df.format(startAt.toDate()) + " - " + df.format(endAt.toDate()));
+                    }
 
-                    // --- Status color ---
                     long now = System.currentTimeMillis();
                     long start = startAt != null ? startAt.toDate().getTime() : Long.MAX_VALUE;
                     long end = endAt != null ? endAt.toDate().getTime() : Long.MAX_VALUE;
@@ -164,7 +145,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         tvStatus.setBackgroundColor(0xFFF1A428);
                     }
 
-                    // --- Load image from URL ---
                     if (imageUrl != null && !imageUrl.isEmpty()) {
                         new Thread(() -> {
                             try {
@@ -190,10 +170,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to load event", Toast.LENGTH_SHORT).show());
     }
 
-    /**
-     * Deletes the current event document from Firestore.
-     * Shows a toast on success/failure and finishes the screen on success.
-     */
     private void deleteEvent() {
         if (eventId == null) return;
 
