@@ -103,25 +103,10 @@ public class MainActivity extends AppCompatActivity {
         TextView btnOpenFilter = findViewById(R.id.btn_open_filter);
 
         btnOpenFilter.setOnClickListener(v -> {
-            android.content.Intent it = new android.content.Intent(this, EventFilterActivity.class);
+            Intent it = new Intent(this, EventFilterActivity.class);
             it.putExtra(EventFilterActivity.EXTRA_TAGS, selectedTags.toArray(new String[0]));
             filterLauncher.launch(it);
         });
-
-        String username = getIntent().getStringExtra("user");
-        String fullName = getIntent().getStringExtra("name");
-        String email = getIntent().getStringExtra("email");
-
-        if (username != null) {
-            // store user info for cross-activity access
-            SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("role", "entrant");
-            editor.putString("user", username);
-            editor.putString("fullName", fullName);
-            editor.putString("email", email);
-            editor.apply();
-        }
 
         Intent launchIntent = getIntent();
         if (Intent.ACTION_VIEW.equals(launchIntent.getAction()) && launchIntent.getData() != null) {
@@ -212,16 +197,6 @@ public class MainActivity extends AppCompatActivity {
         if (viewId == 0) return;
         View v = findViewById(viewId);
         if (v != null) v.setOnClickListener(_v -> action.run());
-    }
-
-    /**
-     * Resolves a view ID by name in the {@code id} resource type.
-     *
-     * @param name resource entry name
-     * @return integer ID or {@code 0} if not found
-     */
-    private int getId(String name) {
-        return getResources().getIdentifier(name, "id", getPackageName());
     }
 
     /**
