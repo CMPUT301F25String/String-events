@@ -31,7 +31,6 @@ public class NotificationScreen extends AppCompatActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // 把通知列表作为成员变量，后面如果要用也方便
     private final ArrayList<Notification> notificationsList = new ArrayList<>();
 
     @Override
@@ -78,7 +77,6 @@ public class NotificationScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 点击底部通知按钮：切换“应用内通知开关”（开启 / 关闭 push）
         notificationImageButton.setOnClickListener(view -> {
             boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
             boolean newValue = !currentlyEnabled;
@@ -86,7 +84,6 @@ public class NotificationScreen extends AppCompatActivity {
             NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
 
             if (newValue) {
-                // 如果刚刚被打开，并且是 Android 13+，尝试再请求一次系统权限
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                         !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
 

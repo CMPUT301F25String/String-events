@@ -91,14 +91,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         holder.notificationEventName.setText(notification.getEventName());
 
-        // 原有逻辑：点击整张卡片 -> 进入 EventDetailActivity（不改）
+
         holder.notificationItemLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
             intent.putExtra("event_id", notification.getEventId());
             context.startActivity(intent);
         });
 
-        // 新增逻辑：点击右侧箭头按钮 -> 触发系统推送通知
+
         holder.notificationExpandButton.setOnClickListener(view -> {
             NotificationHelper.showNotification(context, notification);
         });
@@ -116,7 +116,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             holder.notificationPhoto.setImageResource(R.drawable.event_image);
         }
 
-        // 原有逻辑：点击消息卡片 -> 进入 NotificationMessageDetailActivity（不改）
+
         holder.notificationItemLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, NotificationMessageDetailActivity.class);
             intent.putExtra("eventId", notification.getEventId());
