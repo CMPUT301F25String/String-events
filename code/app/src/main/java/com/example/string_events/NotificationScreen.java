@@ -43,6 +43,12 @@ public class NotificationScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // camera button opens QrScanActivity
+        cameraImageButton.setOnClickListener(view -> {
+            Intent intent = new Intent(NotificationScreen.this, QrScanActivity.class);
+            startActivity(intent);
+        });
+
         profileImageButton.setOnClickListener(view -> {
             Intent intent = new Intent(NotificationScreen.this, ProfileScreen.class);
             startActivity(intent);

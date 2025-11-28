@@ -47,7 +47,7 @@ public class EventsScreenTest {
     @Test
     public void navCamera_click_noCrash() {
         try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.nav_camera)).perform(click());
+            onView(withId(R.id.btnCamera)).perform(click());
         }
     }
 

@@ -47,6 +47,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     val protoLite = "3.25.3"
@@ -64,6 +66,9 @@ dependencies {
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")
 
     testImplementation("junit:junit:4.13.2")
+
+    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }
 
 configurations.configureEach {

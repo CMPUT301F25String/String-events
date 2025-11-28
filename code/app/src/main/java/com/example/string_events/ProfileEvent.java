@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
  * including cover image URL, name, schedule, and location.
  */
 public class ProfileEvent {
+    String profileEventId;
     String profileEventPhotoUrl;
     String profileEventName;
     ZonedDateTime profileEventStartDateTime;
@@ -24,9 +25,10 @@ public class ProfileEvent {
      * @param profileEventEndDateTime    event end time (with zone)
      * @param location                   event location text
      */
-    public ProfileEvent(String profileEventPhotoUrl, String profileEventName,
+    public ProfileEvent(String profileEventId, String profileEventPhotoUrl, String profileEventName,
                         ZonedDateTime profileEventStartDateTime, ZonedDateTime profileEventEndDateTime,
                         String location) {
+        this.profileEventId = profileEventId;
         this.profileEventPhotoUrl = profileEventPhotoUrl;
         this.profileEventName = profileEventName;
         this.profileEventStartDateTime = profileEventStartDateTime;
@@ -82,5 +84,9 @@ public class ProfileEvent {
     /** @param profileEventLocation new location text */
     public void setProfileEventLocation(String profileEventLocation) {
         this.profileEventLocation = profileEventLocation;
+    }
+
+    public String getEventId() {
+        return this.profileEventId;
     }
 }

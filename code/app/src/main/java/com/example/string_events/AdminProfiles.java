@@ -10,6 +10,7 @@ public class AdminProfiles {
     private String email;
     private String password;
     private String docId;
+    private String profileImg;   // new field for profile image URL
 
     /**
      * No-arg constructor required by Firestore for deserialization.
@@ -19,37 +20,45 @@ public class AdminProfiles {
     }
 
     /**
-     * Creates a profile with the provided fields.
+     * Creates a profile with the provided fields (without image).
      *
-     * @param name   display name of the user
-     * @param email  account email address
+     * @param name    display name of the user
+     * @param email   account email address
      * @param password stored password value
-     * @param docId  Firestore document identifier
+     * @param docId   Firestore document identifier
      */
     public AdminProfiles(String name, String email, String password, String docId) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.docId = docId;
+        this.profileImg = null;
     }
 
     /**
-     * @return the display name
+     * Creates a profile with image URL.
+     *
+     * @param name       display name of the user
+     * @param email      account email address
+     * @param password   stored password value
+     * @param docId      Firestore document identifier
+     * @param profileImg profile image URL from Firestore ("profileimg")
      */
+    public AdminProfiles(String name, String email, String password, String docId, String profileImg) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.docId = docId;
+        this.profileImg = profileImg;
+    }
+
     public String getName() { return name; }
 
-    /**
-     * @return the email address
-     */
     public String getEmail() { return email; }
 
-    /**
-     * @return the stored password value
-     */
     public String getPassword() { return password; }
 
-    /**
-     * @return the Firestore document ID
-     */
     public String getDocId() { return docId; }
+
+    public String getProfileImg() { return profileImg; }
 }

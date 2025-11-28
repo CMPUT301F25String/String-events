@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F7">
+>
 
+    <!-- Header Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:background="@android:color/transparent">
 
         <TextView
             android:id="@+id/btn_open_filter"
@@ -45,112 +48,163 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Title -->
         <TextView
             android:id="@+id/tv_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
             android:text="Events"
-            android:textSize="20sp"
+            android:textSize="32sp"
             android:textStyle="bold"
+            android:fontFamily="@font/prompt_regular"
             android:textColor="#101114"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="@id/title_bg"
-            app:layout_constraintBottom_toBottomOf="@id/title_bg"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Subtitle -->
         <TextView
             android:id="@+id/tv_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Click on an event to sign up"
-            android:textSize="14sp"
-            android:textColor="#101114"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toBottomOf="@id/title_bg"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Find your next game"
+            android:textSize="16sp"
+            android:fontFamily="@font/prompt_regular"
+            android:textColor="#757575"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-        <TextView
-            android:id="@+id/label_filters"
+        <!-- Logout Button (Moved to top right for cleaner look) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Filters:"
-            android:textSize="14sp"
-            android:textColor="#101114"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="8dp"
-            app:layout_constraintTop_toBottomOf="@id/label_filters"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="16dp"
+            android:text="Logout"
+            android:textColor="#D32F2F"
+            android:textStyle="bold"
+            android:fontFamily="@font/prompt_regular"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/tv_title" />
+
+        <!-- Filters Section -->
+        <LinearLayout
+            android:id="@+id/layout_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
+
+            <TextView
+                android:id="@+id/label_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filters:"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/prompt_regular"
+                android:textColor="#101114"
+                android:layout_marginEnd="12dp" />
+
+            <!-- Active Chip -->
+            <TextView
+                android:id="@+id/chip_badminton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Badminton"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/prompt_regular"
+                android:textColor="#101114"
+                android:background="@drawable/bg_chip_active"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Inactive Chip -->
+            <TextView
+                android:id="@+id/chip_games"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Games"
+                android:textSize="14sp"
+                android:fontFamily="@font/prompt_regular"
+                android:textColor="#757575"
+                android:background="@drawable/bg_chip_inactive"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Add Button (Styled as a round icon) -->
+            <TextView
+                android:id="@+id/chip_add"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_chip_inactive"
+                android:gravity="center"
+                android:text="+"
+                android:textSize="20sp"
+                android:textColor="#757575" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- List View with Spacing -->
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_bar"
         android:layout_below="@id/header_container"
-        android:layout_marginTop="-2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_above="@+id/bottom_bar"
+        android:layout_marginTop="16dp"
         android:clipToPadding="false"
-        android:divider="#E6E8EB"
-        android:dividerHeight="1dp"
-        android:listSelector="?attr/selectableItemBackground"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        tools:listitem="@android:layout/simple_list_item_2" />
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="16dp"
+        android:listSelector="@android:color/transparent"
+        android:scrollbars="none"
+        tools:listitem="@layout/item_event" />
 
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogout"
-        android:layout_width="62dp"
-        android:layout_height="33dp"
-        android:text="Logout" />
-
-
+    <!-- Bottom Navigation Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="68dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:elevation="6dp">
+        android:elevation="16dp"
+        android:paddingHorizontal="24dp">
 
         <ImageButton
             android:id="@+id/nav_calendar"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/nav_calendar"
             app:srcCompat="@drawable/ic_calendar_outline_24"
-            app:tint="#FF7A00"
+            app:tint="#FFD165"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_camera"
+            app:layout_constraintEnd_toStartOf="@id/btnCamera"
             app:layout_constraintHorizontal_chainStyle="spread" />
 
         <ImageButton
-            android:id="@+id/nav_camera"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:id="@+id/btnCamera"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/nav_camera"
             app:srcCompat="@drawable/ic_camera_outline_24"
-            app:tint="#101114"
+            app:tint="#BDBDBD"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/nav_calendar"
@@ -158,25 +212,25 @@
 
         <ImageButton
             android:id="@+id/nav_bell"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/nav_bell"
             app:srcCompat="@drawable/ic_bell_outline_24"
-            app:tint="#101114"
+            app:tint="#BDBDBD"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_camera"
+            app:layout_constraintStart_toEndOf="@id/btnCamera"
             app:layout_constraintEnd_toStartOf="@id/nav_person" />
 
         <ImageButton
             android:id="@+id/nav_person"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/nav_person"
             app:srcCompat="@drawable/ic_person_outline_24"
-            app:tint="#101114"
+            app:tint="#BDBDBD"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/nav_bell"
@@ -184,4 +238,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>
-

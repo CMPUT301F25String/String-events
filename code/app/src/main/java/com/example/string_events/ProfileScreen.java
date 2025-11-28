@@ -1,11 +1,9 @@
 package com.example.string_events;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.Context;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,16 +12,22 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Profile screen for entrants/organizers.
@@ -33,9 +37,11 @@ import java.util.ArrayList;
  * current user is on the waitlist.
  */
 public class ProfileScreen extends AppCompatActivity {
-
-    ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private ImageView profileImageView;
+    private String currentUsername;
 
     /**
      * Inflates the profile UI, binds buttons, loads user info from
@@ -53,12 +59,14 @@ public class ProfileScreen extends AppCompatActivity {
         TextView editProfileTextView = findViewById(R.id.edit_textView);
         TextView logOutTextView = findViewById(R.id.logOut_textView);
         SwitchCompat notificationSwitch = findViewById(R.id.notification_switch);
-        ImageView profileImageView = findViewById(R.id.profile_imageView);
+        profileImageView = findViewById(R.id.profile_imageView);
         ImageButton switchRolesButton = findViewById(R.id.switch_roles_button);
         TextView nameTextView = findViewById(R.id.name_textView);
         TextView emailTextView = findViewById(R.id.email_textView);
         ConstraintLayout lotteryInfoLayout = findViewById(R.id.lottery_info_layout);
+        TextView profileEventsTextView = findViewById(R.id.profile_events_textView);
         ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
+        View addProfilePhotoButton = findViewById(R.id.btn_add_profile_photo);
 
         // bottom bar buttons
         ImageButton homeButton = findViewById(R.id.btnHome);
@@ -68,14 +76,53 @@ public class ProfileScreen extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         // get the user's role, username, full name, and email to be displayed
         String currentRole = sharedPreferences.getString("role", null);
-        assert currentRole != null;
-        String username = sharedPreferences.getString("user", null);
+        currentUsername = sharedPreferences.getString("user", null);
         String fullName = sharedPreferences.getString("fullName", null);
         String email = sharedPreferences.getString("email", null);
 
         // display name and email immediately
         nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
         emailTextView.setText("Email: " + (email != null ? email : ""));
+
+        // Fetch and load profile image using bitmapping on a background thread
+        if (currentUsername != null) {
+            db.collection("users")
+                    .whereEqualTo("username", currentUsername)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(query -> {
+                        if (!query.isEmpty()) {
+                            String profileImgUrl = query.getDocuments().get(0).getString("profileimg");
+                            if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
+                                new Thread(() -> {
+                                    try {
+                                        java.net.URL url = new java.net.URL(profileImgUrl);
+                                        java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+                                        connection.setDoInput(true);
+                                        connection.connect();
+                                        java.io.InputStream input = connection.getInputStream();
+                                        final android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeStream(input);
+
+                                        profileImageView.post(() -> profileImageView.setImageBitmap(bitmap));
+                                    } catch (Exception e) {
+                                        Log.e("ProfileScreen", "Error loading profile image", e);
+                                        // Optional: set a default error image here
+                                    }
+                                }).start();
+                            }
+                        }
+                    });
+        }
+
+        // Initialize Image Picker
+        setupImagePicker();
+
+        // Set listener for the add photo button
+        addProfilePhotoButton.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"));
+        });
 
         logOutTextView.setOnClickListener(view -> {
             SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
@@ -87,8 +134,18 @@ public class ProfileScreen extends AppCompatActivity {
             overridePendingTransition(0, 0);
         });
 
+        // TODO condense all this currentRole checking into one method
+        // check if the user is currently an event entrant or an event organizer
+        if (currentRole != null && currentRole.equals("entrant")) {
+            switchRolesButton.setImageResource(R.drawable.switch_to_organizer_button);
+            profileEventsTextView.setText("Joined Events:");
+        } else {
+            switchRolesButton.setImageResource(R.drawable.switch_to_entrant_button);
+            profileEventsTextView.setText("Created Events:");
+        }
+
         homeButton.setOnClickListener(view -> {
-            if (currentRole.equals("entrant")) {
+            if (currentRole != null && currentRole.equals("entrant")) {
                 openEntrantEventScreen();
             } else {
                 openOrganizerEventScreen();
@@ -97,13 +154,13 @@ public class ProfileScreen extends AppCompatActivity {
 
         notificationsButton.setOnClickListener(view -> openNotificationsScreen());
 
-        editProfileTextView.setOnClickListener(view -> openEditInformationScreen(username));
+        editProfileTextView.setOnClickListener(view -> openEditInformationScreen(currentUsername));
 
         lotteryInfoLayout.setOnClickListener(view -> openLotteryInformationScreen());
 
         switchRolesButton.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (currentRole.equals("entrant")) {
+            if (currentRole != null && currentRole.equals("entrant")) {
                 editor.putString("role", "organizer");
                 editor.apply();
                 openOrganizerEventScreen();
@@ -115,13 +172,13 @@ public class ProfileScreen extends AppCompatActivity {
         });
 
         deleteProfileImageButton.setOnClickListener(v -> {
-            if (username == null || username.isEmpty()) {
+            if (currentUsername == null || currentUsername.isEmpty()) {
                 Toast.makeText(ProfileScreen.this, "No user to delete", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             db.collection("users")
-                    .whereEqualTo("username", username)
+                    .whereEqualTo("username", currentUsername)
                     .limit(1)
                     .get()
                     .addOnSuccessListener(query -> {
@@ -147,32 +204,119 @@ public class ProfileScreen extends AppCompatActivity {
                     .addOnFailureListener(e ->
                             Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
-        // setup recyclerview in profile screen with events
-        if (username != null && !username.isEmpty()) {
-            db.collection("events")
-                    .whereArrayContains("waitlist", username)
-                    // .orderBy("createdAt", Query.Direction.DESCENDING)
-                    .get()
-                    .addOnSuccessListener(snap -> {
-                        if (snap.isEmpty()) {
-                            Log.d("Firestore", "no events found with waitlists that contain user:" + username);
-                        }
-                        for (QueryDocumentSnapshot d : snap) {
-                            String imageUrl = d.getString("imageUrl");
-                            String name = d.getString("title");
-                            // String startDateTime = d.getString("startAt");
-                            // String endDateTime = d.getString("endAt");
-                            String location = d.getString("location");
-                            ProfileEvent profileEvent = new ProfileEvent(imageUrl, name, null, null, location);
-                            profileEventsList.add(profileEvent);
-                        }
-                        setupRecyclerView(profileEventsList);
-                    })
-                    .addOnFailureListener(e -> {
-                        // It's crucial to handle query failures
-                        Log.e("Firestore", "error getting waitlisted events", e);
-                    });
+        // setup recyclerview in profile screen with either joined events or created events
+        if (currentUsername != null && !currentUsername.isEmpty()) {
+            ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
+            if (currentRole != null && currentRole.equals("entrant")) {
+                db.collection("events")
+                        .whereArrayContains("waitlist", currentUsername)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap.isEmpty()) {
+                                Log.d("Firestore", "no events found with waitlists that contain user:" + currentUsername);
+                            }
+                            for (QueryDocumentSnapshot d : snap) {
+                                String eventId = d.getId();
+                                String imageUrl = d.getString("imageUrl");
+                                String name = d.getString("title");
+                                String location = d.getString("location");
+                                ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
+                                profileEventsList.add(profileEvent);
+                            }
+                            setupRecyclerView(profileEventsList, sharedPreferences);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firestore", "error getting waitlisted events", e);
+                        });
+            } else {
+                db.collection("events")
+                        .whereEqualTo("creator", currentUsername)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap.isEmpty()) {
+                                Log.d("Firestore", "no events found with creator:" + currentUsername);
+                            }
+                            for (QueryDocumentSnapshot d : snap) {
+                                String eventId = d.getId();
+                                String imageUrl = d.getString("imageUrl");
+                                String name = d.getString("title");
+                                String location = d.getString("location");
+                                ProfileEvent profileEvent = new ProfileEvent(eventId, imageUrl, name, null, null, location);
+                                profileEventsList.add(profileEvent);
+                            }
+                            setupRecyclerView(profileEventsList, sharedPreferences);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firestore", "error getting waitlisted events", e);
+                        });
+            }
         }
+    }
+
+    private void setupImagePicker() {
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                        Uri selectedImageUri = null;
+                        if (intent != null) {
+                            if (intent.getData() != null) {
+                                selectedImageUri = intent.getData();
+                            } else if (intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
+                                ClipData clipData = intent.getClipData();
+                                selectedImageUri = clipData.getItemAt(0).getUri();
+                            }
+
+                            if (selectedImageUri != null) {
+                                // Display locally immediately
+                                profileImageView.setImageURI(selectedImageUri);
+                                // Upload to Firebase Storage
+                                uploadImageToStorage(selectedImageUri);
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void uploadImageToStorage(Uri imageUri) {
+        if (currentUsername == null) return;
+
+        // Create a reference to "profile_images/[filename]"
+        String filename = "profile_" + UUID.randomUUID().toString();
+        StorageReference ref = storage.getReference().child("profile_images/" + filename);
+
+        Toast.makeText(this, "wait uploading", Toast.LENGTH_SHORT).show();
+
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Get the download URL
+                    ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        updateProfileImageInFirestore(downloadUrl);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(ProfileScreen.this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateProfileImageInFirestore(String downloadUrl) {
+        db.collection("users")
+                .whereEqualTo("username", currentUsername)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(query -> {
+                    if (!query.isEmpty()) {
+                        String docId = query.getDocuments().get(0).getId();
+                        db.collection("users").document(docId)
+                                .update("profileimg", downloadUrl)
+                                .addOnSuccessListener(aVoid ->
+                                        Toast.makeText(ProfileScreen.this, " image updated!", Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(ProfileScreen.this, "Failed to update", Toast.LENGTH_SHORT).show());
+                    }
+                });
     }
 
     /**
@@ -225,9 +369,9 @@ public class ProfileScreen extends AppCompatActivity {
      *
      * @param profileEventsList list of events to render
      */
-    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList) {
+    private void setupRecyclerView(ArrayList<ProfileEvent> profileEventsList, SharedPreferences sharedPreferences) {
         RecyclerView profileEventRecyclerview = findViewById(R.id.profile_events_recyclerView);
-        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList);
+        ProfileEventsAdapter profileEventsAdapter = new ProfileEventsAdapter(this, profileEventsList, sharedPreferences);
         profileEventRecyclerview.setAdapter(profileEventsAdapter);
         profileEventRecyclerview.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }

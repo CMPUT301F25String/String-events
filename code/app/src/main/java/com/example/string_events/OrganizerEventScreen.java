@@ -32,7 +32,16 @@ public class OrganizerEventScreen extends AppCompatActivity {
         setContentView(R.layout.org_events_screen);
 
         ImageButton createEventButton = findViewById(R.id.create_event_button);
-        createEventButton.setOnClickListener(view -> openCreateEventScreen());
+        ImageButton profileButton = findViewById(R.id.btnProfile);
+
+        createEventButton.setOnClickListener(view -> {
+            Intent intent = new Intent(OrganizerEventScreen.this, CreateEventScreen.class);
+            startActivity(intent);
+        });
+        profileButton.setOnClickListener(view -> {
+            Intent intent = new Intent(OrganizerEventScreen.this, ProfileScreen.class);
+            startActivity(intent);
+        });
 
         RecyclerView rvEvents = findViewById(R.id.recyclerEvents);
         rvEvents.setLayoutManager(new LinearLayoutManager(this));
@@ -40,15 +49,6 @@ public class OrganizerEventScreen extends AppCompatActivity {
         rvEvents.setAdapter(adapter);
 
         loadMyEvents(adapter);
-    }
-
-    /**
-     * Launches the screen for creating a new event.
-     */
-    public void openCreateEventScreen() {
-        Context context = OrganizerEventScreen.this;
-        Intent myIntent = new Intent(context, CreateEventScreen.class);
-        context.startActivity(myIntent);
     }
 
     /**
@@ -61,7 +61,6 @@ public class OrganizerEventScreen extends AppCompatActivity {
         if (currentUser == null || currentUser.trim().isEmpty()) {
             Log.w("ORG_EVENTS", "No logged in user in SharedPreferences (userInfo.user).");
             data.clear();
-//            adapter.notifyDataSetChanged();
             return;
         }
 

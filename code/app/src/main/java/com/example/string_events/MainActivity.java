@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     /** App sections this activity can display. */
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
+    private static final String QR_DEEP_LINK_DEFAULT_EVENT_ID = "07d4dd53-3efe-4613-b852-0720a924be8b";
+
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private static final int REQ_FILTER = 1001;
@@ -200,8 +202,25 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
+        Intent launchIntent = getIntent();
+        if (Intent.ACTION_VIEW.equals(launchIntent.getAction()) && launchIntent.getData() != null) {
+            String eventIdFromLink = launchIntent.getData().getLastPathSegment();
+            if (eventIdFromLink == null || eventIdFromLink.isEmpty()) {
+                eventIdFromLink = QR_DEEP_LINK_DEFAULT_EVENT_ID;
+            }
+            Intent detailIntent = new Intent(this, EventDetailActivity.class);
+            detailIntent.putExtra("event_id", eventIdFromLink);
+            startActivity(detailIntent);
+            finish();
+            return;
+        }
+
         onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
         onClick(R.id.nav_person, () -> show(Screen.PROFILE));
+        onClick(R.id.btnCamera, () -> {
+            Intent intent = new Intent(MainActivity.this, QrScanActivity.class);
+            startActivity(intent);
+        });
         loadEventsIntoList();
     }
 
@@ -264,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
 //                setContentView(R.layout.admin_dashboard);
 //                wireCommon();
 //
-//
 //                onClick(R.id.btnEvents, () -> {
 //                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
 //                    startActivity(intent);
@@ -284,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Wires common actions shared across screens (e.g., logout).
+     * Wires common actions shared across screens (e.g. logout).
      */
     private void wireCommon() {
         onClick(R.id.btnLogout, this::logoutAndGoToSignIn);
@@ -316,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
      * Clears auth state and navigates back to the welcome/sign-in screen.
      */
     private void logoutAndGoToSignIn() {
-        SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
         Intent i = new Intent(this, WelcomeActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
