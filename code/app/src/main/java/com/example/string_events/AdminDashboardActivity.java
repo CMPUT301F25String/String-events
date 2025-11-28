@@ -2,7 +2,7 @@ package com.example.string_events;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,11 +13,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_dashboard);
 
-        ImageButton browseEventsButton = findViewById(R.id.btnEvents);
-        ImageButton browseImagesButton = findViewById(R.id.btnImages);
-        ImageButton browseProfilesButton = findViewById(R.id.btnProfiles);
-        ImageButton myprofile = findViewById(R.id.btnMyProfile);
-        ImageButton notifLogButton = findViewById(R.id.btnNotifLog);
+        // Updated types from ImageButton to View to support MaterialCardView layout
+        View browseEventsButton = findViewById(R.id.btnEvents);
+        View browseImagesButton = findViewById(R.id.btnImages);
+        View browseProfilesButton = findViewById(R.id.btnProfiles);
+        View myprofile = findViewById(R.id.btnMyProfile);
+        View notifLogButton = findViewById(R.id.btnNotifLog);
 
         browseEventsButton.setOnClickListener(view ->
                 startActivity(new Intent(AdminDashboardActivity.this, AdminEventManagementActivity.class)));

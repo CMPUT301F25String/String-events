@@ -6,36 +6,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * Admin screen for viewing a single user's profile and deleting that profile from Firestore.
- * <p>
- * Expects the launching {@link android.content.Intent} to include the following extras:
- * <ul>
- *   <li><b>"name"</b> — user's display name</li>
- *   <li><b>"email"</b> — user's email address</li>
- *   <li><b>"password"</b> — user's password (as currently stored)</li>
- *   <li><b>"role"</b> — user's role label (optional, currently unused)</li>
- *   <li><b>"docId"</b> — Firestore document ID under the {@code users} collection</li>
- * </ul>
- * The delete action removes the document {@code users/{docId}} and finishes the Activity on success.
- *
- * @author group
- * @since 1.0
- */
 public class AdminAllUserProfileActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String docId;
 
-    /**
-     * Inflates the UI, binds views, reads Intent extras, and wires back/delete actions.
-     *
-     * @param savedInstanceState optional saved state provided by Android; may be {@code null}
-     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,16 +31,44 @@ public class AdminAllUserProfileActivity extends AppCompatActivity {
         Button deleteButton = findViewById(R.id.btnDeleteProfile);
         ImageButton backButton = findViewById(R.id.btnBack);
 
-        // Get intent extras
+
         String nameStr = getIntent().getStringExtra("name");
         String emailStr = getIntent().getStringExtra("email");
         String passwordStr = getIntent().getStringExtra("password");
-        String roleStr = getIntent().getStringExtra("role");
+
+
+        String profileImgUrl = getIntent().getStringExtra("profileimg");
+
         docId = getIntent().getStringExtra("docId");
 
         name.setText("Name: " + nameStr);
         email.setText("Email: " + emailStr);
         password.setText("Password: " + passwordStr);
+
+
+        if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
+            new Thread(() -> {
+                try {
+                    java.net.URL url = new java.net.URL(profileImgUrl);
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true);
+                    conn.connect();
+
+                    java.io.InputStream input = conn.getInputStream();
+                    final android.graphics.Bitmap bmp =
+                            android.graphics.BitmapFactory.decodeStream(input);
+
+                    profilePhoto.post(() -> profilePhoto.setImageBitmap(bmp));
+
+                } catch (Exception e) {
+                    profilePhoto.post(() ->
+                            profilePhoto.setImageResource(android.R.drawable.ic_menu_report_image));
+                }
+            }).start();
+        } else {
+
+            profilePhoto.setImageResource(android.R.drawable.ic_menu_report_image);
+        }
 
         backButton.setOnClickListener(v -> onBackPressed());
 
@@ -72,8 +81,7 @@ public class AdminAllUserProfileActivity extends AppCompatActivity {
                             finish();
                         })
                         .addOnFailureListener(e ->
-                                Toast.makeText(this, "Error deleting profile: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                        );
+                                Toast.makeText(this, "Error deleting profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             } else {
                 Toast.makeText(this, "Invalid document ID", Toast.LENGTH_SHORT).show();
             }
