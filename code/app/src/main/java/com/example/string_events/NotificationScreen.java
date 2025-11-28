@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
@@ -29,13 +31,14 @@ public class NotificationScreen extends AppCompatActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // 新增：把通知列表作为成员变量，方便点击按钮时取一条出来发系统通知
+    // 把通知列表作为成员变量，后面如果要用也方便
     private final ArrayList<Notification> notificationsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_screen);
+
         // Android 13+ 需要动态申请 POST_NOTIFICATIONS 权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -46,7 +49,7 @@ public class NotificationScreen extends AppCompatActivity {
                 ActivityCompat.requestPermissions(
                         this,
                         new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        1001  // 自己定的 requestCode
+                        1001
                 );
             }
         }
@@ -75,11 +78,31 @@ public class NotificationScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 新增：点击底部通知按钮，发一条系统通知来测试（使用当前列表里的第一条通知）
+        // 点击底部通知按钮：切换“应用内通知开关”（开启 / 关闭 push）
         notificationImageButton.setOnClickListener(view -> {
-            if (!notificationsList.isEmpty()) {
-                Notification first = notificationsList.get(0);
-                NotificationHelper.showNotification(NotificationScreen.this, first);
+            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
+            boolean newValue = !currentlyEnabled;
+
+            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
+
+            if (newValue) {
+                // 如果刚刚被打开，并且是 Android 13+，尝试再请求一次系统权限
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
+
+                    ActivityCompat.requestPermissions(
+                            NotificationScreen.this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            1001
+                    );
+                }
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications enabled in app.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications disabled in app.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
