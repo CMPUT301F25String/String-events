@@ -166,5 +166,9 @@
             android:name=".WaitlistUsersActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".EventFilterActivity"
+            android:exported="false"/>
+
     </application>
 </manifest>
