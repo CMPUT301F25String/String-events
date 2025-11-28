@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
->
+    android:layout_height="match_parent">
 
     <!-- Header Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +67,7 @@
             android:id="@+id/tv_subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Find your next game"
+            android:text="Click an event to see details"
             android:textSize="16sp"
             android:fontFamily="@font/prompt_regular"
             android:textColor="#757575"
@@ -105,52 +104,32 @@
                 android:id="@+id/label_filters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Filters:"
-                android:textSize="14sp"
+                android:text="Filters"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/prompt_regular"
                 android:textColor="#101114"
                 android:layout_marginEnd="12dp" />
 
-            <!-- Active Chip -->
             <TextView
-                android:id="@+id/chip_badminton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="Badminton"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/prompt_regular"
-                android:textColor="#101114"
-                android:background="@drawable/bg_chip_active"
-                android:layout_marginEnd="8dp" />
-
-            <!-- Inactive Chip -->
-            <TextView
-                android:id="@+id/chip_games"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="Games"
-                android:textSize="14sp"
-                android:fontFamily="@font/prompt_regular"
-                android:textColor="#757575"
-                android:background="@drawable/bg_chip_inactive"
-                android:layout_marginEnd="8dp" />
-
-            <!-- Add Button (Styled as a round icon) -->
-            <TextView
-                android:id="@+id/chip_add"
+                android:id="@+id/btn_open_filter"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_chip_inactive"
                 android:gravity="center"
                 android:text="+"
                 android:textSize="20sp"
                 android:textColor="#757575" />
+
+            <TextView
+                android:id="@+id/tv_filter_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="Showing filtered results"
+                android:textSize="16sp"
+                android:fontFamily="@font/prompt_regular"
+                android:textColor="#757575"
+                android:visibility="gone"/>
 
         </LinearLayout>
 
