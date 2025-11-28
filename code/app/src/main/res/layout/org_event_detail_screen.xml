@@ -129,18 +129,6 @@
                     android:layout_marginTop="8dp" />
 
                 <Button
-                    android:id="@+id/btnCanceled"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Canceled Users"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
-
-                <Button
                     android:id="@+id/btnParticipating"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -158,6 +146,30 @@
                     android:layout_height="48dp"
                     android:background="@drawable/bg_button_yellow_round"
                     android:text="Waitlist Users"
+                    android:textAllCaps="false"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
+                <Button
+                    android:id="@+id/btnInvited"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_button_yellow_round"
+                    android:text="Invited Users"
+                    android:textAllCaps="false"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
+                <Button
+                    android:id="@+id/btnCanceled"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_button_yellow_round"
+                    android:text="Canceled Users"
                     android:textAllCaps="false"
                     android:textColor="#000000"
                     android:textSize="14sp"

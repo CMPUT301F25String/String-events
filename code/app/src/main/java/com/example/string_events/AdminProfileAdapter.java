@@ -1,101 +1,91 @@
 package com.example.string_events;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 
-/**
- * Adapter that displays a list of admin profiles in a {@link RecyclerView}
- * and dispatches item click events via {@link OnProfileClickListener}.
- */
-public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapter.ProfileViewHolder> {
+public class AdminProfileAdapter extends RecyclerView.Adapter<AdminProfileAdapter.ViewHolder> {
 
-    private final List<AdminProfiles> profiles;
-    private final OnProfileClickListener listener;
-
-    /**
-     * Callback for profile item clicks.
-     */
     public interface OnProfileClickListener {
-        /**
-         * Invoked when a profile row is clicked.
-         *
-         * @param profile the clicked {@link AdminProfiles} item
-         */
         void onProfileClick(AdminProfiles profile);
     }
 
-    /**
-     * Creates a new adapter for admin profiles.
-     *
-     * @param profiles immutable list of profiles to display
-     * @param listener optional click listener for item selection
-     */
-    public AdminProfileAdapter(List<AdminProfiles> profiles, OnProfileClickListener listener) {
+    private final ArrayList<AdminProfiles> profiles;
+    private final OnProfileClickListener listener;
+
+    public AdminProfileAdapter(ArrayList<AdminProfiles> profiles, OnProfileClickListener listener) {
         this.profiles = profiles;
         this.listener = listener;
     }
 
-    /**
-     * Inflates the item view and creates a new {@link ProfileViewHolder}.
-     *
-     * @param parent   the parent view group
-     * @param viewType unused view type
-     * @return a new {@link ProfileViewHolder}
-     */
     @NonNull
     @Override
-    public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_admin_profile, parent, false);
-        return new ProfileViewHolder(view);
+        return new ViewHolder(view);
     }
 
-    /**
-     * Binds the profile data to the holder and sets the click callback.
-     *
-     * @param holder   target view holder
-     * @param position adapter position of the item
-     */
     @Override
-    public void onBindViewHolder(@NonNull ProfileViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdminProfiles profile = profiles.get(position);
-        holder.name.setText("Name: " + profile.getName());
-        holder.email.setText("Email: " + profile.getEmail());
+
+        holder.name.setText(profile.getName());
+        holder.email.setText(profile.getEmail());
         holder.password.setText("Password: " + profile.getPassword());
 
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onProfileClick(profile);
-        });
+        String imgUrl = profile.getProfileImg();
+
+        // bitmap loader
+        if (imgUrl != null && !imgUrl.isEmpty()) {
+            new Thread(() -> {
+                try {
+                    URL url = new URL(imgUrl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true);
+                    conn.connect();
+                    InputStream input = conn.getInputStream();
+                    Bitmap bmp = BitmapFactory.decodeStream(input);
+
+                    holder.photo.post(() -> holder.photo.setImageBitmap(bmp));
+                } catch (Exception e) {
+                    holder.photo.post(() ->
+                            holder.photo.setImageResource(R.drawable.profile)
+                    );
+                }
+            }).start();
+        } else {
+            holder.photo.setImageResource(R.drawable.profile);
+        }
+
+        holder.itemView.setOnClickListener(v -> listener.onProfileClick(profile));
     }
 
-    /**
-     * @return the total number of profiles
-     */
     @Override
     public int getItemCount() {
         return profiles.size();
     }
 
-    /**
-     * Simple holder for admin profile item views.
-     */
-    static class ProfileViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView photo;
         TextView name, email, password;
 
-        /**
-         * Creates a holder bound to the given item view.
-         *
-         * @param itemView the inflated profile row view
-         */
-        public ProfileViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            photo = itemView.findViewById(R.id.profile_photo);
             name = itemView.findViewById(R.id.profile_name);
             email = itemView.findViewById(R.id.profile_email);
             password = itemView.findViewById(R.id.profile_password);

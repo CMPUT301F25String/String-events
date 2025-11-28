@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,6 +53,116 @@ public class MainActivity extends AppCompatActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    private static final int REQ_FILTER = 1001;
+
+    private final java.util.Set<String> selectedTags = new java.util.HashSet<>();
+    private java.time.ZonedDateTime filterStart = null, filterEnd = null;
+
+    private android.widget.TextView tvFilterHint;
+    private android.widget.ListView listView;
+    private EventAdapter adapter;
+    private final java.util.List<Event> allEvents   = new java.util.ArrayList<>();
+    private final java.util.List<Event> shownEvents = new java.util.ArrayList<>();
+
+
+    private void applyFilters() {
+        shownEvents.clear();
+        for (Event e : allEvents) {
+            if (!e.matchesTags(selectedTags)) continue;
+            if (!e.within(filterStart, filterEnd)) continue;
+            shownEvents.add(e);
+        }
+        if (adapter != null) adapter.notifyDataSetChanged();
+    }
+
+    private void testFilterQuery(java.util.Set<String> tags,
+                                 @Nullable java.time.ZonedDateTime start,
+                                 @Nullable java.time.ZonedDateTime end) {
+        com.google.firebase.firestore.Query q = db.collection("events");
+
+        java.util.List<String> tagsLower = new java.util.ArrayList<>();
+        for (String t : tags) if (t != null) tagsLower.add(t.toLowerCase(java.util.Locale.ROOT));
+        if (!tagsLower.isEmpty()) {
+            q = q.whereArrayContainsAny("tags", tagsLower);
+        }
+
+        if (start != null) {
+            q = q.whereGreaterThanOrEqualTo(
+                    "startAt",
+                    new com.google.firebase.Timestamp(java.util.Date.from(start.toInstant()))
+            );
+        }
+        if (end != null) {
+            q = q.whereLessThanOrEqualTo(
+                    "endAt",
+                    new com.google.firebase.Timestamp(java.util.Date.from(end.toInstant()))
+            );
+        }
+
+        q = q.orderBy("startAt", com.google.firebase.firestore.Query.Direction.ASCENDING).limit(50);
+
+        q.get()
+                .addOnSuccessListener(snap -> {
+                    StringBuilder sb = new StringBuilder("Query results (" + snap.size() + "):\n");
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
+                        String id = d.getId();
+                        String title = d.getString("title");
+                        Object tg = d.get("tags");
+                        sb.append(id).append(" | ").append(title).append(" | ").append(String.valueOf(tg)).append("\n");
+                    }
+                    android.util.Log.d("TEST_QUERY", sb.toString());
+                    new android.app.AlertDialog.Builder(this)
+                            .setTitle("Filter query results")
+                            .setMessage(sb.length() > 900 ? sb.substring(0, 900) + "…" : sb.toString())
+                            .setPositiveButton("OK", null)
+                            .show();
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("TEST_QUERY", "Query failed", e);
+                    new android.app.AlertDialog.Builder(this)
+                            .setTitle("Query failed")
+                            .setMessage(e.getMessage())
+                            .setPositiveButton("OK", null)
+                            .show();
+                });
+    }
+
+    private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> filterLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    android.content.Intent data = result.getData();
+
+                    selectedTags.clear();
+                    String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
+                    if (arr != null) java.util.Collections.addAll(selectedTags, arr);
+
+                    filterStart = null; filterEnd = null;
+                    if (data.hasExtra(EventFilterActivity.EXTRA_START_MS)) {
+                        long ms = data.getLongExtra(EventFilterActivity.EXTRA_START_MS, 0L);
+                        filterStart = java.time.ZonedDateTime.ofInstant(
+                                java.time.Instant.ofEpochMilli(ms), java.time.ZoneId.systemDefault());
+                    }
+                    if (data.hasExtra(EventFilterActivity.EXTRA_END_MS)) {
+                        long me = data.getLongExtra(EventFilterActivity.EXTRA_END_MS, 0L);
+                        filterEnd = java.time.ZonedDateTime.ofInstant(
+                                java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
+                    }
+
+                    if (adapter != null) {
+                        applyFilters();
+                    }
+                    if (tvFilterHint != null) {
+                        tvFilterHint.setText(selectedTags.isEmpty() && filterStart == null && filterEnd == null
+                                ? " " : "showing filtered results");
+                        tvFilterHint.setVisibility(android.view.View.VISIBLE);
+                    } else {
+                        android.widget.Toast.makeText(this, "Filters applied", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+                testFilterQuery(selectedTags, filterStart, filterEnd);
+
+            });
+
     /**
      * Reads role/user extras, persists basic user info to {@code SharedPreferences},
      * and navigates to admin or user home accordingly.
@@ -63,6 +174,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.events_screen);
         wireCommon();
+
+        tvFilterHint = findViewById(R.id.tv_filter_hint);
+        listView     = findViewById(R.id.list);
+
+        TextView btnOpenFilter = findViewById(R.id.btn_open_filter);
+        tvFilterHint = findViewById(R.id.tv_filter_hint);
+
+        btnOpenFilter.setOnClickListener(v -> {
+            android.content.Intent it = new android.content.Intent(this, EventFilterActivity.class);
+            it.putExtra(EventFilterActivity.EXTRA_TAGS, selectedTags.toArray(new String[0]));
+            filterLauncher.launch(it);
+        });
 
         String username = getIntent().getStringExtra("user");
         String fullName = getIntent().getStringExtra("name");
@@ -99,6 +222,33 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
         loadEventsIntoList();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_FILTER && resultCode == RESULT_OK && data != null) {
+            selectedTags.clear();
+            String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
+            if (arr != null) java.util.Collections.addAll(selectedTags, arr);
+
+            filterStart = null; filterEnd = null;
+            if (data.hasExtra(EventFilterActivity.EXTRA_START_MS)) {
+                long ms = data.getLongExtra(EventFilterActivity.EXTRA_START_MS, 0L);
+                filterStart = java.time.ZonedDateTime.ofInstant(
+                        java.time.Instant.ofEpochMilli(ms), java.time.ZoneId.systemDefault());
+            }
+            if (data.hasExtra(EventFilterActivity.EXTRA_END_MS)) {
+                long me = data.getLongExtra(EventFilterActivity.EXTRA_END_MS, 0L);
+                filterEnd = java.time.ZonedDateTime.ofInstant(
+                        java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
+            }
+
+            applyFilters();
+            tvFilterHint.setText(selectedTags.isEmpty() && filterStart == null && filterEnd == null
+                    ? " " : "showing filtered results");
+        }
     }
 
     /**
@@ -184,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
      * Clears auth state and navigates back to the welcome/sign-in screen.
      */
     private void logoutAndGoToSignIn() {
-        SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
         Intent i = new Intent(this, WelcomeActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

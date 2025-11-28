@@ -112,10 +112,12 @@ public class WaitlistUsersActivity extends AppCompatActivity {
     private void addUserToList(DocumentSnapshot doc) {
         if (!doc.exists()) return;
 
+        String username = doc.getString("username");
         String name = doc.getString("name");
         String email = doc.getString("email");
 
         userList.add(new UserItem(
+                username != null ? username : "",
                 name != null ? name : "",
                 email != null ? email : "",
                 UserItem.Status.WAITLIST

@@ -1,98 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="15dp">
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="8dp">
 
+    <!--
+      Card Background: Fully Rounded (Top and Bottom)
+    -->
     <ImageView
         android:id="@+id/profile_background"
-        android:layout_width="160dp"
-        android:layout_height="230dp"
-        android:background="@drawable/rounded_rectangle1"
+        android:layout_width="165dp"
+        android:layout_height="240dp"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <!--
+      Event Image: Rounded Top, Square Bottom
+      (Matches the top of the card, but sits flush with text below)
+    -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/event_image"
-        android:layout_width="141dp"
-        android:layout_height="94dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
         android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/RoundedImage12"
+        android:background="#E0E0E0"
+        app:shapeAppearanceOverlay="@style/CardTopImage"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="@id/profile_background"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toTopOf="@id/profile_background"/>
 
+    <!-- Content below image -->
     <TextView
         android:id="@+id/event_name"
-        android:layout_width="140dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="12dp"
         android:text="Event Name"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:gravity="center"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#101114"
+        android:gravity="start"
         android:ellipsize="end"
         android:singleLine="true"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="@id/profile_background"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toBottomOf="@id/event_image"/>
 
     <ImageView
         android:id="@+id/date_image"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
         android:layout_marginTop="8dp"
-        android:layout_marginStart="10dp"
-        android:background="@drawable/date"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/clock_icon"
+        app:tint="#FFD165"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="@id/profile_background"
         app:layout_constraintTop_toBottomOf="@id/event_name"/>
 
     <TextView
         android:id="@+id/event_date"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Mon, Oct 8, 2025"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="8dp"
+        android:text="Mon, Oct 8"
         android:textSize="12sp"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#424242"
+        android:elevation="4dp"
         app:layout_constraintStart_toEndOf="@id/date_image"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
-        app:layout_constraintTop_toTopOf="@id/date_image"/>
+        app:layout_constraintTop_toTopOf="@id/date_image"
+        app:layout_constraintBottom_toBottomOf="@id/date_image"/>
 
     <TextView
         android:id="@+id/event_time"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:text="11:00 AM - 1:00 PM"
         android:textSize="11sp"
-        android:textColor="@color/grey"
-        app:layout_constraintStart_toEndOf="@id/date_image"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#757575"
+        android:elevation="4dp"
+        app:layout_constraintStart_toStartOf="@id/event_date"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toBottomOf="@id/event_date"/>
 
     <ImageView
         android:id="@+id/community_centre_image"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="10dp"
-        android:background="@drawable/community_centre_image"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/ic_location_logo"
+        app:tint="#FFD165"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="@id/profile_background"
-        app:layout_constraintTop_toBottomOf="@id/date_image"/>
+        app:layout_constraintTop_toBottomOf="@id/event_time"/>
 
     <TextView
         android:id="@+id/event_location"
-        android:layout_width="105dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="City Centre Community Centre "
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="8dp"
+        android:text="City Centre"
         android:textSize="11sp"
+        android:fontFamily="@font/prompt_regular"
+        android:textColor="#424242"
         android:ellipsize="end"
         android:singleLine="true"
+        android:elevation="4dp"
         app:layout_constraintStart_toEndOf="@id/community_centre_image"
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toTopOf="@id/community_centre_image"
         app:layout_constraintBottom_toBottomOf="@id/community_centre_image"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

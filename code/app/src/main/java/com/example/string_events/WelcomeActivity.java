@@ -44,12 +44,29 @@ public class WelcomeActivity extends AppCompatActivity {
      */
     @Override protected void onStart() {
         super.onStart();
-        SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+
+        SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+
         boolean remember = sp.getBoolean("remember", false);
-        if (remember) {
-            startActivity(new Intent(this, MainActivity.class));
+        String role = sp.getString("role", null);
+        String username = sp.getString("username", null);
+        String adminUsername = sp.getString("adminUsername", null);
+
+        if (remember && role != null) {
+            Intent intent;
+            if ("admin".equals(role)) {
+                intent = new Intent(this, AdminDashboardActivity.class);
+                if (adminUsername != null) {
+                    intent.putExtra("adminUsername", adminUsername);
+                }
+            } else {
+                intent = new Intent(this, MainActivity.class);
+                if (username != null) {
+                    intent.putExtra("user", username);
+                }
+            }
+            startActivity(intent);
             finish();
-        } else {
         }
     }
 }

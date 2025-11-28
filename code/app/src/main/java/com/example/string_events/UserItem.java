@@ -12,6 +12,9 @@ public class UserItem {
         CANCELED, PARTICIPATING, WAITLIST, INVITED, NONE
     }
 
+
+
+    private final String username;
     private final String name;
     private final String email;
     private final Status status;
@@ -23,10 +26,16 @@ public class UserItem {
      * @param email  email address
      * @param status participation status (defaults to {@link Status#NONE} if {@code null})
      */
-    public UserItem(String name, String email, Status status) {
+    public UserItem(String username, String name, String email, Status status) {
+        this.username = username;
         this.name = name;
         this.email = email;
         this.status = status == null ? Status.NONE : status;
+    }
+
+    /** @return username */
+    public String getUsername() {
+        return username;
     }
 
     /** @return display name */
