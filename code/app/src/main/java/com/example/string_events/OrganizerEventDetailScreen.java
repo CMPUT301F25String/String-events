@@ -62,26 +62,12 @@ public class OrganizerEventDetailScreen extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        // commented out for testing purposes
-        // eventId is currently set to "event3"
-//        String eventId = getIntent().getStringExtra(EVENT_ID);
         String eventId = getIntent().getStringExtra(EVENT_ID);
-
-        if (eventId == null) {
-            finish();
-            return;
-        }
-
+        assert eventId != null;
         loadEvent(eventId);
 
         findViewById(R.id.btnRoll).setOnClickListener(v -> {
             Intent it = new Intent(this, LotteryDrawActivity.class);
-            it.putExtra(EVENT_ID, eventId);
-            startActivity(it);
-        });
-
-        findViewById(R.id.btnCanceled).setOnClickListener(v -> {
-            Intent it = new Intent(this, CanceledUsersActivity.class);
             it.putExtra(EVENT_ID, eventId);
             startActivity(it);
         });
@@ -92,8 +78,20 @@ public class OrganizerEventDetailScreen extends AppCompatActivity {
             startActivity(it);
         });
 
+        findViewById(R.id.btnInvited).setOnClickListener(v -> {
+            Intent it = new Intent(this, InvitedUsersActivity.class);
+            it.putExtra(EVENT_ID, eventId);
+            startActivity(it);
+        });
+
         findViewById(R.id.btnWaitlist).setOnClickListener(v -> {
             Intent it = new Intent(this, WaitlistUsersActivity.class);
+            it.putExtra(EVENT_ID, eventId);
+            startActivity(it);
+        });
+
+        findViewById(R.id.btnCanceled).setOnClickListener(v -> {
+            Intent it = new Intent(this, CanceledUsersActivity.class);
             it.putExtra(EVENT_ID, eventId);
             startActivity(it);
         });

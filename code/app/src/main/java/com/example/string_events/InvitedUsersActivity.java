@@ -14,27 +14,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays a list of users with CANCELED status and provides a demo action
+ * Displays a list of users with INVITED status and provides a demo action
  * to send a message to those users.
  */
-public class CanceledUsersActivity extends AppCompatActivity {
+public class InvitedUsersActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private ListView listView;
     private final List<UserItem> userList = new ArrayList<>();
     private UserAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_canceled_users);
+        setContentView(R.layout.activity_invited_users);
 
         db = FirebaseFirestore.getInstance();
 
         ImageButton back = findViewById(R.id.btnBack);
         back.setOnClickListener(v -> finish());
 
-        listView = findViewById(R.id.listCanceled);
+        ListView listView = findViewById(R.id.listInvited);
         adapter = new UserAdapter(this, userList);
         listView.setAdapter(adapter);
 
@@ -44,17 +43,17 @@ public class CanceledUsersActivity extends AppCompatActivity {
             return;
         }
 
-        loadCanceledUsers(eventId);
+        loadInvitedUsers(eventId);
 
-        findViewById(R.id.btnSendCanceled).setOnClickListener(v -> {
+        findViewById(R.id.btnSendInvited).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);
             it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
-            it.putExtra("target_group", "canceled");
+            it.putExtra("target_group", "invited");
             startActivity(it);
         });
     }
 
-    private void loadCanceledUsers(String eventId) {
+    private void loadInvitedUsers(String eventId) {
         db.collection("events").document(eventId)
                 .get()
                 .addOnSuccessListener(doc -> {
@@ -63,14 +62,14 @@ public class CanceledUsersActivity extends AppCompatActivity {
                         return;
                     }
 
-                    List<String> canceledList = (List<String>) doc.get("canceledusers");
-                    if (canceledList == null || canceledList.isEmpty()) {
+                    List<String> invitedList = (List<String>) doc.get("invited");
+                    if (invitedList == null || invitedList.isEmpty()) {
                         userList.clear();
                         adapter.notifyDataSetChanged();
                         return;
                     }
 
-                    fetchUsers(canceledList);
+                    fetchUsers(invitedList);
                 })
                 .addOnFailureListener(e -> finish());
     }
@@ -102,7 +101,7 @@ public class CanceledUsersActivity extends AppCompatActivity {
                 username != null ? username : "",
                 name != null ? name : "",
                 email != null ? email : "",
-                UserItem.Status.CANCELED
+                UserItem.Status.INVITED
         ));
 
         adapter.notifyDataSetChanged();

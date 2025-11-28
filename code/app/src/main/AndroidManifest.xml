@@ -1,174 +1,137 @@
-<manifest package="com.example.string_events"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.string_events">
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:label="@string/app_name"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar">
-
+        <activity
+            android:name=".InvitedUsersActivity"
+            android:exported="false" />
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC8zp1xO0twwkt_oI_Bxk8JBoC50QEeyCU"/>
-
-
+            android:value="AIzaSyC8zp1xO0twwkt_oI_Bxk8JBoC50QEeyCU" />
 
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
         <activity
             android:name=".CreateEventScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".LoginScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".UiHostActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminProfileActivity"
             android:exported="false" />
-
-
         <activity
             android:name=".AdminNotificationDetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminNotificationsActivity"
             android:exported="false" />
-
         <activity
             android:name=".RegisterScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".NotificationScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".ProfileScreen"
-            android:exported="false"/>
-
-
+            android:exported="false" />
         <activity
             android:name=".NotificationMessageDetailActivity"
-            android:exported="false"/>
-
-
+            android:exported="false" />
         <activity
             android:name=".OrganizerEventScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".EventDetailActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".OrganizerEventDetailScreen"
-            android:exported="false">
-        </activity>
-
+            android:exported="false"></activity>
         <activity android:name=".EventMessageActivity" />
-
         <activity
             android:name=".OrganizerEventOverviewScreen"
-            android:exported="false">
-        </activity>
-
-
+            android:exported="false"></activity>
         <activity
             android:name=".CanceledUsersActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".ParticipatingUsersActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".WaitlistMapActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".LotteryDrawActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".EditInformationActivity"
             android:exported="false" />
-
         <activity
             android:name=".LotteryInformationActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminDashboardActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".AdminEventManagementActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".AdminImageManagementActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminProfileManagementActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminProfileScreen"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".AdminEventDetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".AdminAllUserProfileActivity"
             android:exported="false" />
-
         <activity
             android:name=".QrScanActivity"
             android:exported="false" />
-
         <activity
             android:name=".QrCodeActivity"
             android:exported="false" />
-
         <activity
             android:name=".EventQrEntryActivity"
             android:exported="false" />
-
         <activity
             android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".WaitlistUsersActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".EventFilterActivity"
             android:exported="false"/>
 
     </application>
+
 </manifest>
