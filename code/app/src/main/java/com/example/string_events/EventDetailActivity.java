@@ -205,6 +205,7 @@ public class EventDetailActivity extends AppCompatActivity {
         catch (Exception e) { return 0; }
     }
 
+    @SuppressWarnings("unchecked")
     private void getUserStatusFromDatabase(ImageButton applyButton, DocumentReference eventDocumentRef) {
         // setting the value of userInEventWaitlist (checking if user is in the event's waitlist)
         // and the value of userInEventAttendees (checking if user is in the event's attendees)

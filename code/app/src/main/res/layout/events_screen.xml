@@ -13,40 +13,6 @@
         android:paddingBottom="8dp"
         android:background="@android:color/transparent">
 
-        <TextView
-            android:id="@+id/btn_open_filter"
-            android:layout_width="36dp"
-            android:layout_height="28dp"
-            android:text="+"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="#101114"
-            android:background="@drawable/bg_chip_grey"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/label_filters"
-            app:layout_constraintTop_toTopOf="@id/label_filters" />
-
-        <TextView
-            android:id="@+id/tv_filter_hint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" "
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/btn_open_filter"
-            app:layout_constraintTop_toTopOf="@id/btn_open_filter"
-            app:layout_constraintBottom_toBottomOf="@id/btn_open_filter" />
-
-        <View
-            android:id="@+id/title_bg"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:background="#F2F2F2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <!-- Title -->
         <TextView
             android:id="@+id/tv_title"
