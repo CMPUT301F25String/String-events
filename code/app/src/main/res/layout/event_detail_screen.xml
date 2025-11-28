@@ -240,7 +240,13 @@
                 android:lineSpacingExtra="4dp"
                 android:textColor="#555555"/>
 
-            <!-- 新增：导出 CSV 按钮 -->
+            <Button
+                android:id="@+id/btn_save_my_location"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Save My Location (approx)"
+                android:layout_margin="12dp"/>
+
             <Button
                 android:id="@+id/btn_export_csv"
                 android:layout_width="wrap_content"
