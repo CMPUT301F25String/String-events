@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA">
@@ -310,81 +309,80 @@
                 app:elevation="2dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
           
-                <Button
-                    android:id="@+id/btnRoll"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Roll Participants"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnRoll"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Roll Participants"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp" />-->
 
-                <Button
-                    android:id="@+id/btnParticipating"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Participating Users"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnParticipating"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Participating Users"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp" />-->
 
-                <Button
-                    android:id="@+id/btnWaitlist"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Waitlist Users"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnWaitlist"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Waitlist Users"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp" />-->
 
-                <Button
-                    android:id="@+id/btnInvited"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Invited Users"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnInvited"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Invited Users"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp" />-->
 
-                <Button
-                    android:id="@+id/btnCanceled"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Canceled Users"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnCanceled"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Canceled Users"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp" />-->
 
-                <Button
-                    android:id="@+id/btnWaitlistMap"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_button_yellow_round"
-                    android:text="Waitlist User Map"
-                    android:textAllCaps="false"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="0dp" />
+<!--                <Button-->
+<!--                    android:id="@+id/btnWaitlistMap"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:background="@drawable/bg_button_yellow_round"-->
+<!--                    android:text="Waitlist User Map"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textColor="#000000"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    android:layout_marginBottom="0dp" />-->
             </LinearLayout>
 
-        </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
