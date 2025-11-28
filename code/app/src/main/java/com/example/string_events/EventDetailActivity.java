@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Displays details of a single event and lets the current user apply/cancel,
+ * or accept/decline an invite. Event data is loaded from Firestore.
+ */
 public class EventDetailActivity extends AppCompatActivity {
     private final LotteryHelper lotteryHelper = new LotteryHelper();
     private String username;
@@ -42,6 +46,13 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private final List<String> csvEntrants = new ArrayList<>();
 
+    /**
+     * Initializes UI, resolves intent extras, fetches the event document,
+     * configures action buttons (apply / accept / decline), and sets up
+     * membership state checks for attendees and waitlist.
+     *
+     * @param savedInstanceState previously saved instance state, or {@code null}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,33 +75,48 @@ public class EventDetailActivity extends AppCompatActivity {
             exportCsvButton.setOnClickListener(v -> exportEntrantsToCsv());
         }
 
+        // change the visual elements of the event details to match the event details of the clicked event
         eventDocumentRef.get()
                 .addOnSuccessListener(this::bind)
                 .addOnFailureListener(e -> Log.d("FirestoreCheck", "document with eventId does not exist"));
 
+        // set the variables userInEventWaitlist and userInEventAttendees using the database
+        // also change appearance of the apply button to reflect the user's status in the event
         getUserStatusFromDatabase(applyButton, eventDocumentRef);
 
         applyButton.setOnClickListener(view -> {
+            // user has not applied for this event yet
             if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
                 eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
                 Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
                 userInEventWaitlist.set(true);
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            } else if (userInEventWaitlist.get() && !userInEventAttendees.get()) {
+            } 
+            // user has applied for the event and is not an attendee yet (not been accepted yet)
+            else if (userInEventWaitlist.get() && !userInEventAttendees.get()) {
                 eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from waitlist!", Toast.LENGTH_SHORT).show();
                 userInEventWaitlist.set(false);
                 applyButton.setBackgroundResource(R.drawable.apply_button);
-            } else {
+            }
+            // user is already an attendee and wants to cancel their appearance
+            else {
                 eventDocumentRef.update("attendees", FieldValue.arrayRemove(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from attendees!", Toast.LENGTH_SHORT).show();
                 userInEventAttendees.set(false);
+                // when an attendee for an event cancels, the lottery automatically selects a replacement user from the waitlist
                 lotteryHelper.replaceCancelledUser(eventDocumentRef);
                 applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         });
     }
 
+    /**
+     * Populates UI fields with document values and formats date/time and waitlist
+     * counters for display.
+     *
+     * @param s Firestore document snapshot of the event
+     */
     private void bind(DocumentSnapshot s) {
         String title = s.getString("title");
         String description = s.getString("description");
@@ -180,27 +206,36 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void getUserStatusFromDatabase(ImageButton applyButton, DocumentReference eventDocumentRef) {
+        // setting the value of userInEventWaitlist (checking if user is in the event's waitlist)
+        // and the value of userInEventAttendees (checking if user is in the event's attendees)
         eventDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
             ArrayList<String> waitlist = (ArrayList<String>) documentSnapshot.get("waitlist");
             ArrayList<String> invitedList = (ArrayList<String>) documentSnapshot.get("invited");
             ArrayList<String> attendeesList = (ArrayList<String>) documentSnapshot.get("attendees");
 
             if (waitlist != null && waitlist.contains(username)) {
+                Log.d("FirestoreCheck", "already in waitlist");
                 userInEventWaitlist.set(true);
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             } else if (invitedList != null && invitedList.contains(username)) {
+                // user has been invited to the event and needs to either confirm or decline attendance
+                Log.d("FirestoreCheck", "already in attendees");
                 userInEventInvited.set(true);
                 eventPendingUserConfirmation(applyButton, eventDocumentRef);
             } else if (attendeesList != null && attendeesList.contains(username)) {
+                Log.d("FirestoreCheck", "already in attendees");
                 userInEventAttendees.set(true);
+                // TODO make this a leave event button instead of cancel apply
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             } else {
+                // user is not on any of the lists
                 applyButton.setBackgroundResource(R.drawable.apply_button);
             }
         });
     }
 
     private void eventPendingUserConfirmation(ImageButton applyButton, DocumentReference eventDocumentRef) {
+        // this instance of event details was opened from the notification screen
         ImageButton acceptInviteButton = findViewById(R.id.accept_invite_button);
         ImageButton declineInviteButton = findViewById(R.id.decline_invite_button);
 
@@ -222,6 +257,7 @@ public class EventDetailActivity extends AppCompatActivity {
         declineInviteButton.setOnClickListener(view -> {
             eventDocumentRef.update("invited", FieldValue.arrayRemove(username));
             Toast.makeText(EventDetailActivity.this, "You've declined your attendance!", Toast.LENGTH_SHORT).show();
+            // when an invited user for an event declines, the lottery automatically selects a replacement user from the waitlist
             lotteryHelper.replaceCancelledUser(eventDocumentRef);
             applyButton.setBackgroundResource(R.drawable.apply_button);
             applyButton.setVisibility(View.VISIBLE);
@@ -230,6 +266,9 @@ public class EventDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Exports current attendees (csvEntrants) to a CSV file in the public Downloads folder.
+     */
     private void exportEntrantsToCsv() {
         if (csvEntrants.isEmpty()) {
             Toast.makeText(this, "No entrants to export.", Toast.LENGTH_SHORT).show();
