@@ -91,11 +91,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         holder.notificationEventName.setText(notification.getEventName());
 
+
         holder.notificationItemLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
             intent.putExtra("event_id", notification.getEventId());
             context.startActivity(intent);
         });
+
+
+//        holder.notificationExpandButton.setOnClickListener(view -> {
+//            NotificationHelper.showNotification(context, notification);
+//        });
     }
 
     private void bindMessage(MessageViewHolder holder, Notification notification) {
@@ -109,6 +115,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             holder.notificationPhoto.setImageResource(R.drawable.event_image);
         }
+
 
         holder.notificationItemLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, NotificationMessageDetailActivity.class);
