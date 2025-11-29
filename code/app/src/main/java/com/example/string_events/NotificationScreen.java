@@ -38,7 +38,6 @@ public class NotificationScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_screen);
 
-        // Android 13+ 需要动态申请 POST_NOTIFICATIONS 权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -78,29 +77,29 @@ public class NotificationScreen extends AppCompatActivity {
         });
 
         notificationImageButton.setOnClickListener(view -> {
-            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
-            boolean newValue = !currentlyEnabled;
-
-            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
-
-            if (newValue) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
-
-                    ActivityCompat.requestPermissions(
-                            NotificationScreen.this,
-                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                            1001
-                    );
-                }
-                Toast.makeText(NotificationScreen.this,
-                        "Push notifications enabled in app.",
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(NotificationScreen.this,
-                        "Push notifications disabled in app.",
-                        Toast.LENGTH_SHORT).show();
-            }
+//            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
+//            boolean newValue = !currentlyEnabled;
+//
+//            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
+//
+//            if (newValue) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+//                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
+//
+//                    ActivityCompat.requestPermissions(
+//                            NotificationScreen.this,
+//                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+//                            1001
+//                    );
+//                }
+//                Toast.makeText(NotificationScreen.this,
+//                        "Push notifications enabled in app.",
+//                        Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(NotificationScreen.this,
+//                        "Push notifications disabled in app.",
+//                        Toast.LENGTH_SHORT).show();
+//            }
         });
 
         db.collection("notifications")

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -69,9 +71,12 @@ public class ProfileScreen extends AppCompatActivity {
         View addProfilePhotoButton = findViewById(R.id.btn_add_profile_photo);
 
         // bottom bar buttons
-        ImageButton homeButton = findViewById(R.id.btnHome);
+        ImageButton entrantHomeButton = findViewById(R.id.btnHome);
+        ImageButton orgHomeButton = findViewById(R.id.btnHome2);
         ImageButton cameraButton = findViewById(R.id.btnCamera);
         ImageButton notificationsButton = findViewById(R.id.btnNotification);
+        LinearLayout entrantBottomBar = findViewById(R.id.entrantBottomBar);
+        LinearLayout organizerBottomBar = findViewById(R.id.organizerBottomBar);
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         // get the user's role, username, full name, and email to be displayed
@@ -136,20 +141,22 @@ public class ProfileScreen extends AppCompatActivity {
         // TODO condense all this currentRole checking into one method
         // check if the user is currently an event entrant or an event organizer
         if (currentRole != null && currentRole.equals("entrant")) {
-            switchRolesButton.setImageResource(R.drawable.switch_to_organizer_button);
+            switchRolesButton.setBackgroundResource(R.drawable.switch_to_organizer_button);
             profileEventsTextView.setText("Joined Events:");
+            entrantBottomBar.setVisibility(View.VISIBLE);
+            organizerBottomBar.setVisibility(View.GONE);
         } else {
-            switchRolesButton.setImageResource(R.drawable.switch_to_entrant_button);
+            switchRolesButton.setBackgroundResource(R.drawable.switch_to_entrant_button);
             profileEventsTextView.setText("Created Events:");
+            entrantBottomBar.setVisibility(View.GONE);
+            organizerBottomBar.setVisibility(View.VISIBLE);
         }
 
-        homeButton.setOnClickListener(view -> {
-            if (currentRole != null && currentRole.equals("entrant")) {
-                openEntrantEventScreen();
-            } else {
-                openOrganizerEventScreen();
-            }
-        });
+        entrantHomeButton.setOnClickListener(view -> openEntrantEventScreen());
+
+        orgHomeButton.setOnClickListener(view -> openOrganizerEventScreen());
+
+        cameraButton.setOnClickListener(view -> openCameraScreen());
 
         notificationsButton.setOnClickListener(view -> openNotificationsScreen());
 
@@ -208,7 +215,12 @@ public class ProfileScreen extends AppCompatActivity {
             ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();
             if (currentRole != null && currentRole.equals("entrant")) {
                 db.collection("events")
-                        .whereArrayContains("waitlist", currentUsername)
+                        // gets an event if a user is in any of those lists
+                        .where(Filter.or(
+                                Filter.arrayContains("waitlist", currentUsername),
+                                Filter.arrayContains("invited", currentUsername),
+                                Filter.arrayContains("attendees", currentUsername),
+                                Filter.arrayContains("cancelled", currentUsername)))
                         .get()
                         .addOnSuccessListener(snap -> {
                             if (snap.isEmpty()) {
@@ -316,6 +328,14 @@ public class ProfileScreen extends AppCompatActivity {
                                         Toast.makeText(ProfileScreen.this, "Failed to update", Toast.LENGTH_SHORT).show());
                     }
                 });
+    }
+
+    /**
+     * Opens the notifications screen.
+     */
+    public void openCameraScreen() {
+        Intent myIntent = new Intent(ProfileScreen.this, QrScanActivity.class);
+        startActivity(myIntent);
     }
 
     /**

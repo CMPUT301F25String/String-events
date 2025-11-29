@@ -89,6 +89,9 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".InvitedUsersActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".CanceledUsersActivity"

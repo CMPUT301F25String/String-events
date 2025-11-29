@@ -39,8 +39,7 @@ public class OrganizerEventDetailScreen extends AppCompatActivity {
     private TextView tvTime;
     private TextView tvLocation;
     private ImageView imgBanner;
-    private final SimpleDateFormat dateTimeFmt =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    private final SimpleDateFormat dateTimeFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
     /**
      * Inflates the organizer event details UI, wires the back button, reads the
@@ -96,11 +95,11 @@ public class OrganizerEventDetailScreen extends AppCompatActivity {
             startActivity(it);
         });
 
-        View mapBtn = findViewById(R.id.btnWaitlistMap);
-        if (mapBtn != null) {
-            mapBtn.setOnClickListener(v -> {
-            });
-        }
+        findViewById(R.id.btnWaitlistMap).setOnClickListener(v -> {
+            Intent i = new Intent(OrganizerEventDetailScreen.this, WaitlistMapActivity.class);
+            i.putExtra(EVENT_ID, eventId);
+            startActivity(i);
+        });
     }
 
     private void loadEvent(String eventId) {
