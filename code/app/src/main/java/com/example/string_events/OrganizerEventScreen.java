@@ -1,6 +1,5 @@
 package com.example.string_events;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -45,6 +43,8 @@ public class OrganizerEventScreen extends AppCompatActivity {
 
         RecyclerView rvEvents = findViewById(R.id.recyclerEvents);
         rvEvents.setLayoutManager(new LinearLayoutManager(this));
+
+        // --- FIX IS HERE: Removed ", this" because the adapter constructor only takes the list ---
         OrganizerEventAdapter adapter = new OrganizerEventAdapter(data);
         rvEvents.setAdapter(adapter);
 
@@ -82,6 +82,10 @@ public class OrganizerEventScreen extends AppCompatActivity {
                         e.title = d.getString("title");
                         e.location = d.getString("location");
                         e.startAt = d.getTimestamp("startAt");
+
+                        // Ensure endAt is loaded so the Status (Scheduled/Finished) works
+                        e.endAt = d.getTimestamp("endAt");
+
                         e.maxAttendees = asInt(d.get("maxAttendees"));
                         e.attendeesCount = asInt(d.get("attendeesCount"));
                         e.imageUrl = d.getString("imageUrl");

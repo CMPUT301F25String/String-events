@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -40,7 +39,7 @@
             app:layout_constraintStart_toStartOf="@id/tv_title"
             app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-        <!-- Logout Button (Moved to top right for cleaner look) -->
+        <!-- Logout Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -107,7 +106,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_container"
-        android:layout_above="@+id/bottom_bar"
+        android:layout_above="@id/bottomBar"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
@@ -118,68 +117,61 @@
         android:scrollbars="none"
         tools:listitem="@layout/item_event" />
 
-    <!-- Bottom Navigation Bar -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_bar"
+    <!-- Bottom Bar fixed to bottom -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
+        android:layout_height="70dp"
         android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="4"
         android:elevation="16dp"
-        android:paddingHorizontal="24dp">
+        android:layout_alignParentBottom="true">
 
         <ImageButton
             android:id="@+id/nav_calendar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/nav_calendar"
-            app:srcCompat="@drawable/ic_calendar_outline_24"
-            app:tint="#FFD165"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnCamera"
-            app:layout_constraintHorizontal_chainStyle="spread" />
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/calendarorange"
+            android:contentDescription="Home" />
 
         <ImageButton
             android:id="@+id/btnCamera"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/nav_camera"
-            app:srcCompat="@drawable/ic_camera_outline_24"
-            app:tint="#BDBDBD"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_calendar"
-            app:layout_constraintEnd_toStartOf="@id/nav_bell" />
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/camera"
+            android:contentDescription="Camera" />
 
         <ImageButton
             android:id="@+id/nav_bell"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/nav_bell"
-            app:srcCompat="@drawable/ic_bell_outline_24"
-            app:tint="#BDBDBD"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnCamera"
-            app:layout_constraintEnd_toStartOf="@id/nav_person" />
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/bellblack"
+            android:contentDescription="Notifications" />
 
         <ImageButton
             android:id="@+id/nav_person"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/nav_person"
-            app:srcCompat="@drawable/ic_person_outline_24"
-            app:tint="#BDBDBD"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_bell"
-            app:layout_constraintEnd_toEndOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/profileblack"
+            android:contentDescription="Profile" />
+    </LinearLayout>
 
 </RelativeLayout>

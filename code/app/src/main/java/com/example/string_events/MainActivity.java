@@ -10,11 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -24,25 +23,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * Entry activity that routes users to different app sections depending on role.
- * <p>
- * Supported screens:
- * <ul>
- *   <li>ADMIN_HOME – admin dashboard</li>
- *   <li>USER_HOME – public events list</li>
- *   <li>NOTIFICATIONS – notifications screen</li>
- *   <li>PROFILE – profile screen</li>
- * </ul>
  */
 public class MainActivity extends AppCompatActivity {
     /** App sections this activity can display. */
@@ -58,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> filterLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    android.content.Intent data = result.getData();
+                    Intent data = result.getData();
 
                     selectedTags.clear();
                     String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
@@ -76,23 +66,38 @@ public class MainActivity extends AppCompatActivity {
                                 java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
                     }
 
+                    // Check if any filters are active
+                    boolean hasFilters = !selectedTags.isEmpty() || filterStart != null || filterEnd != null;
+
                     if (tvFilterHint != null) {
-                        tvFilterHint.setText(selectedTags.isEmpty() && filterStart == null && filterEnd == null
-                                ? " " : "showing filtered results");
-                        tvFilterHint.setVisibility(android.view.View.VISIBLE);
-                    } else {
-                        android.widget.Toast.makeText(this, "Filters applied", android.widget.Toast.LENGTH_SHORT).show();
+                        if (hasFilters) {
+                            // Build the display string
+                            StringBuilder displayText = new StringBuilder();
+
+                            // 1. Add Tags (e.g. "Sports, Music")
+                            if (!selectedTags.isEmpty()) {
+                                displayText.append(android.text.TextUtils.join(", ", selectedTags));
+                            }
+
+                            // 2. Add Date Indicator if dates are selected
+                            if (filterStart != null || filterEnd != null) {
+                                if (displayText.length() > 0) displayText.append(" + ");
+                                displayText.append("Date Range");
+                            }
+
+                            tvFilterHint.setText(displayText.toString());
+                            tvFilterHint.setVisibility(View.VISIBLE);
+                            Toast.makeText(this, "Filters applied", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Hide the hint completely if no filters are active
+                            tvFilterHint.setVisibility(View.GONE);
+                            Toast.makeText(this, "Filters cleared", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
                 createFilterQuery(selectedTags, filterStart, filterEnd);
             });
 
-    /**
-     * Reads role/user extras, persists basic user info to {@code SharedPreferences},
-     * and navigates to admin or user home accordingly.
-     *
-     * @param savedInstanceState previously saved state, or {@code null}
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,78 +135,31 @@ public class MainActivity extends AppCompatActivity {
         loadEventsIntoList(db.collection("events"));
     }
 
-    /**
-     * Switches the UI to the requested section and wires section-specific handlers.
-     *
-     * @param s target screen
-     */
     private void show(Screen s) {
         switch (s) {
-//            case USER_HOME:
-//                setContentView(R.layout.events_screen);
-//                wireCommon();
-//                onClick(R.id.nav_bell, () -> show(Screen.NOTIFICATIONS));
-//                onClick(R.id.nav_person, () -> show(Screen.PROFILE));
-//                loadEventsIntoList();
-//                break;
-
             case NOTIFICATIONS:
-                // open notifications screen as a separate activity
                 wireCommon();
                 startActivity(new Intent(this, NotificationScreen.class));
                 break;
 
             case PROFILE:
                 wireCommon();
-                // open profile screen as a separate activity
                 Intent profileIntent = new Intent(this, ProfileScreen.class);
                 startActivity(profileIntent);
                 break;
-
-//            case ADMIN_HOME:
-//                setContentView(R.layout.admin_dashboard);
-//                wireCommon();
-//
-//                onClick(R.id.btnEvents, () -> {
-//                    Intent intent = new Intent(this, AdminEventManagementActivity.class);
-//                    startActivity(intent);
-//                });
-//
-//                onClick(R.id.btnImages, () -> {
-//                    Intent intent = new Intent(this, AdminImageManagementActivity.class);
-//                    startActivity(intent);
-//                });
-//
-//                onClick(R.id.btnProfiles, () -> {
-//                    startActivity(new Intent(this, AdminProfileManagementActivity.class));
-//                });
-//
-//                break;
         }
     }
 
-    /**
-     * Wires common actions shared across screens (e.g. logout).
-     */
     private void wireCommon() {
         onClick(R.id.btnLogout, this::logoutAndGoToSignIn);
     }
 
-    /**
-     * Helper to set an onClick listener if the view exists.
-     *
-     * @param viewId resource ID of the view
-     * @param action runnable to execute on click
-     */
     private void onClick(int viewId, Runnable action) {
         if (viewId == 0) return;
         View v = findViewById(viewId);
         if (v != null) v.setOnClickListener(_v -> action.run());
     }
 
-    /**
-     * Clears auth state and navigates back to the welcome/sign-in screen.
-     */
     private void logoutAndGoToSignIn() {
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
@@ -212,10 +170,6 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-    /**
-     * Loads events from Firestore, binds them to the ListView, and opens
-     * {@link EventDetailActivity} on item click.
-     */
     private void loadEventsIntoList(Query query) {
         final ListView lv = findViewById(R.id.list);
         if (lv == null) return;
@@ -226,7 +180,26 @@ public class MainActivity extends AppCompatActivity {
         query.orderBy("startAt", Query.Direction.ASCENDING).get()
                 .addOnSuccessListener(snap -> {
                     data.clear();
+                    Timestamp now = Timestamp.now(); // Get current server time
+
                     for (QueryDocumentSnapshot d : snap) {
+
+                        // 1. FILTER: Check if event is private
+                        Boolean isPrivate = d.getBoolean("private");
+                        // If 'private' is true, skip this event.
+                        // Boolean.TRUE.equals handles null safely (treats null as false/public)
+                        if (Boolean.TRUE.equals(isPrivate)) {
+                            continue;
+                        }
+
+                        // 2. FILTER: Check if event has expired (Finished)
+                        Timestamp endAt = d.getTimestamp("endAt");
+                        // If endAt exists AND it is before Now, skip it.
+                        if (endAt != null && endAt.compareTo(now) < 0) {
+                            continue;
+                        }
+
+                        // If filters pass, proceed to add event
                         EventItem e = new EventItem();
                         String imageUrl = d.getString("imageUrl");
                         if (imageUrl != null) {
@@ -236,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         e.title = d.getString("title");
                         e.location = d.getString("location");
                         e.startAt = d.getTimestamp("startAt");
-                        e.endAt = d.getTimestamp("endAt");
+                        e.endAt = endAt; // We already fetched this above
                         e.maxAttendees = Integer.parseInt(String.valueOf(d.get("maxAttendees")));
                         e.attendeesCount = Integer.parseInt(String.valueOf(d.get("attendeesCount")));
                         data.add(e);
@@ -267,9 +240,6 @@ public class MainActivity extends AppCompatActivity {
         loadEventsIntoList(query);
     }
 
-    /**
-     * Lightweight container used to present event summaries in the list.
-     */
     private static class EventItem {
         String imageUrl;
         String id;
@@ -279,33 +249,18 @@ public class MainActivity extends AppCompatActivity {
         int maxAttendees, attendeesCount;
     }
 
-    /**
-     * Adapter that renders {@link EventItem} rows for the events list.
-     */
     private class EventAdapter extends BaseAdapter {
         private final List<EventItem> items;
-        private final DateFormat timeFmt = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+        private final SimpleDateFormat dateTimeFmt = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
 
-        /**
-         * Creates an adapter over a mutable list of items.
-         *
-         * @param items backing data list
-         */
         EventAdapter(List<EventItem> items) {
             this.items = items;
         }
 
-        /** @return number of rows. */
         @Override public int getCount() { return items.size(); }
-        /** @return item at position. */
         @Override public EventItem getItem(int position) { return items.get(position); }
-        /** @return stable ID (here: position). */
         @Override public long getItemId(int position) { return position; }
 
-        /**
-         * Inflates/binds an event row view with cover image, title, place, time,
-         * remaining spots, and a status chip (Scheduled/In Progress/Finished).
-         */
         @Override
         public View getView(int pos, View convertView, android.view.ViewGroup parent) {
             View v = convertView;
@@ -325,22 +280,21 @@ public class MainActivity extends AppCompatActivity {
             }
 
             EventItem e = getItem(pos);
-            // no image uploaded for event
             if (e.imageUrl == null) {
                 h.imgCover.setImageResource(R.drawable.no_image_available);
-            }
-            // image uploaded for event and retrieved from database successfully
-            else {
+            } else {
                 Glide.with(MainActivity.this)
                         .load(e.imageUrl)
                         .into(h.imgCover);
             }
             if (h.tvTitle != null) h.tvTitle.setText(e.title == null ? "" : e.title);
             if (h.tvPlace != null) h.tvPlace.setText(e.location == null ? "" : e.location);
+
             if (h.tvTime != null) {
-                String t = (e.startAt == null) ? "" : timeFmt.format(e.startAt.toDate());
+                String t = (e.startAt == null) ? "" : dateTimeFmt.format(e.startAt.toDate());
                 h.tvTime.setText(t);
             }
+
             if (h.tvSpots != null) {
                 int left = Math.max(0, e.maxAttendees - e.attendeesCount);
                 h.tvSpots.setText(left + " Spots Left");
@@ -367,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
             return v;
         }
 
-        /** View holder for an event row. */
         class Holder {
             ImageView imgCover;
             TextView tvTitle, tvTime, tvSpots, tvPlace;

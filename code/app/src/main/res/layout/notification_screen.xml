@@ -17,7 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
     <TextView
         android:id="@+id/notifications_textView"
         android:layout_width="0dp"
@@ -42,59 +41,65 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
+    <!-- Bottom Bar (Fixed) -->
     <LinearLayout
         android:id="@+id/bottomBar"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#FFFFFF"
         android:orientation="horizontal"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
         android:gravity="center"
         android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/btnHome"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
             android:src="@drawable/calendar"
             android:contentDescription="Home"
-            android:scaleType="centerInside" />
+         />
 
         <ImageButton
             android:id="@+id/btnCamera"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
             android:src="@drawable/camera"
             android:contentDescription="Camera"
-            android:scaleType="centerInside" />
+/>
 
         <ImageButton
             android:id="@+id/btnNotification"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/notification_clicked"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/bellorange"
             android:contentDescription="Notifications"
-            android:scaleType="centerInside" />
+    />
 
         <ImageButton
             android:id="@+id/btnProfile"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/profile"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:padding="8dp"
+            android:src="@drawable/profileblack"
             android:contentDescription="Profile"
-            android:scaleType="centerInside" />
+ />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
