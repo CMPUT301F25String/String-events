@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 /**
  * Screen for organizers to view users on the waitlist.
  * <p>
@@ -24,6 +25,9 @@ public class WaitlistUsersActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private UserAdapter adapter;
     private final List<UserItem> userList = new ArrayList<>();
+
+    private String currentEventId;
+
     /**
      * Inflates the layout, wires the back button, sets up the list adapter
      * with mock waitlist data, and binds a demo click handler.
@@ -65,6 +69,18 @@ public class WaitlistUsersActivity extends AppCompatActivity {
 
             startActivity(i);
         });
+
+        currentEventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
+        if (currentEventId == null) {
+            currentEventId = getIntent().getStringExtra("EVENT_ID");
+        }
+
+        SwitchMaterial preciseSwitch = findViewById(R.id.switch_precise);
+
+        Intent i = new Intent(this, WaitlistMapActivity.class);
+        i.putExtra(WaitlistMapActivity.EXTRA_EVENT_ID, currentEventId);         // 你已有
+        i.putExtra(WaitlistMapActivity.EXTRA_REQUIRE_PRECISE, preciseSwitch.isChecked()); // 新增
+        startActivity(i);
 
         findViewById(R.id.btnSendWaitlist).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);

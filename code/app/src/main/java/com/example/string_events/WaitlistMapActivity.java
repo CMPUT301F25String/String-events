@@ -1,6 +1,7 @@
 package com.example.string_events;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
     private GoogleMap map;                                   // GoogleMap instance from getMapAsync
     private FusedLocationProviderClient fused;
     private FirebaseFirestore db;
+    private String currentUsername;
     private String eventId;    // Int// To read last known location
 
     private String pendingJoinEventId = null;
@@ -77,6 +79,10 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
 
         db = FirebaseFirestore.getInstance();
         eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        currentUsername = sharedPreferences.getString("user", null);
+        assert currentUsername != null;
 
         ImageButton capture = findViewById(R.id.btn_capture_location);
         ImageButton save    = findViewById(R.id.btn_save_join_location);
@@ -94,8 +100,8 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
                 Toast.makeText(this, "No location yet. Tap the target icon first.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            String uid = (user != null) ? user.getUid() : "anonymous";
+//            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//            String uid = (user != null) ? user.getUid() : "anonymous";
 
             Map<String, Object> data = new HashMap<>();
             data.put("lat", lastCaptured.latitude);
@@ -103,14 +109,13 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
             data.put("capturedAt", System.currentTimeMillis());
             data.put("source", "device_last_known");
 
-            // 路径：events/{eventId}/waitlist/{uid}
             db.collection("events")
                     .document(eventId == null ? "unknown_event" : eventId)
                     .collection("waitlist")
-                    .document(uid)
+                    .document(currentUsername)
                     .set(data, SetOptions.merge())
                     .addOnSuccessListener(unused -> {
-                        String s = String.format(Locale.US, "Saved: %.6f, %.6f",
+                        String s = String.format(Locale.CANADA, "Saved: %.6f, %.6f",
                                 lastCaptured.latitude, lastCaptured.longitude);
                         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
                     })
@@ -197,10 +202,10 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
                 lng = loc.getLongitude();
             }
 
-            String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+//            String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             Map<String, Object> data = new java.util.HashMap<>();
-            data.put("userId", uid);
+            data.put("userId", currentUsername);
             data.put("joinedAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
             if (lat != null && lng != null) {
                 data.put("lat", lat);
@@ -212,7 +217,7 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
 
             com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
             db.collection("events").document(eventId)
-                    .collection("waitlist").document(uid)
+                    .collection("waitlist").document(currentUsername)
                     .set(data, com.google.firebase.firestore.SetOptions.merge())
                     .addOnSuccessListener(unused -> {
                         Toast.makeText(this, "Joined waitlist with location saved.", Toast.LENGTH_SHORT).show();
@@ -233,19 +238,19 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
                 pendingJoinEventId = null;
                 joinWaitlistWithLocation(eid);
             } else {
-                String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
                 if (pendingJoinEventId != null) {
                     String eid = pendingJoinEventId;
                     pendingJoinEventId = null;
 
                     Map<String, Object> data = new java.util.HashMap<>();
-                    data.put("userId", uid);
+                    data.put("userId", currentUsername);
                     data.put("joinedAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
                     data.put("locationSource", "denied");
 
                     com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
                     db.collection("events").document(eid)
-                            .collection("waitlist").document(uid)
+                            .collection("waitlist").document(currentUsername)
                             .set(data, com.google.firebase.firestore.SetOptions.merge())
                             .addOnSuccessListener(unused ->
                                     Toast.makeText(this, "Joined waitlist (no location).", Toast.LENGTH_SHORT).show()

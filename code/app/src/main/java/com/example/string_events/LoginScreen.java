@@ -181,44 +181,29 @@ public class LoginScreen extends AppCompatActivity {
             String fullName = snapshot.getString("name");
             String userEmail = snapshot.getString("email");
 
-            openNextScreen("user", realUsername, fullName, userEmail);
+            openNextScreen(realUsername, fullName, userEmail);
         } else {
             setLoading(false);
             toast("Wrong password");
         }
     }
 
-    private void openNextScreen(String role, String username, String fullName, String email) {
+    private void openNextScreen(String username, String fullName, String email) {
         setLoading(false);
-        Intent i;
-
         boolean rememberMe = chkRemember != null && chkRemember.isChecked();
 
-        if (Objects.equals(role, "user")) {
-            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
-            sp.edit()
-                    .putBoolean("remember", rememberMe)
-                    .putString("username", username)
-                    .putString("user", username)
-                    .putString("role", role)
-                    .apply();
+        // store user info for cross-activity access
+        SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
+        sp.edit()
+                .putBoolean("remember", rememberMe)
+                .putString("username", username)
+                .putString("user", username)
+                .putString("role", "entrant")
+                .putString("name", fullName)
+                .putString("email", email)
+                .apply();
 
-            i = new Intent(this, MainActivity.class);
-            i.putExtra("role", role);
-            i.putExtra("user", username);
-            i.putExtra("name", fullName);
-            i.putExtra("email", email);
-        } else {
-            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
-            sp.edit()
-                    .putBoolean("remember", rememberMe)
-                    .putString("username", username)
-                    .putString("user", "")
-                    .putString("role", "admin")
-                    .apply();
-
-            i = new Intent(this, AdminDashboardActivity.class);
-        }
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
     }

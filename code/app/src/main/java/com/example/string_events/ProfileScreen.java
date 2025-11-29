@@ -77,7 +77,7 @@ public class ProfileScreen extends AppCompatActivity {
         // get the user's role, username, full name, and email to be displayed
         String currentRole = sharedPreferences.getString("role", null);
         currentUsername = sharedPreferences.getString("user", null);
-        String fullName = sharedPreferences.getString("fullName", null);
+        String fullName = sharedPreferences.getString("name", null);
         String email = sharedPreferences.getString("email", null);
 
         // display name and email immediately
@@ -106,7 +106,6 @@ public class ProfileScreen extends AppCompatActivity {
                                         profileImageView.post(() -> profileImageView.setImageBitmap(bitmap));
                                     } catch (Exception e) {
                                         Log.e("ProfileScreen", "Error loading profile image", e);
-                                        // Optional: set a default error image here
                                     }
                                 }).start();
                             }
@@ -125,9 +124,9 @@ public class ProfileScreen extends AppCompatActivity {
         });
 
         logOutTextView.setOnClickListener(view -> {
-            SharedPreferences sp = getSharedPreferences("auth", MODE_PRIVATE);
+            SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
             sp.edit().clear().apply();
-            Intent i = new Intent(ProfileScreen.this, WelcomeActivity.class);
+            Intent i = new Intent(this, WelcomeActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
             finishAffinity();
