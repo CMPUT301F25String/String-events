@@ -26,10 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Loads participating users from Firestore based on attendee list.
  */
 public class ParticipatingUsersActivity extends AppCompatActivity {
-
-    private FirebaseFirestore db;
-    private UserAdapter adapter;
-    private final List<UserItem> userList = new ArrayList<>();
+    private final ArrayList<UserItem> userList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,7 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
 
         String eventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
         assert eventId != null;
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference eventDocRef = db.collection("events").document(eventId);
         // has to be a final array of length 1 to prevent errors with access in an inner class (in onItemClick)
         final UserItem[] selectedUser = {null};
@@ -49,11 +46,12 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
         Button deleteUserButton = findViewById(R.id.btnDeleteUser);
 
         ListView listView = findViewById(R.id.listParticipating);
-        adapter = new UserAdapter(this, userList);
+        UserAdapter adapter = new UserAdapter(this, userList);;
+        UserAdapterHelper adapterHelper = new UserAdapterHelper(adapter, userList, UserItem.Status.PARTICIPATING);
         listView.setAdapter(adapter);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        loadParticipatingUsers(eventId);
+        adapterHelper.loadUsers(eventId);
 
         back.setOnClickListener(v -> finish());
 
@@ -97,59 +95,5 @@ public class ParticipatingUsersActivity extends AppCompatActivity {
             exportList.setVisibility(View.VISIBLE);
             deleteUserButton.setVisibility(View.GONE);
         });
-    }
-
-    // TODO can maybe generalize these repeated methods to an abstract class
-    private void loadParticipatingUsers(String eventId) {
-        db.collection("events").document(eventId)
-                .get()
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) {
-                        finish();
-                        return;
-                    }
-
-                    List<String> attendingList = (List<String>) doc.get("attendees");
-                    if (attendingList == null || attendingList.isEmpty()) {
-                        userList.clear();
-                        adapter.notifyDataSetChanged();
-                        return;
-                    }
-
-                    fetchUsers(attendingList);
-                })
-                .addOnFailureListener(e -> finish());
-    }
-
-    private void fetchUsers(List<String> usernames) {
-        userList.clear();
-
-        for (String username : usernames) {
-            db.collection("users")
-                    .whereEqualTo("username", username)
-                    .get()
-                    .addOnSuccessListener(query -> {
-                        if (!query.isEmpty()) {
-                            addUserToList(query.getDocuments().get(0));
-                        }
-                    });
-        }
-    }
-
-    private void addUserToList(DocumentSnapshot doc) {
-        if (!doc.exists()) return;
-
-        String username = doc.getString("username");
-        String name = doc.getString("name");
-        String email = doc.getString("email");
-
-        userList.add(new UserItem(
-                username != null ? username : "",
-                name != null ? name : "",
-                email != null ? email : "",
-                UserItem.Status.PARTICIPATING
-        ));
-
-        adapter.notifyDataSetChanged();
     }
 }

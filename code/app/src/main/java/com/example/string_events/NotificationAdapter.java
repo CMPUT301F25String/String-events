@@ -99,9 +99,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         });
 
 
-        holder.notificationExpandButton.setOnClickListener(view -> {
-            NotificationHelper.showNotification(context, notification);
-        });
+//        holder.notificationExpandButton.setOnClickListener(view -> {
+//            NotificationHelper.showNotification(context, notification);
+//        });
     }
 
     private void bindMessage(MessageViewHolder holder, Notification notification) {

@@ -1,10 +1,12 @@
 package com.example.string_events;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 
 import android.os.Bundle;
@@ -20,7 +22,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.Timestamp;
@@ -28,6 +33,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -43,21 +49,18 @@ import java.util.Map;
  * or accept/decline an invite. Event data is loaded from Firestore.
  */
 public class EventDetailActivity extends AppCompatActivity {
-    private final LotteryHelper lotteryHelper = new LotteryHelper();
-    private String username;
     private String eventId;
+    private String username;
+    private FirebaseFirestore db;
+    private DocumentReference eventDocumentRef;
 
     private final AtomicBoolean userInEventWaitlist = new AtomicBoolean(false);
     private final AtomicBoolean userInEventInvited = new AtomicBoolean(false);
     private final AtomicBoolean userInEventAttendees = new AtomicBoolean(false);
+    private final LotteryHelper lotteryHelper = new LotteryHelper();
 
-    private static final int REQ_COARSE_SAVE = 7101;
+    private static final int REQ_COARSE_APPLY = 7000;
     private FusedLocationProviderClient fusedForSave;
-    private FirebaseFirestore dbForSave;
-    private String currentUsernameForSave;
-    private String eventIdForSave;
-
-    public static final String EXTRA_EVENT_ID = "EVENT_ID";
 
     private final List<String> csvEntrants = new ArrayList<>();
 
@@ -73,55 +76,15 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_detail_screen);
 
+        eventId = getIntent().getStringExtra("event_id");
+        assert eventId != null;
+        db = FirebaseFirestore.getInstance();
+        eventDocumentRef = db.collection("events").document(eventId);
+
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
-        currentUsernameForSave = sp.getString("user", null);
-        Intent in = getIntent();
-        String eventId = null;
-        if (in != null) {
-            eventId = in.getStringExtra(EXTRA_EVENT_ID);
-            if (eventId == null) eventId = in.getStringExtra("event_id");
-            if (eventId == null) eventId = in.getStringExtra("EVENTID");
-        }
-        if (eventId == null || eventId.trim().isEmpty()) {
-            Log.e("EventDetailActivity", "Missing eventId. extras = " + (in == null ? "null" : in.getExtras()));
-            Toast.makeText(this, "Missing eventId.", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-        this.eventId = eventId;
-        this.eventIdForSave = eventId;
-// -----------------------------------------
-
-        fusedForSave = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this);
-        dbForSave    = com.google.firebase.firestore.FirebaseFirestore.getInstance();
-
-        findViewById(R.id.btn_save_my_location).setOnClickListener(v -> {
-            if (eventIdForSave == null || eventIdForSave.isEmpty()) {
-                android.widget.Toast.makeText(this, "Missing eventId.", android.widget.Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (currentUsernameForSave == null || currentUsernameForSave.trim().isEmpty()) {
-                android.widget.Toast.makeText(this, "Missing username.", android.widget.Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // 只申请 approximate（COARSE）
-            if (androidx.core.content.ContextCompat.checkSelfPermission(
-                    this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                androidx.core.app.ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{ android.Manifest.permission.ACCESS_COARSE_LOCATION },
-                        REQ_COARSE_SAVE
-                );
-            } else {
-                saveMyApproxLocationToEvent();
-            }
-        });
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference eventDocumentRef = db.collection("events").document(eventId);
-
         username = sp.getString("user", null);
+
+        fusedForSave = LocationServices.getFusedLocationProviderClient(this);
 
         ImageView back = findViewById(getId("back_button"));
         ImageButton applyButton = findViewById(R.id.apply_button);
@@ -147,10 +110,20 @@ public class EventDetailActivity extends AppCompatActivity {
         applyButton.setOnClickListener(view -> {
             // user has not applied for this event yet
             if (!userInEventWaitlist.get() && !userInEventAttendees.get()) {
-                eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
-                Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
-                userInEventWaitlist.set(true);
-                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+                eventDocumentRef.get().addOnSuccessListener(this, documentSnapshot -> {
+                    boolean geolocationReq = Boolean.TRUE.equals(documentSnapshot.getBoolean("geolocationReq"));
+                    if (geolocationReq) {
+                        // request location permissions from the user and calls onRequestPermissionsResult
+                        // if the user accepts the permissions, it will add them to the waitlist from within that method
+                        ActivityCompat.requestPermissions(
+                                this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                REQ_COARSE_APPLY);
+                    }
+                    else {
+                        addUserToEventWaitlist(applyButton);
+                    }
+                });
             }
             // user has applied for the event and is not an attendee yet (not been accepted yet)
             else if (userInEventWaitlist.get() && !userInEventAttendees.get()) {
@@ -171,41 +144,49 @@ public class EventDetailActivity extends AppCompatActivity {
         });
     }
 
+    private void addUserToEventWaitlist(ImageButton applyButton) {
+        eventDocumentRef.update("waitlist", FieldValue.arrayUnion(username));
+        Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
+        userInEventWaitlist.set(true);
+        applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQ_COARSE_SAVE) {
-            boolean granted = grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
-            if (granted) saveMyApproxLocationToEvent();
-            else android.widget.Toast.makeText(this, "Approx location denied.", android.widget.Toast.LENGTH_SHORT).show();
+        if (requestCode == REQ_COARSE_APPLY) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                DocumentReference userDocRef = db.collection("users").document(username);
+                userDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                    // store the user's location if it's not already saved
+                    if (!documentSnapshot.contains("location")) {
+                        saveApproxLocation();
+                    }
+                    // add the user to the event's waitlist
+                    addUserToEventWaitlist(findViewById(R.id.apply_button));
+                });
+            } else {
+                Toast.makeText(this, "Please enable location services to join this event.", Toast.LENGTH_LONG).show();
+            }
         }
     }
-
-    private void saveMyApproxLocationToEvent() {
-        fusedForSave.getLastLocation().addOnSuccessListener(this, (android.location.Location loc) -> {
+    private void saveApproxLocation() {
+        fusedForSave.getLastLocation().addOnSuccessListener(this, (Location loc) -> {
             if (loc == null) {
-                android.widget.Toast.makeText(this, "No last location (send coordinate in emulator).", android.widget.Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Could not retrieve location. Please ensure location is enabled and try again.", Toast.LENGTH_LONG).show();
                 return;
             }
-            java.util.Map<String, Object> data = new java.util.HashMap<>();
-            data.put("userId",    currentUsernameForSave);
-            data.put("lat",       loc.getLatitude());
-            data.put("lng",       loc.getLongitude());
-            data.put("permission","approx");
-            data.put("updatedAt", System.currentTimeMillis());
-            data.put("source",    "user_button");
-
-            dbForSave.collection("events").document(eventIdForSave)
-                    .collection("waitlist").document(currentUsernameForSave)
-                    .set(data, com.google.firebase.firestore.SetOptions.merge())
-                    .addOnSuccessListener(unused -> {
-                        String s = String.format(java.util.Locale.US, "Saved: %.5f, %.5f", loc.getLatitude(), loc.getLongitude());
-                        android.widget.Toast.makeText(this, s, android.widget.Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e ->
-                            android.widget.Toast.makeText(this, "Save failed: "+e.getMessage(), android.widget.Toast.LENGTH_LONG).show());
+            Map<String, Object> data = new HashMap<>();
+            GeoPoint userLocation = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+            data.put("location", userLocation);
+            DocumentReference userDocRef = db.collection("users").document(username);
+            userDocRef.update(data).addOnSuccessListener(v -> {
+                Toast.makeText(EventDetailActivity.this, "Saved your approximate location!", Toast.LENGTH_SHORT).show();
+                Log.d("Firestore", "user location uploaded to database");
+            });
         });
     }
+
 
     /**
      * Populates UI fields with document values and formats date/time and waitlist
@@ -253,9 +234,9 @@ public class EventDetailActivity extends AppCompatActivity {
         TextView org = findViewById(R.id.tvOrganizer);
         if (org != null && creator != null) org.setText("Hosted by: " + creator);
 
-        setText(getId("spots_taken"), "(" + taken + "/" + max + ") Spots Taken");
+        setText(getId("spots_taken"), "(" + taken + "/" + max + ") Spots");
         if (waitLimit > 0)
-            setText(getId("waiting_list"), currentWaitCount + "/" + waitLimit + " on Waitlist");
+            setText(getId("waiting_list"), "(" + currentWaitCount + "/" + waitLimit + ") on Waitlist");
         else
             setText(getId("waiting_list"), currentWaitCount + " on Waitlist");
 
