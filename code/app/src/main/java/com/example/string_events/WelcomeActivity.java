@@ -49,21 +49,20 @@ public class WelcomeActivity extends AppCompatActivity {
 
         boolean remember = sp.getBoolean("remember", false);
         String role = sp.getString("role", null);
-        String username = sp.getString("username", null);
         String adminUsername = sp.getString("adminUsername", null);
 
         if (remember && role != null) {
             Intent intent;
+            // the saved login was for an admin
             if ("admin".equals(role)) {
                 intent = new Intent(this, AdminDashboardActivity.class);
                 if (adminUsername != null) {
                     intent.putExtra("adminUsername", adminUsername);
                 }
             } else {
+                // reset the user to an entrant and open events screen
+                sp.edit().putString("role", "entrant").apply();
                 intent = new Intent(this, MainActivity.class);
-                if (username != null) {
-                    intent.putExtra("user", username);
-                }
             }
             startActivity(intent);
             finish();

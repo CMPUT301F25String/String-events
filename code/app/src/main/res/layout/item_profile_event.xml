@@ -14,7 +14,6 @@
         android:id="@+id/profile_background"
         android:layout_width="165dp"
         android:layout_height="240dp"
-        android:background="@drawable/bg_event_card_shadow"
         android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

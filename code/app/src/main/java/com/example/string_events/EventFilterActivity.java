@@ -12,16 +12,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class EventFilterActivity extends AppCompatActivity {
     public static final String EXTRA_TAGS     = "extra_tags";
     public static final String EXTRA_START_MS = "extra_start_ms";
     public static final String EXTRA_END_MS   = "extra_end_ms";
 
-    private final java.util.Set<String> selected = new java.util.HashSet<>();
+    private final HashSet<String> selected = new HashSet<>();
     private TextView chipBadminton, chipGames, chipArts, chipLearning;
     private EditText etStart, etEnd;
-    private Button btnClear, btnApply;
 
     private void toggle(String tag, android.widget.TextView chip) {
         if (selected.contains(tag)) {
@@ -53,7 +54,7 @@ public class EventFilterActivity extends AppCompatActivity {
         try {
             java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
             fmt.setLenient(false);
-            return fmt.parse(s).getTime();
+            return Objects.requireNonNull(fmt.parse(s)).getTime();
         } catch (Exception e) {
             android.widget.Toast.makeText(this, "Time format: yyyy-MM-dd HH:mm", android.widget.Toast.LENGTH_SHORT).show();
             return null;
@@ -73,8 +74,8 @@ public class EventFilterActivity extends AppCompatActivity {
         etStart = findViewById(R.id.et_start_time);
         etEnd   = findViewById(R.id.et_end_time);
 
-        btnClear = findViewById(R.id.btn_clear);
-        btnApply = findViewById(R.id.btn_apply);
+        Button btnClear = findViewById(R.id.btn_clear);
+        Button btnApply = findViewById(R.id.btn_apply);
 
         String[] incoming = getIntent().getStringArrayExtra(EXTRA_TAGS);
         if (incoming != null) java.util.Collections.addAll(selected, incoming);

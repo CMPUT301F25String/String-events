@@ -24,20 +24,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +127,7 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageButton applyButton = findViewById(R.id.apply_button);
         back.setOnClickListener(v -> finish());
 
-        // Export CSV button ()
+        // Export CSV button
         Button exportCsvButton = findViewById(R.id.btn_export_csv);
         if (exportCsvButton != null) {
             exportCsvButton.setOnClickListener(v -> exportEntrantsToCsv());
@@ -221,9 +217,10 @@ public class EventDetailActivity extends AppCompatActivity {
         String title = s.getString("title");
         String description = s.getString("description");
         String location = s.getString("location");
-        String address = s.getString("address");
+        String creator = s.getString("creator");
         Timestamp startAt = s.getTimestamp("startAt");
         Timestamp endAt = s.getTimestamp("endAt");
+
         int max = asInt(s.get("maxAttendees"));
         int taken = asInt(s.get("attendeesCount"));
         int waitLimit = asInt(s.get("waitlistLimit"));
@@ -232,7 +229,6 @@ public class EventDetailActivity extends AppCompatActivity {
         List<String> waitlist = (List<String>) s.get("waitlist");
         int currentWaitCount = (waitlist != null) ? waitlist.size() : 0;
 
-        // 获取 attendees 列表，用于导出 CSV
         @SuppressWarnings("unchecked")
         List<String> attendeesList = (List<String>) s.get("attendees");
         csvEntrants.clear();
@@ -242,24 +238,54 @@ public class EventDetailActivity extends AppCompatActivity {
 
         DateFormat dFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
         DateFormat tFmt = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+
         String dateLine = startAt == null ? "" : dFmt.format(startAt.toDate());
-        String timeLine = (startAt == null ? "" : tFmt.format(startAt.toDate())) +
-                " - " +
+        String timeLine = (startAt == null ? "" : tFmt.format(startAt.toDate()))
+                + " - " +
                 (endAt == null ? "" : tFmt.format(endAt.toDate()));
 
         setText(getId("tvEventTitle"), title);
-        setText(getId("tvAddress"), address);
+        setText(getId("tvAddress"), location);
         setText(getId("tvDateLine"), dateLine);
         setText(getId("tvTimeLine"), timeLine);
-        setText(getId("tvAddress"), location);
         setText(getId("tvDescription"), description);
 
-        setText(getId("spots_taken"), "(" + taken + "/" + max + ") Spots Taken");
+        TextView org = findViewById(R.id.tvOrganizer);
+        if (org != null && creator != null) org.setText("Hosted by: " + creator);
 
+        setText(getId("spots_taken"), "(" + taken + "/" + max + ") Spots Taken");
         if (waitLimit > 0)
             setText(getId("waiting_list"), currentWaitCount + "/" + waitLimit + " on Waitlist");
         else
             setText(getId("waiting_list"), currentWaitCount + " on Waitlist");
+
+        ImageView eventImage = findViewById(R.id.ivEventImage);
+        String imageUrl = s.getString("imageUrl");
+
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            new Thread(() -> {
+                try {
+                    java.net.URL url = new java.net.URL(imageUrl);
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true);
+                    conn.connect();
+                    java.io.InputStream input = conn.getInputStream();
+                    final android.graphics.Bitmap bmp =
+                            android.graphics.BitmapFactory.decodeStream(input);
+
+                    eventImage.post(() -> {
+                        if (bmp != null) eventImage.setImageBitmap(bmp);
+                        else eventImage.setImageResource(android.R.drawable.ic_menu_report_image);
+                    });
+
+                } catch (Exception e) {
+                    eventImage.post(() ->
+                            eventImage.setImageResource(android.R.drawable.ic_menu_report_image));
+                }
+            }).start();
+        } else {
+            eventImage.setImageResource(android.R.drawable.ic_menu_report_image);
+        }
     }
 
     /**
@@ -372,31 +398,13 @@ public class EventDetailActivity extends AppCompatActivity {
         }
 
         StringBuilder sb = new StringBuilder();
-        // header
         sb.append("Username\n");
         for (String user : csvEntrants) {
-            sb.append(escapeCsv(user)).append("\n");
+            sb.append(user).append("\n");
         }
 
-        String safeEventId = (eventId == null ? "event" : eventId);
-        String fileName = "entrants_" + safeEventId + ".csv";
-
+        String fileName = "entrants_" + eventId + ".csv";
         exportCsvToDownloads(fileName, sb.toString());
-    }
-
-    /**
-     * Simple CSV escaping for commas, quotes, and newlines.
-     */
-    private String escapeCsv(String value) {
-        if (value == null) return "";
-        String v = value;
-        if (v.contains("\"")) {
-            v = v.replace("\"", "\"\"");
-        }
-        if (v.contains(",") || v.contains("\n")) {
-            v = "\"" + v + "\"";
-        }
-        return v;
     }
 
     private void exportCsvToDownloads(String fileName, String csvContent) {
@@ -416,12 +424,11 @@ public class EventDetailActivity extends AppCompatActivity {
                     outputStream.write(csvContent.getBytes());
                     outputStream.close();
                 }
-                Toast.makeText(this, "CSV saved to Downloads ✅", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "CSV saved to Downloads", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Failed to save CSV.", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
     }

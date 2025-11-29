@@ -1,38 +1,37 @@
 package com.example.string_events;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.DateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Entry activity that routes users to different app sections depending on role.
@@ -49,86 +48,15 @@ public class MainActivity extends AppCompatActivity {
     /** App sections this activity can display. */
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
-    private static final String QR_DEEP_LINK_DEFAULT_EVENT_ID = "07d4dd53-3efe-4613-b852-0720a924be8b";
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private static final int REQ_FILTER = 1001;
+    private final HashSet<String> selectedTags = new HashSet<>();
+    private ZonedDateTime filterStart = null, filterEnd = null;
 
-    private final java.util.Set<String> selectedTags = new java.util.HashSet<>();
-    private java.time.ZonedDateTime filterStart = null, filterEnd = null;
+    private TextView tvFilterHint;
 
-    private android.widget.TextView tvFilterHint;
-    private android.widget.ListView listView;
-    private EventAdapter adapter;
-    private final java.util.List<Event> allEvents   = new java.util.ArrayList<>();
-    private final java.util.List<Event> shownEvents = new java.util.ArrayList<>();
-
-
-    private void applyFilters() {
-        shownEvents.clear();
-        for (Event e : allEvents) {
-            if (!e.matchesTags(selectedTags)) continue;
-            if (!e.within(filterStart, filterEnd)) continue;
-            shownEvents.add(e);
-        }
-        if (adapter != null) adapter.notifyDataSetChanged();
-    }
-
-    private void testFilterQuery(java.util.Set<String> tags,
-                                 @Nullable java.time.ZonedDateTime start,
-                                 @Nullable java.time.ZonedDateTime end) {
-        com.google.firebase.firestore.Query q = db.collection("events");
-
-        java.util.List<String> tagsLower = new java.util.ArrayList<>();
-        for (String t : tags) if (t != null) tagsLower.add(t.toLowerCase(java.util.Locale.ROOT));
-        if (!tagsLower.isEmpty()) {
-            q = q.whereArrayContainsAny("tags", tagsLower);
-        }
-
-        if (start != null) {
-            q = q.whereGreaterThanOrEqualTo(
-                    "startAt",
-                    new com.google.firebase.Timestamp(java.util.Date.from(start.toInstant()))
-            );
-        }
-        if (end != null) {
-            q = q.whereLessThanOrEqualTo(
-                    "endAt",
-                    new com.google.firebase.Timestamp(java.util.Date.from(end.toInstant()))
-            );
-        }
-
-        q = q.orderBy("startAt", com.google.firebase.firestore.Query.Direction.ASCENDING).limit(50);
-
-        q.get()
-                .addOnSuccessListener(snap -> {
-                    StringBuilder sb = new StringBuilder("Query results (" + snap.size() + "):\n");
-                    for (com.google.firebase.firestore.QueryDocumentSnapshot d : snap) {
-                        String id = d.getId();
-                        String title = d.getString("title");
-                        Object tg = d.get("tags");
-                        sb.append(id).append(" | ").append(title).append(" | ").append(String.valueOf(tg)).append("\n");
-                    }
-                    android.util.Log.d("TEST_QUERY", sb.toString());
-                    new android.app.AlertDialog.Builder(this)
-                            .setTitle("Filter query results")
-                            .setMessage(sb.length() > 900 ? sb.substring(0, 900) + "…" : sb.toString())
-                            .setPositiveButton("OK", null)
-                            .show();
-                })
-                .addOnFailureListener(e -> {
-                    android.util.Log.e("TEST_QUERY", "Query failed", e);
-                    new android.app.AlertDialog.Builder(this)
-                            .setTitle("Query failed")
-                            .setMessage(e.getMessage())
-                            .setPositiveButton("OK", null)
-                            .show();
-                });
-    }
-
-    private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> filterLauncher =
-            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+    private final ActivityResultLauncher<Intent> filterLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     android.content.Intent data = result.getData();
 
@@ -148,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
                                 java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
                     }
 
-                    if (adapter != null) {
-                        applyFilters();
-                    }
                     if (tvFilterHint != null) {
                         tvFilterHint.setText(selectedTags.isEmpty() && filterStart == null && filterEnd == null
                                 ? " " : "showing filtered results");
@@ -159,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         android.widget.Toast.makeText(this, "Filters applied", android.widget.Toast.LENGTH_SHORT).show();
                     }
                 }
-                testFilterQuery(selectedTags, filterStart, filterEnd);
-
+                createFilterQuery(selectedTags, filterStart, filterEnd);
             });
 
     /**
@@ -176,37 +100,19 @@ public class MainActivity extends AppCompatActivity {
         wireCommon();
 
         tvFilterHint = findViewById(R.id.tv_filter_hint);
-        listView     = findViewById(R.id.list);
-
         TextView btnOpenFilter = findViewById(R.id.btn_open_filter);
-        tvFilterHint = findViewById(R.id.tv_filter_hint);
 
         btnOpenFilter.setOnClickListener(v -> {
-            android.content.Intent it = new android.content.Intent(this, EventFilterActivity.class);
+            Intent it = new Intent(this, EventFilterActivity.class);
             it.putExtra(EventFilterActivity.EXTRA_TAGS, selectedTags.toArray(new String[0]));
             filterLauncher.launch(it);
         });
-
-        String username = getIntent().getStringExtra("user");
-        String fullName = getIntent().getStringExtra("name");
-        String email = getIntent().getStringExtra("email");
-
-        if (username != null) {
-            // store user info for cross-activity access
-            SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("role", "entrant");
-            editor.putString("user", username);
-            editor.putString("fullName", fullName);
-            editor.putString("email", email);
-            editor.apply();
-        }
 
         Intent launchIntent = getIntent();
         if (Intent.ACTION_VIEW.equals(launchIntent.getAction()) && launchIntent.getData() != null) {
             String eventIdFromLink = launchIntent.getData().getLastPathSegment();
             if (eventIdFromLink == null || eventIdFromLink.isEmpty()) {
-                eventIdFromLink = QR_DEEP_LINK_DEFAULT_EVENT_ID;
+                return;
             }
             Intent detailIntent = new Intent(this, EventDetailActivity.class);
             detailIntent.putExtra("event_id", eventIdFromLink);
@@ -221,34 +127,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, QrScanActivity.class);
             startActivity(intent);
         });
-        loadEventsIntoList();
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable android.content.Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQ_FILTER && resultCode == RESULT_OK && data != null) {
-            selectedTags.clear();
-            String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
-            if (arr != null) java.util.Collections.addAll(selectedTags, arr);
-
-            filterStart = null; filterEnd = null;
-            if (data.hasExtra(EventFilterActivity.EXTRA_START_MS)) {
-                long ms = data.getLongExtra(EventFilterActivity.EXTRA_START_MS, 0L);
-                filterStart = java.time.ZonedDateTime.ofInstant(
-                        java.time.Instant.ofEpochMilli(ms), java.time.ZoneId.systemDefault());
-            }
-            if (data.hasExtra(EventFilterActivity.EXTRA_END_MS)) {
-                long me = data.getLongExtra(EventFilterActivity.EXTRA_END_MS, 0L);
-                filterEnd = java.time.ZonedDateTime.ofInstant(
-                        java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
-            }
-
-            applyFilters();
-            tvFilterHint.setText(selectedTags.isEmpty() && filterStart == null && filterEnd == null
-                    ? " " : "showing filtered results");
-        }
+        loadEventsIntoList(db.collection("events"));
     }
 
     /**
@@ -321,16 +200,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Resolves a view ID by name in the {@code id} resource type.
-     *
-     * @param name resource entry name
-     * @return integer ID or {@code 0} if not found
-     */
-    private int getId(String name) {
-        return getResources().getIdentifier(name, "id", getPackageName());
-    }
-
-    /**
      * Clears auth state and navigates back to the welcome/sign-in screen.
      */
     private void logoutAndGoToSignIn() {
@@ -343,44 +212,18 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
     }
 
-//    private void loadNotificationsIntoRecycler() {
-//        RecyclerView rv = findViewById(R.id.notifications_recyclerView);
-//        if (rv == null) return;
-//        rv.setLayoutManager(new LinearLayoutManager(this));
-//        ArrayList<Notification> data = new ArrayList<>();
-//        NotificationAdapter adapter = new NotificationAdapter(this, data);
-//        rv.setAdapter(adapter);
-//
-//        db.collection("notifications")
-//                .orderBy("createdAt", Query.Direction.DESCENDING)
-//                .get()
-//                .addOnSuccessListener(snap -> {
-//                    data.clear();
-//                    for (QueryDocumentSnapshot d : snap) {
-//                        boolean selected = Boolean.TRUE.equals(d.getBoolean("selectedStatus"));
-//                        String name = d.getString("eventName");
-//                        String imageUrl = d.getString("imageUrl");
-//                        Uri photo = imageUrl == null || imageUrl.isEmpty() ? null : Uri.parse(imageUrl);
-//                        data.add(new Notification(selected, photo, name));
-//                    }
-//                    adapter.notifyDataSetChanged();
-//                });
-//    }
-
     /**
      * Loads events from Firestore, binds them to the ListView, and opens
      * {@link EventDetailActivity} on item click.
      */
-    private void loadEventsIntoList() {
+    private void loadEventsIntoList(Query query) {
         final ListView lv = findViewById(R.id.list);
         if (lv == null) return;
         final ArrayList<EventItem> data = new ArrayList<>();
         final EventAdapter adapter = new EventAdapter(data);
         lv.setAdapter(adapter);
 
-        db.collection("events")
-                .orderBy("startAt", Query.Direction.ASCENDING)
-                .get()
+        query.orderBy("startAt", Query.Direction.ASCENDING).get()
                 .addOnSuccessListener(snap -> {
                     data.clear();
                     for (QueryDocumentSnapshot d : snap) {
@@ -394,8 +237,8 @@ public class MainActivity extends AppCompatActivity {
                         e.location = d.getString("location");
                         e.startAt = d.getTimestamp("startAt");
                         e.endAt = d.getTimestamp("endAt");
-                        e.maxAttendees = asInt(d.get("maxAttendees"));
-                        e.attendeesCount = asInt(d.get("attendeesCount"));
+                        e.maxAttendees = Integer.parseInt(String.valueOf(d.get("maxAttendees")));
+                        e.attendeesCount = Integer.parseInt(String.valueOf(d.get("attendeesCount")));
                         data.add(e);
                     }
                     adapter.notifyDataSetChanged();
@@ -409,20 +252,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Parses an arbitrary object into an {@code int}, returning 0 on null or parse failure.
-     *
-     * @param o value to parse
-     * @return parsed int or 0 if not parsable
-     */
-    private int asInt(Object o) {
-        if (o == null) return 0;
-        if (o instanceof Number) return ((Number) o).intValue();
-        try {
-            return Integer.parseInt(String.valueOf(o));
-        } catch (Exception e) {
-            return 0;
+    private void createFilterQuery(HashSet<String> tags, ZonedDateTime start, ZonedDateTime end) {
+        Query query = db.collection("events");
+        ArrayList<String> tagsList = new ArrayList<>(tags);
+        if (!tags.isEmpty()) {
+            query = query.whereArrayContainsAny("tags", tagsList);
         }
+        if (start != null) {
+            query = query.whereGreaterThanOrEqualTo("startAt", new Timestamp(Date.from(start.toInstant())));
+        }
+        if (end != null) {
+            query = query.whereLessThanOrEqualTo("endAt", new Timestamp(Date.from(end.toInstant())));
+        }
+        loadEventsIntoList(query);
     }
 
     /**

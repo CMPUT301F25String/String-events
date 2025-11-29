@@ -2,9 +2,9 @@ package com.example.string_events;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +14,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.os.Build;
 
 /**
  * Screen that lists notifications for the signed-in user.
@@ -25,10 +31,27 @@ public class NotificationScreen extends AppCompatActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    private final ArrayList<Notification> notificationsList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_screen);
+
+        // Android 13+ 需要动态申请 POST_NOTIFICATIONS 权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        1001
+                );
+            }
+        }
 
         ImageButton homeImageButton = findViewById(R.id.btnHome);
         ImageButton cameraImageButton = findViewById(R.id.btnCamera);
@@ -54,7 +77,31 @@ public class NotificationScreen extends AppCompatActivity {
             startActivity(intent);
         });
 
-        ArrayList<Notification> notificationsList = new ArrayList<>();
+        notificationImageButton.setOnClickListener(view -> {
+            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
+            boolean newValue = !currentlyEnabled;
+
+            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
+
+            if (newValue) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
+
+                    ActivityCompat.requestPermissions(
+                            NotificationScreen.this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            1001
+                    );
+                }
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications enabled in app.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications disabled in app.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         db.collection("notifications")
                 .whereEqualTo("username", username)
