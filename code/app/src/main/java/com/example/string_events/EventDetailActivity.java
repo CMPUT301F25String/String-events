@@ -56,7 +56,7 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_detail_screen);
+        setContentView(R.layout.event_detail_screen); // Updated to match your latest XML file name
 
         Intent it = getIntent();
         eventId = it.getStringExtra("event_id");
@@ -70,10 +70,13 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageButton applyButton = findViewById(R.id.apply_button);
         back.setOnClickListener(v -> finish());
 
+        // CSV Export functionality commented out as requested
+        /*
         Button exportCsvButton = findViewById(R.id.btn_export_csv);
         if (exportCsvButton != null) {
             exportCsvButton.setOnClickListener(v -> exportEntrantsToCsv());
         }
+        */
 
         // change the visual elements of the event details to match the event details of the clicked event
         eventDocumentRef.get()
@@ -91,7 +94,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 Toast.makeText(EventDetailActivity.this, "Added to waitlist!", Toast.LENGTH_SHORT).show();
                 userInEventWaitlist.set(true);
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
-            } 
+            }
             // user has applied for the event and is not an attendee yet (not been accepted yet)
             else if (userInEventWaitlist.get() && !userInEventAttendees.get()) {
                 eventDocumentRef.update("waitlist", FieldValue.arrayRemove(username));
@@ -136,18 +139,17 @@ public class EventDetailActivity extends AppCompatActivity {
         csvEntrants.clear();
         if (attendeesList != null) csvEntrants.addAll(attendeesList);
 
-        DateFormat dFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        DateFormat tFmt = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+        // Updated Date/Time Logic: Show full Start and End Date/Time in the two TextViews
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault());
+        String startString = startAt != null ? df.format(startAt.toDate()) : "N/A";
+        String endString = endAt != null ? df.format(endAt.toDate()) : "N/A";
 
-        String dateLine = startAt == null ? "" : dFmt.format(startAt.toDate());
-        String timeLine = (startAt == null ? "" : tFmt.format(startAt.toDate()))
-                + " - " +
-                (endAt == null ? "" : tFmt.format(endAt.toDate()));
+        // Assigning Start Date+Time to tvDateLine and End Date+Time to tvTimeLine
+        setText(getId("tvDateLine"), "Start: " + startString);
+        setText(getId("tvTimeLine"), "End:   " + endString);
 
         setText(getId("tvEventTitle"), title);
         setText(getId("tvAddress"), location);
-        setText(getId("tvDateLine"), dateLine);
-        setText(getId("tvTimeLine"), timeLine);
         setText(getId("tvDescription"), description);
 
         TextView org = findViewById(R.id.tvOrganizer);
@@ -270,6 +272,7 @@ public class EventDetailActivity extends AppCompatActivity {
     /**
      * Exports current attendees (csvEntrants) to a CSV file in the public Downloads folder.
      */
+    /*
     private void exportEntrantsToCsv() {
         if (csvEntrants.isEmpty()) {
             Toast.makeText(this, "No entrants to export.", Toast.LENGTH_SHORT).show();
@@ -311,4 +314,5 @@ public class EventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
     }
+    */
 }

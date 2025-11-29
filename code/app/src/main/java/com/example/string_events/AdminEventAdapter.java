@@ -18,7 +18,7 @@ import com.google.firebase.Timestamp;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat; // Import added
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -48,12 +48,15 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
         holder.tvLocation.setText(e.location != null ? e.location : "(No Location)");
         holder.tvOrganizer.setText("Organizer: " + (e.creator != null ? e.creator : "Unknown"));
 
+        // --- UPDATED DATE FORMATTING ---
         if (e.startAt != null) {
-            DateFormat df = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-            holder.tvTime.setText(df.format(e.startAt.toDate()));
+            // Format example: "Nov 28, 2025 at 4:30 PM"
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
+            holder.tvTime.setText(sdf.format(e.startAt.toDate()));
         } else {
-            holder.tvTime.setText("--:--");
+            holder.tvTime.setText("Date TBD");
         }
+        // -------------------------------
 
         if (e.imageUrl != null && !e.imageUrl.isEmpty()) {
             new Thread(() -> {

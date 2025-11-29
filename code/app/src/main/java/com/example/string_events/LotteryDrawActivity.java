@@ -84,10 +84,21 @@ public class LotteryDrawActivity extends AppCompatActivity {
             // get the event details from the database and update the screen's views with them
             tvEventName.setText(d.getString("title"));
             tvLocation.setText(d.getString("location"));
-            DateFormat dfTime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+
+            // Updated Time Logic to show Start Date/Time - End Date/Time
             Timestamp startAt = d.getTimestamp("startAt");
-            assert startAt != null;
-            tvTime.setText(dfTime.format(startAt.toDate()));
+            Timestamp endAt = d.getTimestamp("endAt");
+
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault());
+            String startStr = startAt != null ? df.format(startAt.toDate()) : "";
+            String endStr = endAt != null ? df.format(endAt.toDate()) : "";
+
+            if (!startStr.isEmpty() && !endStr.isEmpty()) {
+                tvTime.setText(String.format("%s - %s", startStr, endStr));
+            } else if (!startStr.isEmpty()) {
+                tvTime.setText(startStr);
+            }
+
             int invitedListSize = ((ArrayList<String>)Objects.requireNonNull(d.get("invited"))).size();
             tvSelectedCount.setText(String.format(Locale.CANADA, "%d participant(s) have been selected!", invitedListSize));
             lotteryRolled = Boolean.TRUE.equals(d.getBoolean("lotteryRolled"));
@@ -128,10 +139,10 @@ public class LotteryDrawActivity extends AppCompatActivity {
     /**
      * Executes the lottery:
      * <ol>
-     *   <li>Determines available slots from {@code maxAttendees - attendeesCount}.</li>
-     *   <li>Fetches the waitlist subcollection and randomly shuffles it.</li>
-     *   <li>Selects winners up to available slots, moves them to participants, and removes them from waitlist in a batch.</li>
-     *   <li>Updates event counters and timestamps, then switches UI to the "after roll" state.</li>
+     * <li>Determines available slots from {@code maxAttendees - attendeesCount}.</li>
+     * <li>Fetches the waitlist subcollection and randomly shuffles it.</li>
+     * <li>Selects winners up to available slots, moves them to participants, and removes them from waitlist in a batch.</li>
+     * <li>Updates event counters and timestamps, then switches UI to the "after roll" state.</li>
      * </ol>
      */
 

@@ -325,7 +325,7 @@
             android:padding="8dp"
             android:src="@drawable/calendar"
             android:contentDescription="Home"
-            app:tint="#101114"/>
+/>
 
         <ImageButton
             android:id="@+id/btnCamera"
@@ -337,7 +337,7 @@
             android:padding="8dp"
             android:src="@drawable/camera"
             android:contentDescription="Camera"
-            app:tint="#101114"/>
+/>
 
         <ImageButton
             android:id="@+id/btnNotification"
@@ -349,7 +349,7 @@
             android:padding="8dp"
             android:src="@drawable/notification"
             android:contentDescription="Notifications"
-            app:tint="#101114"/>
+/>
 
         <ImageButton
             android:id="@+id/btnProfile"
@@ -359,9 +359,9 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter"
             android:padding="8dp"
-            android:src="@drawable/profile_clicked"
+            android:src="@drawable/profileorange"
             android:contentDescription="Profile"
-            app:tint="#FFD165"/> <!-- Active state tint -->
+/> <!-- Active state tint -->
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

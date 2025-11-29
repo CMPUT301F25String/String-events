@@ -3,6 +3,7 @@ package com.example.string_events;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.Holder> {
 
     private final ArrayList<OrganizerEvent> items;
-    private final DateFormat timeFmt =
-            DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+    // UPDATED: Format for Full Date and Time (e.g., Nov 28, 2025 at 5:00 PM)
+    private final SimpleDateFormat dateTimeFmt = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
 
     OrganizerEventAdapter(ArrayList<OrganizerEvent> items) {
         this.items = items;
@@ -49,8 +50,9 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             h.tvPlace.setText(e.location == null ? "" : e.location);
         }
 
+        // UPDATED: Display Full Start Date and Time
         if (h.tvTime != null) {
-            String t = (e.startAt == null) ? "" : timeFmt.format(e.startAt.toDate());
+            String t = (e.startAt == null) ? "Date TBD" : dateTimeFmt.format(e.startAt.toDate());
             h.tvTime.setText(t);
         }
 
@@ -62,10 +64,32 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
             );
         }
 
+        // UPDATED: Status Logic (Scheduled / In Progress / Finished)
+        // We reuse tvSpots (which maps to R.id.chipStatus) for the status label
         if (h.tvSpots != null) {
-            int count = Math.max(0, e.attendeesCount);
-            int left = Math.max(0, e.maxAttendees - count);
-            h.tvSpots.setText(left + " Spots Left");
+            long now = System.currentTimeMillis();
+            long start = e.startAt != null ? e.startAt.toDate().getTime() : Long.MAX_VALUE;
+            long end = e.endAt != null ? e.endAt.toDate().getTime() : Long.MAX_VALUE;
+
+            String statusText;
+            int color;
+
+            if (now < start) {
+                statusText = "Scheduled";
+                color = 0xFF43C06B; // Green
+            } else if (now > end) {
+                statusText = "Finished";
+                color = 0xFFE45A5A; // Red
+            } else {
+                statusText = "In Progress";
+                color = 0xFFF1A428; // Orange
+            }
+
+            h.tvSpots.setText(statusText);
+            // Set background color for the chip look
+            h.tvSpots.setBackgroundColor(color);
+            // Ensure text is white for contrast if needed, or keep default
+            h.tvSpots.setTextColor(Color.WHITE);
         }
 
         if (e.imageUrl != null && !e.imageUrl.isEmpty()) {

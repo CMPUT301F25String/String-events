@@ -39,7 +39,7 @@ public class OrganizerEventDetailScreen extends AppCompatActivity {
     private TextView tvTime;
     private TextView tvLocation;
     private ImageView imgBanner;
-    private final SimpleDateFormat dateTimeFmt =
+    private final SimpleDateFormat dateTimeFmt = //this
             new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
     /**
