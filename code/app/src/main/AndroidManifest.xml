@@ -63,11 +63,16 @@
             android:exported="false" />
         <activity
             android:name=".OrganizerEventDetailScreen"
-            android:exported="false"></activity>
+            android:exported="false">
+        </activity>
+
         <activity android:name=".EventMessageActivity" />
         <activity
             android:name=".OrganizerEventOverviewScreen"
-            android:exported="false"></activity>
+            android:exported="false">
+        </activity>
+
+
         <activity
             android:name=".CanceledUsersActivity"
             android:exported="false" />
@@ -116,18 +121,22 @@
         <activity
             android:name=".EventQrEntryActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".WaitlistUsersActivity"
+            android:exported="false">
+
+        </activity>
+
         <activity
             android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".WaitlistUsersActivity"
-            android:exported="false" />
+
         <activity
             android:name=".EventFilterActivity"
             android:exported="false"/>

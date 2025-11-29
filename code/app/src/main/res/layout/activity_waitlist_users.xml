@@ -11,6 +11,14 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_precise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Use precise location"
+            android:checked="false"
+            android:layout_marginTop="8dp"/>
+
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -58,5 +66,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="View on Map"/>
+
 
 </LinearLayout>
