@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,12 +77,25 @@ public class EventFilterActivity extends AppCompatActivity {
         etStart = findViewById(R.id.et_start_time);
         etEnd   = findViewById(R.id.et_end_time);
 
-        Button btnClear = findViewById(R.id.btn_clear);
-        Button btnApply = findViewById(R.id.btn_apply);
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        MaterialButton btnClear = findViewById(R.id.btn_clear);
+        MaterialButton btnApply = findViewById(R.id.btn_apply);
+        CardView timeFilterCard = findViewById(R.id.time_filter_card);
 
-        String[] incoming = getIntent().getStringArrayExtra(EXTRA_TAGS);
+        Intent intent = getIntent();
+        String[] incoming = intent.getStringArrayExtra(EXTRA_TAGS);
         if (incoming != null) java.util.Collections.addAll(selected, incoming);
         syncChipUI();
+        String action = intent.getStringExtra("action");
+
+        // if we're selecting filters, we should be able to select time filters
+        if (Objects.equals(action, "filter")) {
+            timeFilterCard.setVisibility(CardView.VISIBLE);
+
+        } else {
+            // otherwise, we can only select tags
+            timeFilterCard.setVisibility(CardView.GONE);
+        }
 
         chipBadminton.setOnClickListener(v -> toggle("Badminton", chipBadminton));
         chipGames.setOnClickListener(v     -> toggle("Games",     chipGames));
@@ -88,6 +104,8 @@ public class EventFilterActivity extends AppCompatActivity {
 
         etStart.setOnClickListener(v -> showDateTimePicker(etStart));
         etEnd.setOnClickListener(v   -> showDateTimePicker(etEnd));
+
+        btnBack.setOnClickListener(v -> finish());
 
         btnClear.setOnClickListener(v -> {
             Intent out = new Intent();

@@ -93,11 +93,11 @@ public class NotificationHelper {
         String text;
 
         if (notification.getSelectedStatus()) {
-            title = "Congratulations, you were selected!";
-            text = "You were selected for " + notification.getEventName();
+            title = "Lottery Won";
+            text = "Congratulations, you were selected for " + notification.getEventName() + "!";
         } else {
-            title = "Unfortunately, you weren't selected";
-            text = "You weren't selected for " + notification.getEventName();
+            title = "Lottery Lost";
+            text = "You weren't selected for " + notification.getEventName() + ".";
         }
 
         Intent intent = new Intent(context, EventDetailActivity.class);

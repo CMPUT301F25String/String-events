@@ -9,7 +9,7 @@ public class EventTimeFieldsTest {
 
     private static Event newEvent() {
         ZonedDateTime now = ZonedDateTime.now();
-        return new Event(
+        return new Event(null,
                 "creator","T",null,"d", new ArrayList<>(),
                 now.plusDays(1), now.plusDays(2),
                 "Loc",

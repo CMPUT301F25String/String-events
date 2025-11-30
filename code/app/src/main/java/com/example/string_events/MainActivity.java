@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         btnOpenFilter.setOnClickListener(v -> {
             Intent it = new Intent(this, EventFilterActivity.class);
             it.putExtra(EventFilterActivity.EXTRA_TAGS, selectedTags.toArray(new String[0]));
+            it.putExtra("action", "filter");
             filterLauncher.launch(it);
         });
 
@@ -185,10 +186,10 @@ public class MainActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot d : snap) {
 
                         // 1. FILTER: Check if event is private
-                        Boolean isPrivate = d.getBoolean("private");
-                        // If 'private' is true, skip this event.
-                        // Boolean.TRUE.equals handles null safely (treats null as false/public)
-                        if (Boolean.TRUE.equals(isPrivate)) {
+                        Boolean visibility = d.getBoolean("visibility");
+                        // If 'visibility' is false, skip this event.
+                        // Boolean.FALSE.equals handles null safely (treats null as false/public)
+                        if (Boolean.FALSE.equals(visibility)) {
                             continue;
                         }
 
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         Query query = db.collection("events");
         ArrayList<String> tagsList = new ArrayList<>(tags);
         if (!tags.isEmpty()) {
-            query = query.whereArrayContainsAny("tags", tagsList);
+            query = query.whereArrayContainsAny("categories", tagsList);
         }
         if (start != null) {
             query = query.whereGreaterThanOrEqualTo("startAt", new Timestamp(Date.from(start.toInstant())));

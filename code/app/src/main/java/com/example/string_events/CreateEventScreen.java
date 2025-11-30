@@ -9,10 +9,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,10 +35,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -56,6 +62,31 @@ import com.google.firebase.storage.UploadTask;
 public class CreateEventScreen extends AppCompatActivity {
     /** Firestore entry point used to persist event data. */
     private FirebaseFirestore db;
+    private final HashSet<String> selectedTags = new HashSet<>();
+
+    ImageButton backButton;
+    EditText eventTitleEditText;
+    ImageButton addEventPhotoButton;
+    ImageView eventPhotoImageView;
+    EditText eventDescriptionEditText;
+    ImageButton addEventTagsButton;
+    TextView tagsDisplayText;
+    EditText eventStartDateEditText;
+    EditText eventStartTimeEditText;
+    EditText eventEndDateEditText;
+    EditText eventEndTimeEditText;
+    EditText eventLocationEditText;
+    EditText registrationStartDateEditText;
+    EditText registrationStartTimeEditText;
+    EditText registrationEndDateEditText;
+    EditText registrationEndTimeEditText;
+
+    EditText eventAttendantsEditText;
+    EditText eventWaitlistEdittext;
+    SwitchCompat eventGeolocationSwitch;
+    SwitchCompat eventAutoRollingSwitch;
+    ImageButton eventVisibilityPublic;
+    ImageButton eventVisibilityPrivate;
 
     /**
      * Initializes view bindings, date/time pickers, image picker, visibility toggles,
@@ -69,28 +100,35 @@ public class CreateEventScreen extends AppCompatActivity {
         setContentView(R.layout.create_event_screen);
         db = FirebaseFirestore.getInstance();
 
-        ImageButton backButton = findViewById(R.id.back_button);
-        EditText eventTitleEditText = findViewById(R.id.event_title_editText);
-        ImageButton addEventPhotoButton = findViewById(R.id.add_photo_button);
-        ImageView eventPhotoImageView = findViewById(R.id.event_photo);
-        EditText eventDescriptionEditText = findViewById(R.id.event_description_editText);
-        ImageButton addEventTagsButton = findViewById(R.id.add_tags_button);
-        EditText eventStartDateEditText = findViewById(R.id.event_start_date_editText);
-        EditText eventStartTimeEditText = findViewById(R.id.event_start_time_editText);
-        EditText eventEndDateEditText = findViewById(R.id.event_end_date_editText);
-        EditText eventEndTimeEditText = findViewById(R.id.event_end_time_editText);
-        EditText eventLocationEditText = findViewById(R.id.event_location_editText);
-        EditText registrationStartDateEditText = findViewById(R.id.registration_start_date_editText);
-        EditText registrationStartTimeEditText = findViewById(R.id.registration_start_time_editText);
-        EditText registrationEndDateEditText = findViewById(R.id.registration_end_date_editText);
-        EditText registrationEndTimeEditText = findViewById(R.id.registration_end_time_editText);
+        String eventId = getIntent().getStringExtra("eventId");
+        if (eventId != null && !eventId.isEmpty()) {
+            // if an eventId is passed in, we should use the id to populate the screen
+            populateEventDetails(eventId);
+        }
 
-        EditText eventAttendantsEditText = findViewById(R.id.event_attendants_editText);
-        EditText eventWaitlistEdittext = findViewById(R.id.event_waitlist_editText);
-        SwitchCompat eventGeolocationSwitch = findViewById(R.id.geolocation_switch);
-        SwitchCompat eventAutoRollingSwitch = findViewById(R.id.auto_rolling_switch);
-        ImageButton eventVisibilityPublic = findViewById(R.id.event_public_button);
-        ImageButton eventVisibilityPrivate = findViewById(R.id.event_private_button);
+        backButton = findViewById(R.id.back_button);
+        eventTitleEditText = findViewById(R.id.event_title_editText);
+        addEventPhotoButton = findViewById(R.id.add_photo_button);
+        eventPhotoImageView = findViewById(R.id.event_photo);
+        eventDescriptionEditText = findViewById(R.id.event_description_editText);
+        addEventTagsButton = findViewById(R.id.add_tags_button);
+        tagsDisplayText = findViewById(R.id.display_tags_text);
+        eventStartDateEditText = findViewById(R.id.event_start_date_editText);
+        eventStartTimeEditText = findViewById(R.id.event_start_time_editText);
+        eventEndDateEditText = findViewById(R.id.event_end_date_editText);
+        eventEndTimeEditText = findViewById(R.id.event_end_time_editText);
+        eventLocationEditText = findViewById(R.id.event_location_editText);
+        registrationStartDateEditText = findViewById(R.id.registration_start_date_editText);
+        registrationStartTimeEditText = findViewById(R.id.registration_start_time_editText);
+        registrationEndDateEditText = findViewById(R.id.registration_end_date_editText);
+        registrationEndTimeEditText = findViewById(R.id.registration_end_time_editText);
+
+        eventAttendantsEditText = findViewById(R.id.event_attendants_editText);
+        eventWaitlistEdittext = findViewById(R.id.event_waitlist_editText);
+        eventGeolocationSwitch = findViewById(R.id.geolocation_switch);
+        eventAutoRollingSwitch = findViewById(R.id.auto_rolling_switch);
+        eventVisibilityPublic = findViewById(R.id.event_public_button);
+        eventVisibilityPrivate = findViewById(R.id.event_private_button);
         // needs to be atomic boolean to avoid an error
         AtomicBoolean visibility = new AtomicBoolean(false);
 
@@ -151,6 +189,36 @@ public class CreateEventScreen extends AppCompatActivity {
             imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"));
         });
 
+        // create an ActivityResultLauncher for selecting event tags
+        ActivityResultLauncher<Intent> tagsLauncher =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        selectedTags.clear();
+                        String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
+                        assert arr != null;
+                        java.util.Collections.addAll(selectedTags, arr);
+
+                        // build the display string and add the tags to it
+                        StringBuilder displayText = new StringBuilder();
+                        if (!selectedTags.isEmpty()) {
+                            displayText.append(android.text.TextUtils.join(", ", selectedTags));
+                            tagsDisplayText.setText(displayText.toString());
+                            tagsDisplayText.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            tagsDisplayText.setVisibility(View.GONE);
+                        }
+                    }
+                });
+
+        addEventTagsButton.setOnClickListener(view -> {
+            Intent it = new Intent(this, EventFilterActivity.class);
+            it.putExtra(EventFilterActivity.EXTRA_TAGS, selectedTags.toArray(new String[0]));
+            it.putExtra("action", "tags");
+            tagsLauncher.launch(it);
+        });
+
         eventVisibilityPublic.setOnClickListener(view -> {
             eventVisibilityPublic.setBackgroundResource(R.drawable.public_button_clicked);
             eventVisibilityPrivate.setBackgroundResource(R.drawable.private_button);
@@ -163,11 +231,19 @@ public class CreateEventScreen extends AppCompatActivity {
         });
 
         doneButton.setOnClickListener(view -> {
-            String title = String.valueOf(eventTitleEditText.getText());
-            Uri photo = (Uri)eventPhotoImageView.getTag();
+            // validate user inputs first before continuing
+            if (!validateInputs()) {
+                return;
+            }
 
+            String title = String.valueOf(eventTitleEditText.getText());
+            Uri photo;
+            if (eventPhotoImageView.getTag() instanceof Uri) {
+                photo = (Uri) eventPhotoImageView.getTag();
+            } else {
+                photo = Uri.parse((String) eventPhotoImageView.getTag());
+            }
             String description = String.valueOf(eventDescriptionEditText.getText());
-            ArrayList<String> tags = null; // TODO
 
             // converts the text in the editText into a LocalDateTime and then into a ZonedDateTime (has timezone)
             ZonedDateTime startDateTime = LocalDate.parse(
@@ -197,7 +273,8 @@ public class CreateEventScreen extends AppCompatActivity {
             boolean geolocationRequirement = eventGeolocationSwitch.isChecked();
             boolean autoRoll = eventAutoRollingSwitch.isChecked();
 
-            Event newEvent = new Event(username, title, photo, description, tags,
+            ArrayList<String> tags = new ArrayList<>(selectedTags);
+            Event newEvent = new Event(eventId, username, title, photo, description, tags,
                     startDateTime, endDateTime, location,
                     registrationStartDateTime, registrationEndDateTime,
                     maxAttendees, waitlistLimit, geolocationRequirement, visibility.get());
@@ -268,23 +345,44 @@ public class CreateEventScreen extends AppCompatActivity {
      * @param event event to be uploaded and saved
      */
     private void uploadNewEventToDatabase(Event event) {
-        Toast.makeText(CreateEventScreen.this, "Please wait...", Toast.LENGTH_SHORT).show();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
-        StorageReference imageRef = storageRef.child("event_images/" + UUID.randomUUID().toString() + ".png");
+        Object photoData = eventPhotoImageView.getTag(); // this can be a Uri (new image) or a String (existing URL)
 
-        // start file upload
-        imageRef.putFile(event.getPhotoUri()).addOnSuccessListener(taskSnapshot -> {
-                    // wait for the image to upload first before getting the download url
-                    imageRef.getDownloadUrl().addOnSuccessListener(photoUri -> {
-                        // get the download url of the photo
-                        String downloadUrl = photoUri.toString();
-                        Log.d("UploadImage", "image uploaded successfully url: " + downloadUrl);
+        if (photoData instanceof Uri) {
+            // new image was selected so we must upload it
+            Toast.makeText(CreateEventScreen.this, "Please wait...", Toast.LENGTH_SHORT).show();
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            StorageReference imageRef = storageRef.child("event_images/" + event.getEventId() + ".png");
 
-                        // call helper function to fill in the event details and upload event to database
-                        saveEventDetailsToDatabase(event, downloadUrl);
-                    }).addOnFailureListener(e -> Log.e("UploadImage", "couldn't get image download url: " + e.getMessage()));
-                }).addOnFailureListener(e -> Log.e("UploadImage", "couldn't upload image: " + e.getMessage()));
+            imageRef.putFile(event.getPhotoUri())
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Image uploaded successfully, now get its public download URL
+                        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String downloadUrl = uri.toString();
+                            Log.d("Upload", "New image uploaded successfully. URL: " + downloadUrl);
+                            // Now, save the event details WITH THE NEW image URL.
+                            saveEventDetailsToDatabase(event, downloadUrl);
+                        }).addOnFailureListener(e -> {
+                            Log.e("Upload", "Failed to get download URL: " + e.getMessage());
+                            Toast.makeText(this, "Error getting image URL", Toast.LENGTH_SHORT).show();
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Upload", "Image upload failed: " + e.getMessage());
+                        Toast.makeText(this, "Error uploading image", Toast.LENGTH_SHORT).show();
+                    });
+
+        } else if (photoData instanceof String) {
+            // image was not changed so the photoData is just the existing URL string
+            String existingImageUrl = (String) photoData;
+            Log.d("Upload", "Image not changed. Reusing existing URL: " + existingImageUrl);
+            // skip the upload and save the event details directly, passing the existing URL
+            saveEventDetailsToDatabase(event, existingImageUrl);
+
+        } else {
+            Log.w("Upload", "No valid image provided. Saving event without an image.");
+            saveEventDetailsToDatabase(event, null);
+        }
     }
 
     /**
@@ -305,7 +403,7 @@ public class CreateEventScreen extends AppCompatActivity {
             doc.put("imageUrl", imageUrl);
         }
         doc.put("description", event.getDescription());
-        doc.put("categories", "TODO");
+        doc.put("categories", event.getTags());
         // need to convert the ZonedDateTime type into a Date type so it can be stored properly as a timestamp
         doc.put("startAt", Date.from(event.getStartDateTime().toInstant()));
         doc.put("endAt", Date.from(event.getEndDateTime().toInstant()));
@@ -325,11 +423,10 @@ public class CreateEventScreen extends AppCompatActivity {
         // creating new event in database under collection "events"
         db.collection("events").document(event.getEventId()).set(doc)
                 .addOnSuccessListener(v -> {
-                    Toast.makeText(CreateEventScreen.this, "Event Created!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateEventScreen.this, "Event Uploaded!", Toast.LENGTH_SHORT).show();
                     Log.d("Firestore", "event uploaded to database");
                     // testing function that replaces the image button on the screen with the database uploaded image
                     // this is just to test that we can get the image back from the database and use it in the app
-                    testingImageGet(event);
                     generateAndUploadQrCode(event);
                     Intent intent = new Intent(CreateEventScreen.this, OrganizerEventDetailScreen.class);
                     intent.putExtra("eventId", event.getEventId());
@@ -342,30 +439,141 @@ public class CreateEventScreen extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Debug helper that fetches the event document and, if an image URL exists,
-     * loads it into the "add photo" button using Glide to confirm retrieval works.
-     *
-     * @param event the event whose document is retrieved
-     */
-    public void testingImageGet(Event event) {
-        // get the specified event from the database
-        DocumentReference documentReference = db.collection("events").document(event.getEventId());
-        documentReference.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                // getting the imageUrl from the specified event's field
-                String imageUrl = documentSnapshot.getString("imageUrl");
-                if (imageUrl != null) {
-                    // load the image from the imageUrl into an ImageButton (can also be an ImageView)
-                    ImageButton addPhotoButton = findViewById(R.id.add_photo_button);
-                    Glide.with(CreateEventScreen.this)
-                            .load(imageUrl)
-                            .into(addPhotoButton);
-                }
-            } else {
-                Log.d("Firestore", "document doesn't exist");
-            }
+    private void populateEventDetails(String eventId) {
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // populate text and number fields
+                        eventTitleEditText.setText(documentSnapshot.getString("title"));
+                        eventDescriptionEditText.setText(documentSnapshot.getString("description"));
+                        eventLocationEditText.setText(documentSnapshot.getString("location"));
+                        eventAttendantsEditText.setText(String.valueOf(documentSnapshot.getLong("maxAttendees")));
+                        eventWaitlistEdittext.setText(String.valueOf(documentSnapshot.getLong("waitlistLimit")));
+
+                        // populate image
+                        String imageUrl = documentSnapshot.getString("imageUrl");
+                        if (imageUrl != null) {
+                            // use Glide to load the image from the URL
+                            Glide.with(this).load(imageUrl).into(eventPhotoImageView);
+                            // store the original URL in the tag
+                            eventPhotoImageView.setTag(imageUrl);
+                        }
+
+                        // populate tags
+                        @SuppressWarnings("unchecked")
+                        ArrayList<String> tags = (ArrayList<String>) documentSnapshot.get("categories");
+                        if (tags != null) {
+                            selectedTags.clear();
+                            selectedTags.addAll(tags);
+                            tagsDisplayText.setText(TextUtils.join(", ", selectedTags));
+                            tagsDisplayText.setVisibility(View.VISIBLE);
+                        }
+
+                        // populate dates and times
+                        Timestamp startTimestamp = documentSnapshot.getTimestamp("startAt");
+                        if (startTimestamp != null) {
+                            ZonedDateTime startDateTime = startTimestamp.toDate().toInstant().atZone(ZoneId.systemDefault());
+                            eventStartDateEditText.setText(startDateTime.toLocalDate().toString());
+                            eventStartTimeEditText.setText(startDateTime.toLocalTime().toString());
+                        }
+                        Timestamp endTimestamp = documentSnapshot.getTimestamp("endAt");
+                        if (endTimestamp != null) {
+                            ZonedDateTime endDateTime = endTimestamp.toDate().toInstant().atZone(ZoneId.systemDefault());
+                            eventEndDateEditText.setText(endDateTime.toLocalDate().toString());
+                            eventEndTimeEditText.setText(endDateTime.toLocalTime().toString());
+                        }
+                        Timestamp regStartTimestamp = documentSnapshot.getTimestamp("regStartAt");
+                        if (regStartTimestamp != null) {
+                            ZonedDateTime regStartDateTime = regStartTimestamp.toDate().toInstant().atZone(ZoneId.systemDefault());
+                            registrationStartDateEditText.setText(regStartDateTime.toLocalDate().toString());
+                            registrationStartTimeEditText.setText(regStartDateTime.toLocalTime().toString());
+                        }
+                        Timestamp regEndTimestamp = documentSnapshot.getTimestamp("regEndAt");
+                        if (regEndTimestamp != null) {
+                            ZonedDateTime regEndDateTime = regEndTimestamp.toDate().toInstant().atZone(ZoneId.systemDefault());
+                            registrationEndDateEditText.setText(regEndDateTime.toLocalDate().toString());
+                            registrationEndTimeEditText.setText(regEndDateTime.toLocalTime().toString());
+                        }
+
+                        // populate switches
+                        Boolean geoReq = documentSnapshot.getBoolean("geolocationReq");
+                        eventGeolocationSwitch.setChecked(geoReq != null && geoReq);
+//                        Boolean autoRoll = documentSnapshot.getBoolean("autoRoll");
+//                        eventAutoRollingSwitch.setChecked(autoRoll != null && autoRoll);
+
+                        // populate visibility
+                        Boolean isPublic = documentSnapshot.getBoolean("visibility");
+                        if (isPublic != null && isPublic) {
+                            eventVisibilityPublic.performClick();
+                        } else {
+                            eventVisibilityPrivate.performClick();
+                        }
+
+                    } else {
+                        Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private boolean validateInputs() {
+        // check for empty text fields
+        if (isEditTextEmpty(eventTitleEditText, "Title") ||
+                isEditTextEmpty(eventStartDateEditText, "Start date") ||
+                isEditTextEmpty(eventStartTimeEditText, "Start time") ||
+                isEditTextEmpty(eventEndDateEditText, "End date") ||
+                isEditTextEmpty(eventEndTimeEditText, "End time") ||
+                isEditTextEmpty(eventLocationEditText, "Location") ||
+                isEditTextEmpty(registrationStartDateEditText, "Registration start date") ||
+                isEditTextEmpty(registrationStartTimeEditText, "Registration start time") ||
+                isEditTextEmpty(registrationEndDateEditText, "Registration end date") ||
+                isEditTextEmpty(registrationEndTimeEditText, "Registration end time") ||
+                isEditTextEmpty(eventAttendantsEditText, "Max attendants") ||
+                isEditTextEmpty(eventWaitlistEdittext, "Waitlist limit")) {
+            return false; // Stop validation if any field is empty
+        }
+
+        // check if an image has been selected
+        if (eventPhotoImageView.getTag() == null) {
+            Toast.makeText(this, "Please select an event photo", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        // validate event start and end date times
+        ZonedDateTime startDateTime = LocalDate.parse(eventStartDateEditText.getText().toString())
+                .atTime(LocalTime.parse(eventStartTimeEditText.getText().toString()))
+                .atZone(ZoneId.systemDefault());
+        ZonedDateTime endDateTime = LocalDate.parse(eventEndDateEditText.getText().toString())
+                .atTime(LocalTime.parse(eventEndTimeEditText.getText().toString()))
+                .atZone(ZoneId.systemDefault());
+
+        // check if end datetime is after start datetime
+        if (endDateTime.isBefore(startDateTime)) {
+            eventEndDateEditText.setError("End date must be after start date");
+            eventEndTimeEditText.setError("End time must be after start time");
+            Toast.makeText(this, "Event cannot end before it starts", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        // validate max attendants
+        int maxAttendees = Integer.parseInt(eventAttendantsEditText.getText().toString());
+        if (maxAttendees <= 0) {
+            eventAttendantsEditText.setError("Max attendants must be greater than 0");
+            return false;
+        }
+
+        // if all checks pass
+        return true;
+    }
+
+    private boolean isEditTextEmpty(EditText editText, String fieldName) {
+        if (editText.getText().toString().trim().isEmpty()) {
+            editText.setError(fieldName + " cannot be empty");
+            return true;
+        }
+        return false;
     }
 
     private void generateAndUploadQrCode(Event event) {
@@ -405,5 +613,4 @@ public class CreateEventScreen extends AppCompatActivity {
         ).addOnFailureListener(e ->
                 Log.e("UploadQR", "Failed to upload QR image", e));
     }
-
 }

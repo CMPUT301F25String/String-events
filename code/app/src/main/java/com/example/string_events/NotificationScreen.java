@@ -77,29 +77,27 @@ public class NotificationScreen extends AppCompatActivity {
         });
 
         notificationImageButton.setOnClickListener(view -> {
-//            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
-//            boolean newValue = !currentlyEnabled;
-//
-//            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, newValue);
-//
-//            if (newValue) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-//                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
-//
-//                    ActivityCompat.requestPermissions(
-//                            NotificationScreen.this,
-//                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
-//                            1001
-//                    );
-//                }
-//                Toast.makeText(NotificationScreen.this,
-//                        "Push notifications enabled in app.",
-//                        Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(NotificationScreen.this,
-//                        "Push notifications disabled in app.",
-//                        Toast.LENGTH_SHORT).show();
-//            }
+            boolean currentlyEnabled = NotificationHelper.areNotificationsEnabled(NotificationScreen.this);
+            NotificationHelper.setNotificationsEnabled(NotificationScreen.this, !currentlyEnabled);
+
+            if (!currentlyEnabled) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        !NotificationHelper.hasPostNotificationPermission(NotificationScreen.this)) {
+
+                    ActivityCompat.requestPermissions(
+                            NotificationScreen.this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            1001
+                    );
+                }
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications enabled in app.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(NotificationScreen.this,
+                        "Push notifications disabled in app.",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
 
         db.collection("notifications")

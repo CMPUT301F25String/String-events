@@ -37,25 +37,6 @@ public class Event {
     ArrayList<User> waitlist;
     boolean lotteryRolled;
 
-    public boolean matchesTags(java.util.Set<String> selected) {
-        if (selected == null || selected.isEmpty()) return true;
-        if (tags == null || tags.isEmpty()) return false;
-        for (String t : tags) {
-            if (selected.contains(t)) return true;
-        }
-        return false;
-    }
-    public boolean within(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
-        if (start == null && end == null) return true;
-        if (start != null) {
-            if (startDateTime == null || startDateTime.isBefore(start)) return false;
-        }
-        if (end != null) {
-            if (endDateTime == null || endDateTime.isAfter(end)) return false;
-        }
-        return true;
-    }
-
     /**
      * Creates a fully specified event and initializes empty attendee/waitlist collections.
      * A random {@code eventId} is generated.
@@ -76,10 +57,17 @@ public class Event {
      * @param visibility             {@code true} if public, {@code false} if private
      */
 
-    public Event(String eventCreator, String title, Uri photo, String description, ArrayList<String> tags,
+    public Event(String eventId, String eventCreator, String title, Uri photo, String description, ArrayList<String> tags,
                  ZonedDateTime startDateTime, ZonedDateTime endDateTime, String location,
                  ZonedDateTime registrationStartDateTime, ZonedDateTime registrationEndDateTime,
                  int numOfAttendants, int waitlistLimit, boolean geolocationRequirement, boolean visibility) {
+        if (eventId == null || eventId.isEmpty()) {
+            // generates a unique random id for the new event
+            this.eventId = UUID.randomUUID().toString();
+        } else {
+            // if an id is provided, use the same one (editing events)
+            this.eventId = eventId;
+        }
         this.eventCreator = eventCreator;
         this.title = title;
         this.photo = photo;
@@ -95,8 +83,6 @@ public class Event {
         this.geolocationRequirement = geolocationRequirement;
         this.visibility = visibility;
 
-        // generates a unique random id for the new event
-        this.eventId = UUID.randomUUID().toString();
         this.attendees = new ArrayList<>(); // when creating a new event, an empty attendees list is created
         this.invited = new ArrayList<>(); // when creating a new event, an empty invited list is created
         this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created

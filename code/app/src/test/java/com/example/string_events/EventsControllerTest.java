@@ -80,7 +80,7 @@ public class EventsControllerTest {
     static final class TestFactory {
         static Event event(String title) {
             java.time.ZonedDateTime now = java.time.ZonedDateTime.now();
-            return new Event(
+            return new Event(null,
                     "creator", title, null, "desc", new ArrayList<>(),
                     now.plusDays(1), now.plusDays(1).plusHours(1), "Loc",
                     now.minusDays(1), now.plusDays(1),
