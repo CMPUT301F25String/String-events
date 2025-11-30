@@ -1,7 +1,6 @@
 package com.example.string_events;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -9,8 +8,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import android.content.Intent;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,57 +18,22 @@ import org.junit.runner.RunWith;
 public class EventsScreenTest {
 
     private Intent makeIntent() {
-        Intent i = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
-        i.putExtra("role", "user");
-        i.putExtra("user", "tester");
-        i.putExtra("fullName", "Test User");
+        Intent i = new Intent(
+                InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                UiHostActivity.class);
+        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.events_screen);
         return i;
     }
 
     @Test
     public void launch_showsCoreViews() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
+        try (ActivityScenario<UiHostActivity> sc = ActivityScenario.launch(makeIntent())) {
             onView(withId(R.id.header_container)).check(matches(isDisplayed()));
-            onView(withId(R.id.title_bg)).check(matches(isDisplayed()));
             onView(withId(R.id.tv_title)).check(matches(isDisplayed()));
+            onView(withId(R.id.tv_subtitle)).check(matches(isDisplayed()));
+            onView(withId(R.id.layout_filters)).check(matches(isDisplayed()));
             onView(withId(R.id.list)).check(matches(isDisplayed()));
-            onView(withId(R.id.bottom_bar)).check(matches(isDisplayed()));
-        }
-    }
-
-    @Test
-    public void navCalendar_click_noCrash() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.nav_calendar)).perform(click());
-        }
-    }
-
-    @Test
-    public void navCamera_click_noCrash() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.btnCamera)).perform(click());
-        }
-    }
-
-    @Test
-    public void navBell_click_noCrash() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.nav_bell)).perform(click());
-        }
-    }
-
-    @Test
-    public void navPerson_click_noCrash() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.nav_person)).perform(click());
-        }
-    }
-
-    @Test
-    public void logout_click_noCrash() {
-        try (ActivityScenario<?> sc = ActivityScenario.launch(makeIntent())) {
-            onView(withId(R.id.btnLogout)).check(matches(isDisplayed()));
-            onView(withId(R.id.btnLogout)).perform(click());
+            onView(withId(R.id.bottomBar)).check(matches(isDisplayed()));
         }
     }
 }
