@@ -158,6 +158,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".EventOverviewScreen"
+            android:exported="false" />
+
+        <activity
             android:name=".WaitlistUsersActivity"
             android:exported="false">
 
