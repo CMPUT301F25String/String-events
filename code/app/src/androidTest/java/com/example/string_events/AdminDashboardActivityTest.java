@@ -52,7 +52,7 @@ public class AdminDashboardActivityTest {
     public void showsCoreWidgets() {
         try (ActivityScenario<?> sc = launchDashboardOrHost()) {
             onView(withId(R.id.tvTitle)).check(matches(isDisplayed()));
-            onView(withId(R.id.grid)).check(matches(isDisplayed()));
+            onView(withId(R.id.tv_subtitle)).check(matches(isDisplayed()));
 
             onView(withId(R.id.btnEvents)).check(matches(isDisplayed()));
             onView(withId(R.id.btnProfiles)).check(matches(isDisplayed()));

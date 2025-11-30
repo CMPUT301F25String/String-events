@@ -29,8 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.List;
-
 
 @RunWith(AndroidJUnit4.class)
 public class AdminProfileManagementActivityTest {
@@ -83,17 +81,16 @@ public class AdminProfileManagementActivityTest {
                 RecyclerView rv = host.findViewById(R.id.recyclerView);
                 rv.setLayoutManager(new LinearLayoutManager(host));
 
-                List<AdminProfiles> data = new ArrayList<>();
+                ArrayList<AdminProfiles> data = new ArrayList<>();
                 data.add(new AdminProfiles("Alice Zhang", "alice@test.com", "p@ssw0rd", "doc-1"));
                 data.add(new AdminProfiles("Bob Lee",    "bob@test.com",   "secret",   "doc-2"));
 
-                AdminProfileAdapter adapter = new AdminProfileAdapter(data, p -> { /* no-op */ });
+                AdminProfileAdapter adapter = new AdminProfileAdapter(data, p -> { });
                 rv.setAdapter(adapter);
             });
 
             onView(withId(R.id.recyclerView)).perform(scrollToPosition(0));
 
-            // name
             onView(withId(R.id.recyclerView))
                     .check(matches(atPositionOnView(
                             0, R.id.profile_name,
@@ -103,7 +100,6 @@ public class AdminProfileManagementActivityTest {
                                     withText(equalToCompressingWhiteSpace("Alice Zhang"))
                             ))));
 
-            // email
             onView(withId(R.id.recyclerView))
                     .check(matches(atPositionOnView(
                             0, R.id.profile_email,
@@ -141,7 +137,7 @@ public class AdminProfileManagementActivityTest {
                 RecyclerView rv = host.findViewById(R.id.recyclerView);
                 rv.setLayoutManager(new LinearLayoutManager(host));
 
-                List<AdminProfiles> data = new ArrayList<>();
+                ArrayList<AdminProfiles> data = new ArrayList<>();
                 for (int idx = 0; idx < N; idx++) {
                     data.add(new AdminProfiles(
                             "User " + idx,
@@ -149,7 +145,7 @@ public class AdminProfileManagementActivityTest {
                             "pwd" + idx,
                             "doc-" + idx));
                 }
-                AdminProfileAdapter adapter = new AdminProfileAdapter(data, p -> { /* no-op */ });
+                AdminProfileAdapter adapter = new AdminProfileAdapter(data, p -> { });
                 rv.setAdapter(adapter);
             });
 
