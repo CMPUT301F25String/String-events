@@ -11,16 +11,22 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:label="@string/app_name"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar">
 
-        <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC8zp1xO0twwkt_oI_Bxk8JBoC50QEeyCU"/>
 
-
+        <service
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <activity
             android:name=".MainActivity"
@@ -42,7 +48,6 @@
             android:name=".AdminProfileActivity"
             android:exported="false" />
 
-
         <activity
             android:name=".AdminNotificationDetailActivity"
             android:exported="false" />
@@ -63,11 +68,9 @@
             android:name=".ProfileScreen"
             android:exported="false"/>
 
-
         <activity
             android:name=".NotificationMessageDetailActivity"
             android:exported="false"/>
-
 
         <activity
             android:name=".OrganizerEventScreen"
@@ -79,15 +82,13 @@
 
         <activity
             android:name=".OrganizerEventDetailScreen"
-            android:exported="false">
-        </activity>
+            android:exported="false"/>
 
         <activity android:name=".EventMessageActivity" />
 
         <activity
             android:name=".OrganizerEventOverviewScreen"
-            android:exported="false">
-        </activity>
+            android:exported="false"/>
 
         <activity
             android:name=".InvitedUsersActivity"
@@ -163,9 +164,7 @@
 
         <activity
             android:name=".WaitlistUsersActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false"/>
 
         <activity
             android:name=".WelcomeActivity"

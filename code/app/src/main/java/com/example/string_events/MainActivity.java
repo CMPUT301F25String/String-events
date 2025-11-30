@@ -3,6 +3,7 @@ package com.example.string_events;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.os.Build; // <--- ADD THIS IMPORT
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,25 +32,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Entry activity that routes users to different app sections depending on role.
- */
 public class MainActivity extends AppCompatActivity {
-    /** App sections this activity can display. */
     private enum Screen { ADMIN_HOME, USER_HOME, NOTIFICATIONS, PROFILE }
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private final HashSet<String> selectedTags = new HashSet<>();
     private ZonedDateTime filterStart = null, filterEnd = null;
-
     private TextView tvFilterHint;
 
     private final ActivityResultLauncher<Intent> filterLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Intent data = result.getData();
-
                     selectedTags.clear();
                     String[] arr = data.getStringArrayExtra(EventFilterActivity.EXTRA_TAGS);
                     if (arr != null) java.util.Collections.addAll(selectedTags, arr);
@@ -66,30 +61,22 @@ public class MainActivity extends AppCompatActivity {
                                 java.time.Instant.ofEpochMilli(me), java.time.ZoneId.systemDefault());
                     }
 
-                    // Check if any filters are active
                     boolean hasFilters = !selectedTags.isEmpty() || filterStart != null || filterEnd != null;
 
                     if (tvFilterHint != null) {
                         if (hasFilters) {
-                            // Build the display string
                             StringBuilder displayText = new StringBuilder();
-
-                            // 1. Add Tags (e.g. "Sports, Music")
                             if (!selectedTags.isEmpty()) {
                                 displayText.append(android.text.TextUtils.join(", ", selectedTags));
                             }
-
-                            // 2. Add Date Indicator if dates are selected
                             if (filterStart != null || filterEnd != null) {
                                 if (displayText.length() > 0) displayText.append(" + ");
                                 displayText.append("Date Range");
                             }
-
                             tvFilterHint.setText(displayText.toString());
                             tvFilterHint.setVisibility(View.VISIBLE);
                             Toast.makeText(this, "Filters applied", Toast.LENGTH_SHORT).show();
                         } else {
-                            // Hide the hint completely if no filters are active
                             tvFilterHint.setVisibility(View.GONE);
                             Toast.makeText(this, "Filters cleared", Toast.LENGTH_SHORT).show();
                         }
@@ -103,6 +90,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.events_screen);
         wireCommon();
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+        String username = sharedPreferences.getString("user", null);
+
+        if (username != null) {
+            Intent serviceIntent = new Intent(this, NotificationService.class);
+            // Android 8.0+ requires startForegroundService
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+        }
 
         tvFilterHint = findViewById(R.id.tv_filter_hint);
         TextView btnOpenFilter = findViewById(R.id.btn_open_filter);
@@ -142,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 wireCommon();
                 startActivity(new Intent(this, NotificationScreen.class));
                 break;
-
             case PROFILE:
                 wireCommon();
                 Intent profileIntent = new Intent(this, ProfileScreen.class);
@@ -162,6 +162,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logoutAndGoToSignIn() {
+        // stop the service when logging out
+        Intent serviceIntent = new Intent(this, NotificationService.class);
+        stopService(serviceIntent);
+
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
         Intent i = new Intent(this, WelcomeActivity.class);
@@ -181,36 +185,23 @@ public class MainActivity extends AppCompatActivity {
         query.orderBy("startAt", Query.Direction.ASCENDING).get()
                 .addOnSuccessListener(snap -> {
                     data.clear();
-                    Timestamp now = Timestamp.now(); // Get current server time
+                    Timestamp now = Timestamp.now();
 
                     for (QueryDocumentSnapshot d : snap) {
-
-                        // 1. FILTER: Check if event is private
                         Boolean visibility = d.getBoolean("visibility");
-                        // If 'visibility' is false, skip this event.
-                        // Boolean.FALSE.equals handles null safely (treats null as false/public)
-                        if (Boolean.FALSE.equals(visibility)) {
-                            continue;
-                        }
+                        if (Boolean.FALSE.equals(visibility)) continue;
 
-                        // 2. FILTER: Check if event has expired (Finished)
                         Timestamp endAt = d.getTimestamp("endAt");
-                        // If endAt exists AND it is before Now, skip it.
-                        if (endAt != null && endAt.compareTo(now) < 0) {
-                            continue;
-                        }
+                        if (endAt != null && endAt.compareTo(now) < 0) continue;
 
-                        // If filters pass, proceed to add event
                         EventItem e = new EventItem();
                         String imageUrl = d.getString("imageUrl");
-                        if (imageUrl != null) {
-                            e.imageUrl = imageUrl;
-                        }
+                        if (imageUrl != null) e.imageUrl = imageUrl;
                         e.id = d.getId();
                         e.title = d.getString("title");
                         e.location = d.getString("location");
                         e.startAt = d.getTimestamp("startAt");
-                        e.endAt = endAt; // We already fetched this above
+                        e.endAt = endAt;
                         e.maxAttendees = Integer.parseInt(String.valueOf(d.get("maxAttendees")));
                         e.attendeesCount = Integer.parseInt(String.valueOf(d.get("attendeesCount")));
                         data.add(e);
