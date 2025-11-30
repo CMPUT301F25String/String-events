@@ -35,7 +35,7 @@ public class LotteryBeforeRollLayoutTest {
     public ActivityScenarioRule<UiHostActivity> rule =
             new ActivityScenarioRule<>(
                     new Intent(ApplicationProvider.getApplicationContext(), UiHostActivity.class)
-                            .putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.lottery_screen)
+                            .putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, R.layout.lottery_before_roll )
             );
 
     private static ViewAction safeScrollTo() {
