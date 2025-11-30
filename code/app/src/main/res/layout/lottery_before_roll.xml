@@ -178,6 +178,7 @@
                 android:id="@+id/cardStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp">
@@ -282,7 +283,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="32dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/ivNotify"
@@ -338,7 +339,6 @@
         android:padding="24dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-
         <FrameLayout
             android:layout_width="200dp"
             android:layout_height="60dp"
@@ -347,27 +347,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_chip_active"
-                android:backgroundTint="#FFD165"
-                android:gravity="center"
-                android:text="Roll Participants"
-                android:textColor="#101114"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/prompt_regular"/>
-
-            <!-- Functional ImageButton (Transparent, catches clicks) -->
             <ImageButton
                 android:id="@+id/btnRoll"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:src="@null"
-                android:contentDescription="Roll Participants"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/roll_button_available"
+                android:contentDescription="Roll Participants"
+                android:visibility="gone"/>
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
