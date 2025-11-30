@@ -90,9 +90,6 @@
                         android:layout_height="wrap_content"
                         app:chipSpacing="8dp">
 
-                        <!-- Using TextViews styled as chips to match your original logic,
-                             wrapped in a Flexbox or Flow layout is ideal but linear works for simple rows -->
-                        <!-- Row 1 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -164,9 +161,11 @@
 
             <!-- Time Filter Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/time_filter_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="5dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp">
@@ -290,6 +289,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Clear"
+            android:textAllCaps="false"
             android:textColor="#101114"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -304,7 +304,7 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Apply Filters"
+            android:text="Apply"
             android:textColor="#101114"
             android:textSize="16sp"
             android:textStyle="bold"

@@ -71,6 +71,7 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         tvDescription     = findViewById(R.id.tvDescription);
         btnBack           = findViewById(R.id.btnBack);
         btnCancelEvent    = findViewById(R.id.btnCancelEvent);
+        MaterialButton btnEditEvent = findViewById(R.id.btnEditEvent);
         MaterialButton btnEventDetails = findViewById(R.id.btnEventDetails);
         btnQrCode         = findViewById(R.id.btnQrCode);
 
@@ -88,9 +89,15 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
                 Toast.makeText(this, "Cancel event action not implemented yet", Toast.LENGTH_SHORT).show()
         );
 
+        btnEditEvent.setOnClickListener(v -> {
+            Intent intent = new Intent(OrganizerEventOverviewScreen.this, CreateEventScreen.class);
+            intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
+            startActivity(intent);
+        });
+
         btnEventDetails.setOnClickListener(v -> {
             Intent intent = new Intent(OrganizerEventOverviewScreen.this, OrganizerEventDetailScreen.class);
-            intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
+            intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
 

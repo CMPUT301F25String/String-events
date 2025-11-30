@@ -67,7 +67,6 @@ public class ProfileScreen extends AppCompatActivity {
         TextView emailTextView = findViewById(R.id.email_textView);
         ConstraintLayout lotteryInfoLayout = findViewById(R.id.lottery_info_layout);
         TextView profileEventsTextView = findViewById(R.id.profile_events_textView);
-        ImageButton deleteProfileImageButton = findViewById(R.id.delete_profile_button);
         View addProfilePhotoButton = findViewById(R.id.btn_add_profile_photo);
 
         // bottom bar buttons
@@ -177,39 +176,6 @@ public class ProfileScreen extends AppCompatActivity {
             }
         });
 
-        deleteProfileImageButton.setOnClickListener(v -> {
-            if (currentUsername == null || currentUsername.isEmpty()) {
-                Toast.makeText(ProfileScreen.this, "No user to delete", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            db.collection("users")
-                    .whereEqualTo("username", currentUsername)
-                    .limit(1)
-                    .get()
-                    .addOnSuccessListener(query -> {
-                        if (!query.isEmpty()) {
-                            String docId = query.getDocuments().get(0).getId();
-                            db.collection("users").document(docId)
-                                    .delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(ProfileScreen.this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                        Intent i = new Intent(ProfileScreen.this, WelcomeActivity.class);
-                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                                Intent.FLAG_ACTIVITY_NEW_TASK |
-                                                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        ProfileScreen.this.startActivity(i);
-                                        ProfileScreen.this.finish();
-                                    })
-                                    .addOnFailureListener(e ->
-                                            Toast.makeText(ProfileScreen.this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                        } else {
-                            Toast.makeText(ProfileScreen.this, "User not found", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(ProfileScreen.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-        });
         // setup recyclerview in profile screen with either joined events or created events
         if (currentUsername != null && !currentUsername.isEmpty()) {
             ArrayList<ProfileEvent> profileEventsList = new ArrayList<>();

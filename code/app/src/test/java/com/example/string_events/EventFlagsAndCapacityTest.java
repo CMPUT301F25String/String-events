@@ -3,13 +3,21 @@ package com.example.string_events;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
+
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EventFlagsAndCapacityTest {
 
     private static Event newEvent() {
         ZonedDateTime now = ZonedDateTime.now();
-        return new Event(
+        return new Event(null,
                 "creator","T",null,"d", new ArrayList<>(),
                 now.plusDays(1), now.plusDays(2),
                 "Loc",
@@ -20,6 +28,16 @@ public class EventFlagsAndCapacityTest {
 
     @Test
     public void visibility_and_geolocation_flags_toggle() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("creator", "Abc");
+        doc.put("title", "titletest");
+        db.collection("events").document("randomid").set(doc)
+                .addOnSuccessListener(v -> {
+                            Log.d("Firestore", "event uploaded to database");
+                        });
+
+
         Event e = newEvent();
         assertTrue(e.getEventVisibility());
         assertTrue(e.getGeolocationRequirement());

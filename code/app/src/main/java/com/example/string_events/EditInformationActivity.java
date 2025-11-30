@@ -1,7 +1,9 @@
 package com.example.string_events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
@@ -38,6 +40,7 @@ public class EditInformationActivity extends AppCompatActivity {
         etName = findViewById(R.id.et_new_name);
         etEmail = findViewById(R.id.et_new_email);
         etPassword = findViewById(R.id.et_new_password);
+        ImageButton deleteProfileButton = findViewById(R.id.delete_profile_button);
         MaterialButton btnDone = findViewById(R.id.btn_done);
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
 
@@ -49,6 +52,40 @@ public class EditInformationActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        deleteProfileButton.setOnClickListener(v -> {
+            if (username == null || username.isEmpty()) {
+                Toast.makeText(EditInformationActivity.this, "No user to delete", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            db.collection("users")
+                    .whereEqualTo("username", username)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(query -> {
+                        if (!query.isEmpty()) {
+                            String docId = query.getDocuments().get(0).getId();
+                            db.collection("users").document(docId)
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(EditInformationActivity.this, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(EditInformationActivity.this, WelcomeActivity.class);
+                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                                Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(EditInformationActivity.this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        } else {
+                            Toast.makeText(EditInformationActivity.this, "User not found", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(EditInformationActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
 
         btnDone.setOnClickListener(v -> {
             String newName = etName.getText() != null ? etName.getText().toString().trim() : "";

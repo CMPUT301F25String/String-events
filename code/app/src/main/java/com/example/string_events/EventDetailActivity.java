@@ -24,8 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.firebase.geofire.GeoFireUtils;
-import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.Timestamp;
@@ -49,7 +47,6 @@ import java.util.Map;
  * or accept/decline an invite. Event data is loaded from Firestore.
  */
 public class EventDetailActivity extends AppCompatActivity {
-    private String eventId;
     private String username;
     private FirebaseFirestore db;
     private DocumentReference eventDocumentRef;
@@ -61,8 +58,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private static final int REQ_COARSE_APPLY = 7000;
     private FusedLocationProviderClient fusedForSave;
-
-    private final List<String> csvEntrants = new ArrayList<>();
 
     /**
      * Initializes UI, resolves intent extras, fetches the event document,
@@ -76,7 +71,7 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_detail_screen); // Updated to match your latest XML file name
 
-        eventId = getIntent().getStringExtra("event_id");
+        String eventId = getIntent().getStringExtra("event_id");
         assert eventId != null;
         db = FirebaseFirestore.getInstance();
         eventDocumentRef = db.collection("events").document(eventId);
@@ -89,13 +84,6 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView back = findViewById(getId("back_button"));
         ImageButton applyButton = findViewById(R.id.apply_button);
         back.setOnClickListener(v -> finish());
-      
-        /*
-        Button exportCsvButton = findViewById(R.id.btn_export_csv);
-        if (exportCsvButton != null) {
-            exportCsvButton.setOnClickListener(v -> exportEntrantsToCsv());
-        }
-        */
 
         // change the visual elements of the event details to match the event details of the clicked event
         eventDocumentRef.get()
@@ -210,13 +198,6 @@ public class EventDetailActivity extends AppCompatActivity {
         @SuppressWarnings("unchecked")
         List<String> waitlist = (List<String>) s.get("waitlist");
         int currentWaitCount = (waitlist != null) ? waitlist.size() : 0;
-
-        @SuppressWarnings("unchecked")
-        List<String> attendeesList = (List<String>) s.get("attendees");
-        csvEntrants.clear();
-        if (attendeesList != null) {
-            csvEntrants.addAll(attendeesList);
-        }
 
         // Updated Date/Time Logic: Show full Start and End Date/Time in the two TextViews
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.getDefault());
@@ -368,51 +349,4 @@ public class EventDetailActivity extends AppCompatActivity {
             declineInviteButton.setVisibility(View.GONE);
         });
     }
-
-    /**
-     * Exports current attendees (csvEntrants) to a CSV file in the public Downloads folder.
-     */
-    /*
-    private void exportEntrantsToCsv() {
-        if (csvEntrants.isEmpty()) {
-            Toast.makeText(this, "No entrants to export.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Username\n");
-        for (String user : csvEntrants) {
-            sb.append(user).append("\n");
-        }
-
-        String fileName = "entrants_" + eventId + ".csv";
-        exportCsvToDownloads(fileName, sb.toString());
-    }
-
-    private void exportCsvToDownloads(String fileName, String csvContent) {
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Downloads.MIME_TYPE, "text/csv");
-        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-
-        ContentResolver resolver = getContentResolver();
-        Uri downloadUri = MediaStore.Files.getContentUri("external");
-        Uri uri = resolver.insert(downloadUri, values);
-
-        try {
-            if (uri != null) {
-                OutputStream outputStream = resolver.openOutputStream(uri);
-                if (outputStream != null) {
-                    outputStream.write(csvContent.getBytes());
-                    outputStream.close();
-                }
-                Toast.makeText(this, "CSV saved to Downloads", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Failed to save CSV.", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
-        }
-    }
-    */
 }

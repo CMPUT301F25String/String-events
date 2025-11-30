@@ -396,7 +396,7 @@
                     android:layout_height="50dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    android:text="Details"
+                    android:text="Event Details"
                     android:textSize="14sp"
                     android:textColor="#101114"
                     app:backgroundTint="#FFFFFF"

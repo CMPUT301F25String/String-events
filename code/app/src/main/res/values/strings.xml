@@ -46,6 +46,7 @@
     <string name="status_in_progress">In Progress</string>
     <string name="status_finished">Finished</string>
     <string name="add_text_hint">Click to add text</string>
+    <string name="add_number_hint">Click to add number</string>
     <string name="sample_title">Community Sports Day</string>
     <string name="sample_time">Nov 10, 2:00 PM</string>
     <string name="sample_status_scheduled">Scheduled</string>

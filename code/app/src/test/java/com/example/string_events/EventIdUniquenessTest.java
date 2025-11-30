@@ -14,7 +14,7 @@ public class EventIdUniquenessTest {
     // Ensures Event IDs are unique across many instances.
     private Event newEvent(int i) {
         ZonedDateTime now = ZonedDateTime.now();
-        return new Event(
+        return new Event(null,
                 "creator-" + i,
                 "Title " + i,
                 null,
