@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
-public class AdminEventDetailActivityInstrumentedTest {
+public class AdminEventDetailActivityFirebaseTest {
 
     @Test
     public void deleteEvent_removesDocumentFromFirestore() throws Exception {
