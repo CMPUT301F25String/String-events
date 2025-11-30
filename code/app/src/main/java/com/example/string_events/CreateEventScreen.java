@@ -388,7 +388,7 @@ public class CreateEventScreen extends AppCompatActivity {
     /**
      * Builds a Firestore document from the provided {@link Event} and stores it under
      * the {@code events} collection using the event's ID. Shows a toast on success/failure
-     * and triggers a lightweight image retrieval test via {@link #testingImageGet(Event)}.
+     * and triggers a lightweight image retrieval test via.
      *
      * @param event    the event whose fields populate the document
      * @param imageUrl optional image download URL to persist (ignored if {@code null})
@@ -549,10 +549,23 @@ public class CreateEventScreen extends AppCompatActivity {
                 .atTime(LocalTime.parse(eventEndTimeEditText.getText().toString()))
                 .atZone(ZoneId.systemDefault());
 
+        ZonedDateTime regStartDateTime = LocalDate.parse(registrationStartDateEditText.getText().toString())
+                .atTime(LocalTime.parse(registrationStartTimeEditText.getText().toString()))
+                .atZone(ZoneId.systemDefault());
+        ZonedDateTime regEndDateTime = LocalDate.parse(registrationEndDateEditText.getText().toString())
+                .atTime(LocalTime.parse(registrationEndTimeEditText.getText().toString()))
+                .atZone(ZoneId.systemDefault());
+
         // check if end datetime is after start datetime
         if (endDateTime.isBefore(startDateTime)) {
             eventEndDateEditText.setError("End date must be after start date");
             eventEndTimeEditText.setError("End time must be after start time");
+            Toast.makeText(this, "Event cannot end before it starts", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if (regEndDateTime.isBefore(regStartDateTime)) {
+            registrationEndDateEditText.setError("Registration End date must be after start date");
+            registrationEndTimeEditText.setError("Registration End time must be after start time");
             Toast.makeText(this, "Event cannot end before it starts", Toast.LENGTH_LONG).show();
             return false;
         }

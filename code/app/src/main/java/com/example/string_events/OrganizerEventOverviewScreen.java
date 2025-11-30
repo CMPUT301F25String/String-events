@@ -85,9 +85,16 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
 
-        btnCancelEvent.setOnClickListener(v ->
-                Toast.makeText(this, "Cancel event action not implemented yet", Toast.LENGTH_SHORT).show()
-        );
+        btnCancelEvent.setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Cancel Event")
+                    .setMessage("Are you sure you want to permanently cancel and delete this event? This action cannot be undone.")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        deleteEvent(eventId);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
 
         btnEditEvent.setOnClickListener(v -> {
             Intent intent = new Intent(OrganizerEventOverviewScreen.this, CreateEventScreen.class);
@@ -189,6 +196,20 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         if (imageUrl != null && !imageUrl.isEmpty()) {
             loadImageAsync(imageUrl);
         }
+    }
+
+    private void deleteEvent(String eventId) {
+        db.collection("events").document(eventId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Event successfully deleted!");
+                    Toast.makeText(OrganizerEventOverviewScreen.this, "Event has been deleted.", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(OrganizerEventOverviewScreen.this, OrganizerEventScreen.class));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error deleting event", e);
+                    Toast.makeText(OrganizerEventOverviewScreen.this, "Error: Could not delete event.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private int asInt(Object o) {

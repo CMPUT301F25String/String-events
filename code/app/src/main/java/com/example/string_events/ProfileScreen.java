@@ -22,6 +22,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -42,7 +44,7 @@ public class ProfileScreen extends AppCompatActivity {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private ActivityResultLauncher<Intent> imagePickerLauncher;
-    private ImageView profileImageView;
+    private ShapeableImageView profileImageView;
     private String currentUsername;
 
     /**
@@ -98,20 +100,21 @@ public class ProfileScreen extends AppCompatActivity {
                         if (!query.isEmpty()) {
                             String profileImgUrl = query.getDocuments().get(0).getString("profileimg");
                             if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
-                                new Thread(() -> {
-                                    try {
-                                        java.net.URL url = new java.net.URL(profileImgUrl);
-                                        java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-                                        connection.setDoInput(true);
-                                        connection.connect();
-                                        java.io.InputStream input = connection.getInputStream();
-                                        final android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeStream(input);
-
-                                        profileImageView.post(() -> profileImageView.setImageBitmap(bitmap));
-                                    } catch (Exception e) {
-                                        Log.e("ProfileScreen", "Error loading profile image", e);
-                                    }
-                                }).start();
+                                Glide.with(this).load(profileImgUrl).into(profileImageView);
+//                                new Thread(() -> {
+//                                    try {
+//                                        java.net.URL url = new java.net.URL(profileImgUrl);
+//                                        java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+//                                        connection.setDoInput(true);
+//                                        connection.connect();
+//                                        java.io.InputStream input = connection.getInputStream();
+//                                        final android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeStream(input);
+//
+//                                        profileImageView.post(() -> profileImageView.setImageBitmap(bitmap));
+//                                    } catch (Exception e) {
+//                                        Log.e("ProfileScreen", "Error loading profile image", e);
+//                                    }
+//                                }).start();
                             }
                         }
                     });
@@ -137,7 +140,6 @@ public class ProfileScreen extends AppCompatActivity {
             overridePendingTransition(0, 0);
         });
 
-        // TODO condense all this currentRole checking into one method
         // check if the user is currently an event entrant or an event organizer
         if (currentRole != null && currentRole.equals("entrant")) {
             switchRolesButton.setBackgroundResource(R.drawable.switch_to_organizer_button);
