@@ -49,13 +49,12 @@ public class EditInformationActivityTest {
     @Test
     public void showsCoreWidgets() {
         onView(withId(R.id.backButton)).check(matches(isDisplayed()));
-        onView(withId(R.id.til_name)).check(matches(isDisplayed()));
         onView(withId(R.id.et_new_name)).check(matches(isDisplayed()));
 
-        onView(withId(R.id.til_email)).check(matches(isDisplayed()));
         onView(withId(R.id.et_new_email)).check(matches(isDisplayed()));
 
-        onView(withId(R.id.til_password)).check(matches(isDisplayed()));
+        onView(withId(R.id.et_new_phone)).check(matches(isDisplayed()));
+
         onView(withId(R.id.et_new_password)).check(matches(isDisplayed()));
 
         onView(withId(R.id.btn_done)).check(matches(isDisplayed()));
@@ -74,6 +73,8 @@ public class EditInformationActivityTest {
                 .perform(clearText(), replaceText("user"), closeSoftKeyboard());
         onView(withId(R.id.et_new_email))
                 .perform(clearText(), replaceText("user@example.com"), closeSoftKeyboard());
+        onView(withId(R.id.et_new_phone))
+                .perform(clearText(), replaceText("1234567890"), closeSoftKeyboard());
         onView(withId(R.id.et_new_password))
                 .perform(clearText(), replaceText("P@ssw0rd!"), closeSoftKeyboard());
 

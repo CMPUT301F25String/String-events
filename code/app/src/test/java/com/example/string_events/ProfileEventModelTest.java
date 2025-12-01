@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -21,8 +22,8 @@ public class ProfileEventModelTest {
 
     @Test
     public void constructor_setsCoreFieldsCorrectly() {
-        ZonedDateTime start = ZonedDateTime.parse("2025-01-01T10:00:00Z");
-        ZonedDateTime end   = ZonedDateTime.parse("2025-01-01T12:30:00Z");
+        Date start = new Date();
+        Date end   = new Date();
 
         ProfileEvent event = new ProfileEvent(
                 "event-123",
@@ -48,8 +49,8 @@ public class ProfileEventModelTest {
 
     @Test
     public void setProfileEventLocation_updatesLocationField() {
-        ZonedDateTime start = ZonedDateTime.parse("2025-02-01T09:00:00Z");
-        ZonedDateTime end   = ZonedDateTime.parse("2025-02-01T11:00:00Z");
+        Date start = new Date();
+        Date end   = new Date();
 
         ProfileEvent event = new ProfileEvent(
                 "event-456",
@@ -69,8 +70,8 @@ public class ProfileEventModelTest {
 
     @Test
     public void getEventId_returnsUnderlyingProfileEventId() {
-        ZonedDateTime start = ZonedDateTime.parse("2025-03-01T09:00:00Z");
-        ZonedDateTime end   = ZonedDateTime.parse("2025-03-01T10:00:00Z");
+        Date start = new Date();
+        Date end   = new Date();
 
         ProfileEvent event = new ProfileEvent(
                 "event-789",

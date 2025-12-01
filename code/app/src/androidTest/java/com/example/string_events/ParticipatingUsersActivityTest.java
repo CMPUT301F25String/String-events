@@ -30,45 +30,27 @@ import org.junit.runner.RunWith;
 public class ParticipatingUsersActivityTest {
 
     /** Launch launcher activity and set our layout as content. Also add no-op listeners. */
-    private ActivityScenario<? extends Activity> launchWithLayout() {
+    private static Intent makeIntent() {
         Context ctx = ApplicationProvider.getApplicationContext();
-        Intent launch = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
-        if (launch == null) launch = new Intent(Intent.ACTION_MAIN);
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        ActivityScenario<? extends Activity> sc = ActivityScenario.launch(launch);
-        sc.onActivity(a -> {
-            a.setContentView(R.layout.activity_participating_users);
-            // attach no-op listeners so clicks won't throw
-            int[] ids = { R.id.btnBack, R.id.btnSendParticipating, R.id.btnExportParticipating };
-            android.view.View.OnClickListener noop = v -> { /* no-op */ };
-            for (int id : ids) {
-                android.view.View v = a.findViewById(id);
-                if (v != null) {
-                    v.setClickable(true);
-                    v.setOnClickListener(noop);
-                }
-            }
-        });
-        return sc;
+        return new Intent(ctx, ParticipatingUsersActivity.class)
+                .putExtra("fromTest", true)
+                .putExtra("eventId", "test-event")
+                .putExtra("organizerId", "org-123");
     }
 
     @Test
     public void views_areDisplayed_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
-            // Header
+        try (ActivityScenario<ParticipatingUsersActivity> sc =
+                     ActivityScenario.launch(makeIntent())) {
             onView(withId(R.id.btnBack)).check(matches(isDisplayed()));
             onView(withId(R.id.tvTitle)).check(matches(isDisplayed()));
-            onView(withId(R.id.tvTitle)).check(matches(withText("Participating Users"))); // from XML
+            onView(withId(R.id.tvTitle)).check(matches(withText("Participating Users")));
 
-            // List
             onView(withId(R.id.listParticipating)).check(matches(isDisplayed()));
 
-            // Bottom actions
             onView(withId(R.id.btnSendParticipating)).check(matches(isDisplayed()));
             onView(withId(R.id.btnExportParticipating)).check(matches(isDisplayed()));
 
-            // Delete button should be GONE
             onView(withId(R.id.btnDeleteUser))
                     .check(matches(withEffectiveVisibility(Visibility.GONE)));
         }
@@ -76,10 +58,11 @@ public class ParticipatingUsersActivityTest {
 
     @Test
     public void buttons_areClickable_noCrash_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
-            onView(withId(R.id.btnBack)).check(matches(isClickable())).perform(click());
-            onView(withId(R.id.btnSendParticipating)).check(matches(isClickable())).perform(click());
+        try (ActivityScenario<ParticipatingUsersActivity> sc =
+                     ActivityScenario.launch(makeIntent())) {
             onView(withId(R.id.btnExportParticipating)).check(matches(isClickable())).perform(click());
+            onView(withId(R.id.btnSendParticipating)).check(matches(isClickable())).perform(click());
+            onView(withId(R.id.btnBack)).check(matches(isClickable())).perform(click());
         }
     }
 }

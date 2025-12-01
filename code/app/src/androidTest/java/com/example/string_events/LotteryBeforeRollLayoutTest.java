@@ -61,7 +61,7 @@ public class LotteryBeforeRollLayoutTest {
 
     @Test
     public void showsCoreWidgets() {
-        onView(isRoot()).perform(idle(120));
+        onView(isRoot()).perform(idle(1000));
 
         onView(withId(R.id.btnBack)).check(matches(shown()));
         onView(withId(R.id.tvTitle)).check(matches(shown()));

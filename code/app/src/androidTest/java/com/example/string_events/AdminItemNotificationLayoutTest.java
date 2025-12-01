@@ -26,20 +26,17 @@ import org.junit.runner.RunWith;
 public class AdminItemNotificationLayoutTest {
 
     /** Launches the app's launcher Activity and swaps content to the layout under test. */
-    private ActivityScenario<? extends Activity> launchWithLayout() {
+    private static Intent hostIntentFor(int layoutResId) {
         Context ctx = ApplicationProvider.getApplicationContext();
-        Intent launchIntent = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
-        if (launchIntent == null) launchIntent = new Intent(Intent.ACTION_MAIN);
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        ActivityScenario<? extends Activity> scenario = ActivityScenario.launch(launchIntent);
-        scenario.onActivity(a -> a.setContentView(R.layout.admin_item_notification));
-        return scenario;
+        Intent i = new Intent(ctx, UiHostActivity.class);
+        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, layoutResId);
+        return i;
     }
 
     @Test
     public void views_areDisplayed_test() {
-        try (ActivityScenario<? extends Activity> scenario = launchWithLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.admin_item_notification))) {
             onView(withId(R.id.tvTitle)).check(matches(isDisplayed()));
             onView(withId(R.id.tvEventName)).check(matches(isDisplayed()));
             onView(withId(R.id.ivArrow)).check(matches(isDisplayed()));
@@ -48,8 +45,8 @@ public class AdminItemNotificationLayoutTest {
 
     @Test
     public void views_areCompletelyDisplayed_test() {
-        // Extra safety: ensure key views are fully laid out within bounds
-        try (ActivityScenario<? extends Activity> scenario = launchWithLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.admin_item_notification))) {
             onView(withId(R.id.tvTitle)).check(matches(isCompletelyDisplayed()));
             onView(withId(R.id.tvEventName)).check(matches(isCompletelyDisplayed()));
             onView(withId(R.id.ivArrow)).check(matches(isCompletelyDisplayed()));

@@ -61,6 +61,7 @@ public class LotteryDrawActivity extends AppCompatActivity {
 
         lotteryLayoutBlockedRoll = findViewById(R.id.lottery_layout_blocked_roll);
         lotteryLayoutBeforeRoll = findViewById(R.id.lottery_layout_before_roll);
+        lotteryLayoutBeforeRoll.setVisibility(View.GONE);
         lotteryLayoutAfterRoll = findViewById(R.id.lottery_layout_after_roll);
         tvSelectedCount = findViewById(R.id.tvSelectedCount);
         btnRoll = findViewById(R.id.btnRoll);
