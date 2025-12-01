@@ -4,6 +4,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.FieldValue;
+
 /**
  * Model representing a notification for a user about an event,
  * including selection status and basic event metadata.
@@ -14,6 +16,7 @@ public class Notification {
     String eventId;
     String eventPhoto; // eventPhoto needs to be of type Uri because it is a user uploaded image
     String eventName;
+    FieldValue timeStamp;
 
     boolean isMessage;
     String messageText;
@@ -33,18 +36,20 @@ public class Notification {
         this.eventId = eventId;
         this.eventPhoto = eventPhoto;
         this.eventName = eventName;
+        this.timeStamp = FieldValue.serverTimestamp();
         this.isMessage = false;
         this.messageText = null;
     }
 
     public Notification(String username, String eventId, String eventName, String eventPhoto, boolean isMessage, String messageText) {
         this.username = username;
+        this.selectedStatus = false;
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventPhoto = eventPhoto;
+        this.timeStamp = FieldValue.serverTimestamp();
         this.isMessage = isMessage;
         this.messageText = messageText;
-        this.selectedStatus = false;
     }
 
     /**
@@ -120,6 +125,10 @@ public class Notification {
      */
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public FieldValue getTimeStamp() {
+        return timeStamp;
     }
 
     public boolean isMessage() {

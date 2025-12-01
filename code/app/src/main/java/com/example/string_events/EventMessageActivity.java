@@ -76,13 +76,16 @@ public class EventMessageActivity extends AppCompatActivity {
                     }
 
                     for (String username : users) {
+                        Notification newNotification = new Notification(username, eventId, eventName, imageUrl, true, message);
+
                         Map<String, Object> data = new HashMap<>();
-                        data.put("username", username);
-                        data.put("message", message);
-                        data.put("eventId", eventId);
+                        data.put("username", newNotification.getUsername());
+                        data.put("eventId", newNotification.getEventId());
+                        data.put("eventName", newNotification.getEventName());
+                        data.put("imageUrl", newNotification.getEventPhoto());
                         data.put("ismessage", true);
-                        data.put("eventName", eventName);
-                        data.put("imageUrl", imageUrl != null ? imageUrl : "");
+                        data.put("message", newNotification.getMessageText());
+                        data.put("createdAt", newNotification.getTimeStamp());
 
                         db.collection("notifications").add(data);
                     }

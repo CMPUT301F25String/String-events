@@ -64,10 +64,11 @@
             <!-- Interests Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                android:layout_marginBottom="5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -217,7 +218,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:background="@drawable/bg_profile_input"
-                            android:hint="Select Date  Time"
+                            android:hint="Select Date and Time"
                             android:paddingHorizontal="16dp"
                             android:textColor="#101114"
                             android:textColorHint="#9E9E9E"
@@ -251,7 +252,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:background="@drawable/bg_profile_input"
-                            android:hint="Select Date  Time"
+                            android:hint="Select Date and Time"
                             android:paddingHorizontal="16dp"
                             android:textColor="#101114"
                             android:textColorHint="#9E9E9E"

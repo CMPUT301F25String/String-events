@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -71,12 +72,6 @@ public class ProfileScreen extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         String currentRole = sharedPreferences.getString("role", null);
         currentUsername = sharedPreferences.getString("user", null);
-        String fullName = sharedPreferences.getString("name", null);
-        String email = sharedPreferences.getString("email", null);
-
-        nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
-        emailTextView.setText("Email: " + (email != null ? email : ""));
-
 
         // 1. Load saved state (Default to TRUE)
         boolean isNotifEnabled = sharedPreferences.getBoolean("notifications_enabled", true);
@@ -99,15 +94,20 @@ public class ProfileScreen extends AppCompatActivity {
             }
         });
 
-        // Load Profile Image
+        // Load Profile Info
         if (currentUsername != null) {
             db.collection("users").whereEqualTo("username", currentUsername).limit(1).get()
                     .addOnSuccessListener(query -> {
                         if (!query.isEmpty()) {
-                            String profileImgUrl = query.getDocuments().get(0).getString("profileimg");
+                            DocumentSnapshot user = query.getDocuments().get(0);
+                            String profileImgUrl = user.getString("profileimg");
                             if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
                                 Glide.with(this).load(profileImgUrl).into(profileImageView);
                             }
+                            String fullName = user.getString("name");
+                            String email = user.getString("email");
+                            nameTextView.setText("Name: " + (fullName != null ? fullName : ""));
+                            emailTextView.setText("Email: " + (email != null ? email : ""));
                         }
                     });
         }

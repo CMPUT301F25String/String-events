@@ -49,14 +49,6 @@ public class WaitlistUsersActivity extends AppCompatActivity {
         }
         adapterHelper.loadUsers(eventId);
 
-        Button openMap = findViewById(R.id.btn_open_waitlist_map);
-
-        openMap.setOnClickListener(v -> {
-            Intent i = new Intent(WaitlistUsersActivity.this, WaitlistMapActivity.class);
-            i.putExtra("eventId", eventId);
-            startActivity(i);
-        });
-
         findViewById(R.id.btnSendWaitlist).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);
             it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);

@@ -16,7 +16,8 @@
 
     <application
         android:label="@string/app_name"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+        android:name=".NotificationServiceHelper">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

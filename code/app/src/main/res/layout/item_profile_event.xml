@@ -3,14 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_layout"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="12dp"
-    android:layout_marginBottom="8dp">
+    android:layout_height="245dp"
+    android:layout_marginEnd="12dp">
 
-    <!--
-      Card Background: Uses the new white drawable
-      Added outlineProvider to make the shadow follow the rounded corners
-    -->
     <ImageView
         android:id="@+id/profile_background"
         android:layout_width="165dp"
@@ -21,9 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!--
-      Event Image
-    -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/event_image"
         android:layout_width="0dp"
@@ -36,7 +28,6 @@
         app:layout_constraintEnd_toEndOf="@id/profile_background"
         app:layout_constraintTop_toTopOf="@id/profile_background"/>
 
-    <!-- Content below image -->
     <TextView
         android:id="@+id/event_name"
         android:layout_width="0dp"

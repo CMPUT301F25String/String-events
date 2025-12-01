@@ -30,7 +30,7 @@ public class EventFilterActivity extends AppCompatActivity {
     private void toggle(String tag, android.widget.TextView chip) {
         if (selected.contains(tag)) {
             selected.remove(tag);
-            chip.setBackgroundResource(R.drawable.bg_chip_grey);
+            chip.setBackgroundResource(R.drawable.bg_chip_inactive);
             chip.setTextColor(0xFF101114);
         } else {
             selected.add(tag);
@@ -48,7 +48,7 @@ public class EventFilterActivity extends AppCompatActivity {
 
     private void setChipState(android.widget.TextView chip, String tag) {
         boolean on = selected.contains(tag);
-        chip.setBackgroundResource(on ? R.drawable.bg_chip_selected : R.drawable.bg_chip_grey);
+        chip.setBackgroundResource(on ? R.drawable.bg_chip_selected : R.drawable.bg_chip_inactive);
         chip.setTextColor(on ? 0xFFFFFFFF : 0xFF101114);
     }
 

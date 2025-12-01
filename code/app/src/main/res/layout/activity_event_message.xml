@@ -35,16 +35,6 @@
                 android:layout_centerInParent="true"/>
         </RelativeLayout>
 
-        <!-- Section label -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send Message To:"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="12dp"/>
-
         <!-- Row of image buttons -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,33 +44,6 @@
             android:weightSum="3"
             android:layout_marginBottom="24dp">
 
-            <ImageButton
-                android:id="@+id/btnWaitingUsers"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/waitinglistusers"
-                android:contentDescription="Waiting Users" />
-
-            <ImageButton
-                android:id="@+id/btnParticipatingUsers"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/participatinguser"
-                android:contentDescription="Participating Users" />
-
-            <ImageButton
-                android:id="@+id/btnCanceledUsers"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/canceledusers"
-                android:contentDescription="Canceled Users" />
         </LinearLayout>
 
         <!-- Message Content Label -->
@@ -110,7 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@drawable/sendmessage"
+            android:background="@drawable/send_message_button"
             android:contentDescription="Send Message" />
     </LinearLayout>
 

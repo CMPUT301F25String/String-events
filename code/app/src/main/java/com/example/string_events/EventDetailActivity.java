@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -192,7 +193,9 @@ public class EventDetailActivity extends AppCompatActivity {
         Timestamp endAt = s.getTimestamp("endAt");
 
         int max = asInt(s.get("maxAttendees"));
-        int taken = asInt(s.get("attendeesCount"));
+        ArrayList<String> attendees = (ArrayList<String>) s.get("attendees");
+        assert attendees != null;
+        int taken = attendees.size();
         int waitLimit = asInt(s.get("waitlistLimit"));
 
         @SuppressWarnings("unchecked")
@@ -205,7 +208,7 @@ public class EventDetailActivity extends AppCompatActivity {
         String endString = endAt != null ? df.format(endAt.toDate()) : "N/A";
 
         // Assigning Start Date+Time to tvDateLine and End Date+Time to tvTimeLine
-        setText(getId("tvDateLine"), "Start: " + startString);
+        setText(getId("tvDateLine"), "Start:  " + startString);
         setText(getId("tvTimeLine"), "End:   " + endString);
 
         setText(getId("tvEventTitle"), title);
@@ -309,8 +312,7 @@ public class EventDetailActivity extends AppCompatActivity {
             } else if (attendeesList != null && attendeesList.contains(username)) {
                 Log.d("FirestoreCheck", "already in attendees");
                 userInEventAttendees.set(true);
-                // TODO make this a leave event button instead of cancel apply
-                applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
+                applyButton.setBackgroundResource(R.drawable.leave_event_button);
             } else {
                 // user is not on any of the lists
                 applyButton.setBackgroundResource(R.drawable.apply_button);
@@ -322,10 +324,10 @@ public class EventDetailActivity extends AppCompatActivity {
         // this instance of event details was opened from the notification screen
         ImageButton acceptInviteButton = findViewById(R.id.accept_invite_button);
         ImageButton declineInviteButton = findViewById(R.id.decline_invite_button);
+        LinearLayout inviteButtonsLayout = findViewById(R.id.invite_buttons_container);
 
         applyButton.setVisibility(View.GONE);
-        acceptInviteButton.setVisibility(View.VISIBLE);
-        declineInviteButton.setVisibility(View.VISIBLE);
+        inviteButtonsLayout.setVisibility(View.VISIBLE);
 
         acceptInviteButton.setOnClickListener(view -> {
             eventDocumentRef.update("attendees", FieldValue.arrayUnion(username));
@@ -334,8 +336,7 @@ public class EventDetailActivity extends AppCompatActivity {
             userInEventAttendees.set(true);
             applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             applyButton.setVisibility(View.VISIBLE);
-            acceptInviteButton.setVisibility(View.GONE);
-            declineInviteButton.setVisibility(View.GONE);
+            inviteButtonsLayout.setVisibility(View.GONE);
         });
 
         declineInviteButton.setOnClickListener(view -> {
@@ -345,8 +346,7 @@ public class EventDetailActivity extends AppCompatActivity {
             lotteryHelper.replaceCancelledUser(eventDocumentRef);
             applyButton.setBackgroundResource(R.drawable.apply_button);
             applyButton.setVisibility(View.VISIBLE);
-            acceptInviteButton.setVisibility(View.GONE);
-            declineInviteButton.setVisibility(View.GONE);
+            inviteButtonsLayout.setVisibility(View.GONE);
         });
     }
 }

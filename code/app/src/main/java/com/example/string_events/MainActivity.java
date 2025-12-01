@@ -98,16 +98,12 @@ public class MainActivity extends AppCompatActivity {
 
         boolean isNotifEnabled = sharedPreferences.getBoolean("notifications_enabled", true);
 
-        if (username != null && isNotifEnabled) {
+        if (username != null && isNotifEnabled && !NotificationServiceHelper.isNotificationServiceRunning) {
             Intent serviceIntent = new Intent(this, NotificationService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            } else {
-                startService(serviceIntent);
-            }
+            startForegroundService(serviceIntent);
+            // set the static flag to true so this won't run again
+            NotificationServiceHelper.isNotificationServiceRunning = true;
         }
-
-
 
         tvFilterHint = findViewById(R.id.tv_filter_hint);
         TextView btnOpenFilter = findViewById(R.id.btn_open_filter);
@@ -170,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, NotificationService.class);
         stopService(serviceIntent);
 
+        // reset the static flag on logout because it doesn't kill the app process
+        NotificationServiceHelper.isNotificationServiceRunning = false;
+
         SharedPreferences sp = getSharedPreferences("userInfo", MODE_PRIVATE);
         sp.edit().clear().apply();
         Intent i = new Intent(this, WelcomeActivity.class);
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         final ListView lv = findViewById(R.id.list);
         if (lv == null) return;
         final ArrayList<EventItem> data = new ArrayList<>();
-        final EventAdapter adapter = new EventAdapter(data);
+        final EventAdapter adapter = new EventAdapter(MainActivity.this, data);
         lv.setAdapter(adapter);
 
         query.orderBy("startAt", Query.Direction.ASCENDING).get()
@@ -207,7 +206,9 @@ public class MainActivity extends AppCompatActivity {
                         e.startAt = d.getTimestamp("startAt");
                         e.endAt = endAt;
                         e.maxAttendees = Integer.parseInt(String.valueOf(d.get("maxAttendees")));
-                        e.attendeesCount = Integer.parseInt(String.valueOf(d.get("attendeesCount")));
+                        ArrayList<String> attendees = (ArrayList<String>) d.get("attendees");
+                        assert attendees != null;
+                        e.attendeesCount = attendees.size();
                         data.add(e);
                     }
                     adapter.notifyDataSetChanged();
@@ -234,93 +235,5 @@ public class MainActivity extends AppCompatActivity {
             query = query.whereLessThanOrEqualTo("endAt", new Timestamp(Date.from(end.toInstant())));
         }
         loadEventsIntoList(query);
-    }
-
-    private static class EventItem {
-        String imageUrl;
-        String id;
-        String title;
-        String location;
-        Timestamp startAt, endAt;
-        int maxAttendees, attendeesCount;
-    }
-
-    private class EventAdapter extends BaseAdapter {
-        private final List<EventItem> items;
-        private final SimpleDateFormat dateTimeFmt = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
-
-        EventAdapter(List<EventItem> items) {
-            this.items = items;
-        }
-
-        @Override public int getCount() { return items.size(); }
-        @Override public EventItem getItem(int position) { return items.get(position); }
-        @Override public long getItemId(int position) { return position; }
-
-        @Override
-        public View getView(int pos, View convertView, android.view.ViewGroup parent) {
-            View v = convertView;
-            Holder h;
-            if (v == null) {
-                v = getLayoutInflater().inflate(R.layout.item_event, parent, false);
-                h = new Holder();
-                h.imgCover = v.findViewById(R.id.img_cover);
-                h.tvTitle = v.findViewById(R.id.tv_title);
-                h.tvTime = v.findViewById(R.id.tv_time);
-                h.tvSpots = v.findViewById(R.id.tv_spots);
-                h.tvPlace = v.findViewById(R.id.tv_place);
-                h.btnStatus = v.findViewById(R.id.btn_status);
-                v.setTag(h);
-            } else {
-                h = (Holder) v.getTag();
-            }
-
-            EventItem e = getItem(pos);
-            if (e.imageUrl == null) {
-                h.imgCover.setImageResource(R.drawable.no_image_available);
-            } else {
-                Glide.with(MainActivity.this)
-                        .load(e.imageUrl)
-                        .into(h.imgCover);
-            }
-            if (h.tvTitle != null) h.tvTitle.setText(e.title == null ? "" : e.title);
-            if (h.tvPlace != null) h.tvPlace.setText(e.location == null ? "" : e.location);
-
-            if (h.tvTime != null) {
-                String t = (e.startAt == null) ? "" : dateTimeFmt.format(e.startAt.toDate());
-                h.tvTime.setText(t);
-            }
-
-            if (h.tvSpots != null) {
-                int left = Math.max(0, e.maxAttendees - e.attendeesCount);
-                h.tvSpots.setText(left + " Spots Left");
-            }
-            if (h.btnStatus != null) {
-                long now = System.currentTimeMillis();
-                long start = e.startAt == null ? Long.MAX_VALUE : e.startAt.toDate().getTime();
-                long end = e.endAt == null ? Long.MAX_VALUE : e.endAt.toDate().getTime();
-                CharSequence text;
-                int color;
-                if (now < start) {
-                    text = "Scheduled";
-                    color = 0xFF43C06B;
-                } else if (now > end) {
-                    text = "Finished";
-                    color = 0xFFE45A5A;
-                } else {
-                    text = "In Progress";
-                    color = 0xFFF1A428;
-                }
-                h.btnStatus.setText(text);
-                h.btnStatus.setBackgroundTintList(ColorStateList.valueOf(color));
-            }
-            return v;
-        }
-
-        class Holder {
-            ImageView imgCover;
-            TextView tvTitle, tvTime, tvSpots, tvPlace;
-            MaterialButton btnStatus;
-        }
     }
 }
