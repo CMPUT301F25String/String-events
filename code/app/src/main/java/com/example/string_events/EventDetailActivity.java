@@ -162,6 +162,9 @@ public class EventDetailActivity extends AppCompatActivity {
         }
     }
     private void saveApproxLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         fusedForSave.getLastLocation().addOnSuccessListener(this, (Location loc) -> {
             if (loc == null) {
                 Toast.makeText(this, "Could not retrieve location. Please ensure location is enabled and try again.", Toast.LENGTH_LONG).show();
@@ -189,6 +192,7 @@ public class EventDetailActivity extends AppCompatActivity {
         String title = s.getString("title");
         String description = s.getString("description");
         String location = s.getString("location");
+        boolean geolocation = Boolean.TRUE.equals(s.getBoolean("geolocationReq"));
         String creator = s.getString("creator");
         Timestamp startAt = s.getTimestamp("startAt");
         Timestamp endAt = s.getTimestamp("endAt");
@@ -214,6 +218,12 @@ public class EventDetailActivity extends AppCompatActivity {
 
         setText(getId("tvEventTitle"), title);
         setText(getId("tvAddress"), location);
+        if (geolocation) {
+            setText(getId("geolocation_text"), "Entrant geolocation is enabled");
+        } else {
+            setText(getId("geolocation_text"), "Entrant geolocation is disabled");
+        }
+
         setText(getId("tvDescription"), description);
 
         TextView org = findViewById(R.id.tvOrganizer);
@@ -307,7 +317,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 applyButton.setBackgroundResource(R.drawable.cancel_apply_button);
             } else if (invitedList != null && invitedList.contains(username)) {
                 // user has been invited to the event and needs to either confirm or decline attendance
-                Log.d("FirestoreCheck", "already in attendees");
+                Log.d("FirestoreCheck", "already in invited");
                 userInEventInvited.set(true);
                 eventPendingUserConfirmation(applyButton, eventDocumentRef);
             } else if (attendeesList != null && attendeesList.contains(username)) {

@@ -302,39 +302,40 @@
                         android:lineSpacingExtra="4dp"
                         android:text="Event description goes here..."/>
 
-                    <!-- Tags Section inside Description Card -->
-                    <LinearLayout
-                        android:id="@+id/layoutTags"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="16dp">
-
-                        <TextView
-                            android:id="@+id/tvTag1"
+                        <LinearLayout
+                            android:id="@+id/layoutTags"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Fitness"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:background="@drawable/bg_chip_inactive"
-                            android:textColor="#424242"
-                            android:textSize="12sp"
-                            android:layout_marginEnd="8dp"
-                            android:fontFamily="@font/prompt_regular"/>
+                            android:orientation="horizontal"
+                            android:layout_marginTop="16dp">
 
-                        <TextView
-                            android:id="@+id/tvTag2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Games"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:background="@drawable/bg_chip_inactive"
-                            android:textColor="#424242"
-                            android:textSize="12sp"
-                            android:fontFamily="@font/prompt_regular"/>
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/tvTag1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tag1"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:background="@drawable/bg_chip_inactive"
+                                android:textColor="#424242"
+                                android:textSize="12sp"
+                                android:layout_marginEnd="8dp"
+                                android:fontFamily="@font/prompt_regular"/>
+
+                            <TextView
+                                android:id="@+id/tvTag2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tag2"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="6dp"
+                                android:background="@drawable/bg_chip_inactive"
+                                android:textColor="#424242"
+                                android:textSize="12sp"
+                                android:layout_marginEnd="8dp"
+                                android:fontFamily="@font/prompt_regular"/>
+
+                        </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
