@@ -13,11 +13,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity that allows an organizer/admin to send a message to a specific
+ * group of users related to an event (participants, waitlist, or canceled users).
+ * <p>
+ * Messages are stored in the {@code notifications} collection in Firestore,
+ * one document per user recipient.
+ */
 public class EventMessageActivity extends AppCompatActivity {
 
+    /**
+     * Firestore instance used to read event data and write notifications.
+     */
     private FirebaseFirestore db;
+
+    /**
+     * Input field where the organizer types the message to send.
+     */
     private EditText etMessage;
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Initializes the Firestore instance.</li>
+     *     <li>Sets up the back button to close this screen.</li>
+     *     <li>Finds the message input and send button views.</li>
+     *     <li>Extracts the target event ID and user group from the intent.</li>
+     *     <li>Configures the send button to trigger {@link #sendMessage(String, String)}.</li>
+     * </ul>
+     *
+     * @param savedInstanceState previously saved state, or {@code null} if created fresh
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +65,27 @@ public class EventMessageActivity extends AppCompatActivity {
         btnSend.setOnClickListener(v -> sendMessage(eventId, group));
     }
 
+    /**
+     * Sends a message to all users in the specified group for the given event.
+     * <p>
+     * The method:
+     * <ul>
+     *     <li>Validates that the message is not empty.</li>
+     *     <li>Loads the event document to obtain event metadata (name, image).</li>
+     *     <li>Determines the target user list based on {@code groupName}:
+     *         <ul>
+     *             <li>{@code "participating"} → {@code attendees}</li>
+     *             <li>{@code "waitlist"} → {@code waitlist}</li>
+     *             <li>{@code "canceled"} → {@code canceledusers}</li>
+     *         </ul>
+     *     </li>
+     *     <li>Creates a notification document in Firestore for each user.</li>
+     *     <li>Shows a confirmation toast and finishes the activity on success.</li>
+     * </ul>
+     *
+     * @param eventId   Firestore ID of the event whose users will receive the message
+     * @param groupName target user group name (e.g., "participating", "waitlist", "canceled")
+     */
     private void sendMessage(String eventId, String groupName) {
         String message = etMessage.getText().toString().trim();
 

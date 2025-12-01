@@ -26,12 +26,38 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity that displays a high-level overview of a single event to the organizer.
+ * <p>
+ * This screen shows:
+ * <ul>
+ *     <li>Event cover image</li>
+ *     <li>Event name and time range</li>
+ *     <li>Location</li>
+ *     <li>Registration start and end times</li>
+ *     <li>Waitlist limit and current attendees count</li>
+ *     <li>Up to two category tags</li>
+ *     <li>Description</li>
+ * </ul>
+ * It also provides navigation to:
+ * <ul>
+ *     <li>The detailed organizer event screen</li>
+ *     <li>A QR code screen for the event</li>
+ * </ul>
+ */
 public class EventOverviewScreen extends AppCompatActivity {
 
+    /**
+     * Tag used for logging within this activity.
+     */
     private static final String TAG = "EventOverview";
 
+    /**
+     * Firestore instance used to load event data.
+     */
     private FirebaseFirestore db;
 
+    // UI components for event overview
     private ImageView imgEventCover;
     private TextView tvEventName;
     private TextView tvEventTimeRange;
@@ -47,9 +73,27 @@ public class EventOverviewScreen extends AppCompatActivity {
     private ImageButton btnCancelEvent; // image-style button at bottom
     private MaterialButton btnQrCode;
 
+    /**
+     * Formatter for displaying date and time values on the UI.
+     * <p>
+     * Format example: {@code 2025-11-28 16:30}
+     */
     private final SimpleDateFormat dateTimeFmt =
             new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Initializes Firestore and binds all views.</li>
+     *     <li>Reads the event ID from the launching intent.</li>
+     *     <li>Sets up click listeners for back, cancel, details, and QR code buttons.</li>
+     *     <li>Triggers loading of event data from Firestore.</li>
+     * </ul>
+     *
+     * @param savedInstanceState previously saved state, or {@code null} if created fresh
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,27 +124,37 @@ public class EventOverviewScreen extends AppCompatActivity {
             return;
         }
 
+        // Navigate back to the previous screen
         btnBack.setOnClickListener(v -> finish());
 
+        // Placeholder handler for cancel event action
         btnCancelEvent.setOnClickListener(v ->
                 Toast.makeText(this, "Cancel event action not implemented yet", Toast.LENGTH_SHORT).show()
         );
 
+        // Open the detailed organizer event screen
         btnEventDetails.setOnClickListener(v -> {
             Intent intent = new Intent(EventOverviewScreen.this, OrganizerEventDetailScreen.class);
             intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
             startActivity(intent);
         });
 
+        // Open the QR code screen for this event
         btnQrCode.setOnClickListener(v -> {
             Intent intent = new Intent(EventOverviewScreen.this, QrCodeActivity.class);
             intent.putExtra(QrCodeActivity.EXTRA_EVENT_ID, eventId);
             startActivity(intent);
         });
 
+        // Load event data from Firestore
         loadEvent(eventId);
     }
 
+    /**
+     * Loads the event document from Firestore by ID and binds it to the UI.
+     *
+     * @param eventId the Firestore document ID of the event to load
+     */
     private void loadEvent(String eventId) {
         db.collection("events").document(eventId)
                 .get()
@@ -112,6 +166,20 @@ public class EventOverviewScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Binds event data from a Firestore document to the UI components.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Reads core fields such as title, location, description, image URL.</li>
+     *     <li>Formats and displays start/end times and registration periods.</li>
+     *     <li>Displays waitlist limit and attendee count.</li>
+     *     <li>Shows up to two category tags.</li>
+     *     <li>Starts asynchronous loading of the cover image if a URL is provided.</li>
+     * </ul>
+     *
+     * @param doc the Firestore {@link DocumentSnapshot} representing the event
+     */
     private void bindEvent(DocumentSnapshot doc) {
         if (!doc.exists()) {
             Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -151,6 +219,7 @@ public class EventOverviewScreen extends AppCompatActivity {
         tvWaitlistLimit.setText(String.valueOf(waitlistLimit));
         tvAttendees.setText(String.valueOf(attendeesCount));
 
+        // Handle categories as either a List or a single String
         Object cats = doc.get("categories");
         if (cats instanceof List) {
             List<?> list = (List<?>) cats;
@@ -182,6 +251,15 @@ public class EventOverviewScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Safely converts an arbitrary object to an {@code int}.
+     * <p>
+     * Used to read numeric fields from Firestore that might be stored
+     * as different numeric types or strings.
+     *
+     * @param o the object to convert
+     * @return the integer value if conversion succeeds, otherwise {@code 0}
+     */
     private int asInt(Object o) {
         if (o == null) return 0;
         if (o instanceof Number) return ((Number) o).intValue();
@@ -192,6 +270,12 @@ public class EventOverviewScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads the event cover image from a URL on a background thread and
+     * updates the {@link ImageView} on the UI thread.
+     *
+     * @param imageUrl the URL of the image to load
+     */
     private void loadImageAsync(String imageUrl) {
         new Thread(() -> {
             try {
@@ -208,6 +292,11 @@ public class EventOverviewScreen extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Handles the system back button press.
+     * <p>
+     * Simply finishes the activity and returns to the previous screen.
+     */
     @Override
     public void onBackPressed() {
         finish();

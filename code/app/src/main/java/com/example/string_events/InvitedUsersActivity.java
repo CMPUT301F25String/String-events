@@ -14,12 +14,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays a list of users with INVITED status and provides a demo action
- * to send a message to those users.
+ * Displays a list of users with {@link UserItem.Status#INVITED} status and
+ * provides an action to send a message to those users.
+ * <p>
+ * The invited users are loaded via {@link UserAdapterHelper#loadUsers(String)}
+ * using the event ID passed from {@link OrganizerEventDetailScreen}.
+ * A button at the bottom opens {@link EventMessageActivity} targeting the
+ * "invited" group for the same event.
  */
 public class InvitedUsersActivity extends AppCompatActivity {
+
+    /**
+     * Backing list of invited users displayed in the {@link ListView}.
+     */
     private final ArrayList<UserItem> userList = new ArrayList<>();
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Inflates the layout containing the invited users list.</li>
+     *     <li>Initializes the back button to close this screen.</li>
+     *     <li>Configures a {@link UserAdapter} and {@link UserAdapterHelper} for the list.</li>
+     *     <li>Retrieves the event ID from the launching intent.</li>
+     *     <li>Loads invited users for that event.</li>
+     *     <li>Configures a "send message" button to launch {@link EventMessageActivity}
+     *         with the appropriate event and target group.</li>
+     * </ul>
+     *
+     * @param savedInstanceState previously saved state, or {@code null} if created fresh
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,12 +60,15 @@ public class InvitedUsersActivity extends AppCompatActivity {
 
         String eventId = getIntent().getStringExtra(OrganizerEventDetailScreen.EVENT_ID);
         if (eventId == null) {
+            // No event ID means we cannot load invited users; close the screen.
             finish();
             return;
         }
 
+        // Load invited users for the given event ID
         adapterHelper.loadUsers(eventId);
 
+        // Open EventMessageActivity targeting the "invited" group for this event
         findViewById(R.id.btnSendInvited).setOnClickListener(v -> {
             Intent it = new Intent(this, EventMessageActivity.class);
             it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);

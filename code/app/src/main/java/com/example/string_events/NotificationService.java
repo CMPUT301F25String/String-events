@@ -24,23 +24,68 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Foreground service that listens to Firestore for new notification documents
+ * for the currently logged-in user and shows system push notifications.
+ * <p>
+ * Behavior:
+ * <ul>
+ *     <li>Starts as a foreground service with a sticky notification.</li>
+ *     <li>Subscribes to the {@code notifications} collection for the current username.</li>
+ *     <li>Ignores existing documents on first load to prevent duplicates.</li>
+ *     <li>Shows a push notification for each newly added document belonging to the user.</li>
+ * </ul>
+ */
 public class NotificationService extends Service {
 
+    /**
+     * Notification channel ID used for all event update notifications.
+     */
     private final String CHANNEL_ID = "event_updates_channel";
 
-    // Flags to prevent duplicates
+    /**
+     * Flag used to detect and skip the initial Firestore snapshot
+     * (so existing documents do not trigger notifications).
+     */
     private boolean isFirstLoad = true;
+
+    /**
+     * Set of processed Firestore document IDs to avoid sending duplicate
+     * notifications for the same document within a service session.
+     */
     private final Set<String> processedDocIds = new HashSet<>();
 
+    /**
+     * Called when the service is first created.
+     * <p>
+     * Initializes the notification channel required for posting notifications
+     * on Android 8.0 (API 26) and above.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
     }
 
+    /**
+     * Called each time the service is started via {@link android.content.Context#startService(Intent)}.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Starts the service in the foreground with a persistent notification.</li>
+     *     <li>Reads the logged-in username and notification preference from shared preferences.</li>
+     *     <li>If notifications are enabled and a username is set, starts the Firestore listener.</li>
+     *     <li>Stops the service if no user or if notifications are disabled.</li>
+     * </ul>
+     *
+     * @param intent  the Intent supplied to {@code startService}, if any
+     * @param flags   additional flags for the start request
+     * @param startId a unique integer representing this specific request to start
+     * @return {@link #START_STICKY} so the service is restarted if killed by the system
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Start Foreground immediately
+        // Start foreground immediately so the service is less likely to be killed
         startForeground(999, getStickyNotification());
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
@@ -52,13 +97,27 @@ public class NotificationService extends Service {
         if (username != null && isEnabled) {
             startFirestoreListener(username);
         } else {
-
+            // No user or notifications disabled → stop service
             stopSelf();
         }
 
         return START_STICKY;
     }
 
+    /**
+     * Starts a real-time Firestore listener on the {@code notifications} collection
+     * for documents belonging to the specified username.
+     * <p>
+     * Logic:
+     * <ul>
+     *     <li>On the first snapshot, marks existing documents as processed and skips notifications.</li>
+     *     <li>On subsequent snapshots, processes {@link DocumentChange.Type#ADDED} changes only.</li>
+     *     <li>Generates a push notification depending on the notification type:
+     *         message vs. lottery selection status.</li>
+     * </ul>
+     *
+     * @param username username for which notifications should be listened to
+     */
     private void startFirestoreListener(String username) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -109,6 +168,13 @@ public class NotificationService extends Service {
                 });
     }
 
+    /**
+     * Builds and shows a push notification that opens {@link NotificationScreen}
+     * when tapped.
+     *
+     * @param title notification title (usually the event name)
+     * @param body  notification message body
+     */
     private void sendPushNotification(String title, String body) {
         Intent intent = new Intent(this, NotificationScreen.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -131,6 +197,12 @@ public class NotificationService extends Service {
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
 
+    /**
+     * Creates the notification channel required for posting notifications
+     * on Android Oreo (API 26) and later.
+     * <p>
+     * If the channel already exists, the call is effectively a no-op.
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
@@ -145,6 +217,11 @@ public class NotificationService extends Service {
         }
     }
 
+    /**
+     * Creates the persistent foreground notification used to keep the service alive.
+     *
+     * @return a non-dismissible notification indicating that the app is listening for updates
+     */
     private Notification getStickyNotification() {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Event Monitor")
@@ -153,6 +230,12 @@ public class NotificationService extends Service {
                 .build();
     }
 
+    /**
+     * This service is not designed for binding, so this method always returns {@code null}.
+     *
+     * @param intent binding intent (unused)
+     * @return {@code null}, since binding is not supported
+     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
