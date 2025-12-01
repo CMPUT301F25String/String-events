@@ -125,6 +125,7 @@ public class EventDetailActivity extends AppCompatActivity {
             // user is already an attendee and wants to cancel their appearance
             else {
                 eventDocumentRef.update("attendees", FieldValue.arrayRemove(username));
+                eventDocumentRef.update("cancelled", FieldValue.arrayUnion(username));
                 Toast.makeText(EventDetailActivity.this, "Removed from attendees!", Toast.LENGTH_SHORT).show();
                 userInEventAttendees.set(false);
                 // when an attendee for an event cancels, the lottery automatically selects a replacement user from the waitlist

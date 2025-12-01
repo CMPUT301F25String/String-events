@@ -15,11 +15,33 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * List adapter that binds {@link EventItem} objects to {@code item_event} rows.
+ * <p>
+ * Each row displays:
+ * <ul>
+ *     <li>Cover image (or a fallback image if none is available)</li>
+ *     <li>Title and location</li>
+ *     <li>Start time</li>
+ *     <li>Number of spots left</li>
+ *     <li>Status (Scheduled / In Progress / Finished) with color coding</li>
+ * </ul>
+ */
 public class EventAdapter extends BaseAdapter {
     private final Context context;
     private final List<EventItem> items;
+    /**
+     * Date-time formatter for displaying event start time.
+     * <p>
+     * Example: {@code Nov 28, 2025 at 4:30 PM}
+     */
     private final SimpleDateFormat dateTimeFmt = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
 
+    /**
+     * Creates a new adapter with the given backing list.
+     *
+     * @param items list of events to display
+     */
     EventAdapter(Context context, List<EventItem> items) {
         this.context = context;
         this.items = items;
@@ -29,6 +51,14 @@ public class EventAdapter extends BaseAdapter {
     @Override public EventItem getItem(int position) { return items.get(position); }
     @Override public long getItemId(int position) { return position; }
 
+    /**
+     * Inflates and binds a single event row.
+     *
+     * @param pos         position of the item in the list
+     * @param convertView recycled view, if available
+     * @param parent      parent view group
+     * @return the populated row view
+     */
     @Override
     public View getView(int pos, View convertView, android.view.ViewGroup parent) {
         View v = convertView;
@@ -89,6 +119,9 @@ public class EventAdapter extends BaseAdapter {
         return v;
     }
 
+    /**
+     * ViewHolder pattern for efficient row view reuse.
+     */
     static class Holder {
         ImageView imgCover;
         TextView tvTitle, tvTime, tvSpots, tvPlace;

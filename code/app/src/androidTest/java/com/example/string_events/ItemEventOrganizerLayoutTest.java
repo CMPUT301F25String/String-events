@@ -27,25 +27,17 @@ import org.junit.runner.RunWith;
 public class ItemEventOrganizerLayoutTest {
 
     /** Launches the app's launcher Activity and sets our layout as content. */
-    private ActivityScenario<? extends Activity> launchWithOurLayout() {
+    private static Intent hostIntentFor(int layoutResId) {
         Context ctx = ApplicationProvider.getApplicationContext();
-        // Get the existing launcher activity of the target app (no class name needed)
-        Intent launchIntent = ctx.getPackageManager()
-                .getLaunchIntentForPackage(ctx.getPackageName());
-        // Safety: ensure we don't carry LAUNCHER category after startup
-        launchIntent = (launchIntent == null)
-                ? new Intent(Intent.ACTION_MAIN) : new Intent(launchIntent);
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        ActivityScenario<? extends Activity> scenario = ActivityScenario.launch(launchIntent);
-        // Replace the launcher activity's content with the layout under test
-        scenario.onActivity(activity -> activity.setContentView(R.layout.item_event_organizer));
-        return scenario;
+        Intent i = new Intent(ctx, UiHostActivity.class);
+        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, layoutResId);
+        return i;
     }
 
     @Test
     public void views_areDisplayed_test() {
-        try (ActivityScenario<? extends Activity> scenario = launchWithOurLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.item_event_organizer))) {
             onView(withId(R.id.imgCover)).check(matches(isDisplayed()));
             onView(withId(R.id.chipStatus)).check(matches(isDisplayed()));
             onView(withId(R.id.tvTitle)).check(matches(isDisplayed()));
@@ -60,8 +52,8 @@ public class ItemEventOrganizerLayoutTest {
 
     @Test
     public void layout_inflates_without_crash_test() {
-        try (ActivityScenario<? extends Activity> scenario = launchWithOurLayout()) {
-            // Smoke check on a core view
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.item_event_organizer))) {
             onView(withId(R.id.tvTitle)).check(matches(isDisplayed()));
         }
     }

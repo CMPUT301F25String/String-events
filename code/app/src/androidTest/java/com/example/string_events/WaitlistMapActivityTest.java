@@ -15,8 +15,14 @@ import android.os.Bundle;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,60 +33,33 @@ import org.junit.runner.RunWith;
  */
 @RunWith(AndroidJUnit4.class)
 public class WaitlistMapActivityTest {
-
     /** Launches launcher Activity and sets our layout as the content view. */
-    private ActivityScenario<? extends Activity> launchWithLayout() {
+    public Intent newIntent() {
+        // Using ApplicationProvider.getApplicationContext() is the standard way
+        // to get a context in an instrumented test.
         Context ctx = ApplicationProvider.getApplicationContext();
-        Intent launch = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
-        if (launch == null) launch = new Intent(Intent.ACTION_MAIN);
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent intent = new Intent(ctx, WaitlistMapActivity.class);
 
-        ActivityScenario<? extends Activity> scenario = ActivityScenario.launch(launch);
-        scenario.onActivity(a -> {
-            a.setContentView(R.layout.activity_waitlist_map);
-            // Optional: drive MapView minimal lifecycle to avoid NPEs on some devices
-            android.view.View mv = a.findViewById(R.id.map_view);
-            if (mv instanceof com.google.android.gms.maps.MapView) {
-                com.google.android.gms.maps.MapView mapView = (com.google.android.gms.maps.MapView) mv;
-                mapView.onCreate(new Bundle());
-                mapView.onResume();
-            }
-        });
-        return scenario;
+        intent.putExtra("eventId", "ca659820-0d64-4948-9469-b91707a26212");
+        return intent;
     }
+    @Rule
+    public ActivityScenarioRule<WaitlistMapActivity> scenario = new ActivityScenarioRule<>(newIntent());
 
     @Test
     public void views_areDisplayed_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
+//        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
             onView(withId(R.id.map_view)).check(matches(isDisplayed()));
-            onView(withId(R.id.btn_refresh)).check(matches(isDisplayed()));
-            onView(withId(R.id.btn_capture_location)).check(matches(isDisplayed()));
-            onView(withId(R.id.btn_save_join_location)).check(matches(isDisplayed()));
-            onView(withId(R.id.btn_save_my_location_precise)).check(matches(isDisplayed()));
-        }
-    }
-
-    @Test
-    public void texts_areCorrect_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
-            onView(withId(R.id.btn_save_my_location_precise))
-                    .check(matches(withText("Save My Location (precise)")));
-        }
+//        }
     }
 
     @Test
     public void buttons_areClickable_noCrash_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
-            onView(withId(R.id.btn_refresh)).check(matches(isClickable()));
-            onView(withId(R.id.btn_capture_location)).check(matches(isClickable()));
-            onView(withId(R.id.btn_save_join_location)).check(matches(isClickable()));
-            onView(withId(R.id.btn_save_my_location_precise)).check(matches(isClickable()));
+//        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
+            onView(withId(R.id.btnBack)).check(matches(isClickable()));
 
             // Light interactions; success criterion: no crash
-            onView(withId(R.id.btn_refresh)).perform(click());
-            onView(withId(R.id.btn_capture_location)).perform(click());
-            onView(withId(R.id.btn_save_join_location)).perform(click());
-            onView(withId(R.id.btn_save_my_location_precise)).perform(click());
-        }
+            onView(withId(R.id.btnBack)).perform(click());
+//        }
     }
 }

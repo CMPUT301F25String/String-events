@@ -127,9 +127,6 @@ public class CreateEventScreenTest {
         bringIntoView(R.id.geolocation_switch);
         onView(withId(R.id.geolocation_switch)).check(matches(isDisplayed()));
 
-        bringIntoView(R.id.auto_rolling_switch);
-        onView(withId(R.id.auto_rolling_switch)).check(matches(isDisplayed()));
-
         bringIntoView(R.id.event_visibility);
         onView(withId(R.id.event_visibility)).check(matches(isDisplayed()));
         onView(withId(R.id.event_public_button)).check(matches(isDisplayed()));

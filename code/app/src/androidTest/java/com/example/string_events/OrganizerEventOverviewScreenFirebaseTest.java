@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,8 @@ public class OrganizerEventOverviewScreenFirebaseTest {
         data.put("startAt", Timestamp.now());
         data.put("endAt", Timestamp.now());
         data.put("creator", "test_delete_creator");
-
+        data.put("waitlist", new ArrayList<String>());
+        data.put("attendees", new ArrayList<String>());
         Tasks.await(docRef.set(data), TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         try (ActivityScenario<OrganizerEventOverviewScreen> scenario =
@@ -97,6 +99,8 @@ public class OrganizerEventOverviewScreenFirebaseTest {
         data.put("waitlistLimit", 10);
         data.put("attendeesCount", 0);
         data.put("creator", "overview_test_creator");
+        data.put("waitlist", new ArrayList<String>());
+        data.put("attendees", new ArrayList<String>());
 
         try {
             Tasks.await(docRef.set(data), TIMEOUT_SECONDS, TimeUnit.SECONDS);

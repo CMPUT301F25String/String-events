@@ -28,16 +28,6 @@ public class EventFlagsAndCapacityTest {
 
     @Test
     public void visibility_and_geolocation_flags_toggle() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> doc = new HashMap<>();
-        doc.put("creator", "Abc");
-        doc.put("title", "titletest");
-        db.collection("events").document("randomid").set(doc)
-                .addOnSuccessListener(v -> {
-                            Log.d("Firestore", "event uploaded to database");
-                        });
-
-
         Event e = newEvent();
         assertTrue(e.getEventVisibility());
         assertTrue(e.getGeolocationRequirement());

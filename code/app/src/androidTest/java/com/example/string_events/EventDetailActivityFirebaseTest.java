@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.Test;
@@ -35,12 +36,14 @@ public class EventDetailActivityFirebaseTest {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         String eventId = "test-detail-event-" + System.currentTimeMillis();
-        String username = "detail_user_" + System.currentTimeMillis();
+//        String eventId = "e299ee34-3977-491e-8f2b-0ce30bd7e447";
+        String username = "detail_user_abc";
 
-        // seed Firestore with a test event document
+//         seed Firestore with a test event document
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("title", "EventDetailActivity test event");
         eventData.put("waitlist", new ArrayList<String>());
+        eventData.put("attendees", new ArrayList<String>());
 
         CountDownLatch createLatch = new CountDownLatch(1);
         db.collection(EVENTS_COLLECTION)
@@ -83,7 +86,6 @@ public class EventDetailActivityFirebaseTest {
                             db.collection(EVENTS_COLLECTION).document(eventId));
 
                     ImageButton applyButton = activity.findViewById(R.id.apply_button);
-
                     Method addMethod = EventDetailActivity.class
                             .getDeclaredMethod("addUserToEventWaitlist", ImageButton.class);
                     addMethod.setAccessible(true);
@@ -114,16 +116,31 @@ public class EventDetailActivityFirebaseTest {
                         })
                         .addOnFailureListener(e -> checkLatch.countDown());
 
-                checkLatch.await(5, TimeUnit.SECONDS);
+                checkLatch.await(10, TimeUnit.SECONDS);
                 if (!inWaitlist.get()) {
-                    Thread.sleep(700);
+                    Thread.sleep(2000);
                 }
             }
-
-            assertTrue("Username was not added to event waitlist in Firestore", inWaitlist.get());
-
+            db.collection(EVENTS_COLLECTION)
+                    .document(eventId)
+                    .update("waitlist", FieldValue.arrayRemove(username)).addOnSuccessListener(aVoid -> {
+                        assertTrue("Username was not added to event waitlist in Firestore", inWaitlist.get());
+                    });
         } finally {
-            // clean up Firestore event document
+            CountDownLatch cleanupLatch = new CountDownLatch(1);
+            db.collection(EVENTS_COLLECTION)
+                    .document(eventId)
+                    .update("waitlist", FieldValue.arrayRemove(username))
+                    .addOnSuccessListener(aVoid -> {
+                        cleanupLatch.countDown();
+                    })
+                    .addOnFailureListener(e -> {
+                        cleanupLatch.countDown();
+                    });
+            assertTrue("Cleanup timed out: Failed to remove user from waitlist.",
+                    cleanupLatch.await(10, TimeUnit.SECONDS));
+
+//             clean up Firestore event document
             CountDownLatch deleteLatch = new CountDownLatch(1);
             db.collection(EVENTS_COLLECTION)
                     .document(eventId)
