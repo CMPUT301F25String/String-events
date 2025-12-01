@@ -40,7 +40,11 @@ public class LoginScreen extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent i = new Intent(LoginScreen.this, WelcomeActivity.class);
+            startActivity(i);
+            finish();
+        });
 
         btnUser = findViewById(R.id.btnUser);
         btnAdmin = findViewById(R.id.btnAdmin);
@@ -56,6 +60,8 @@ public class LoginScreen extends AppCompatActivity {
         btnAdmin.setOnClickListener(v -> setRole(Role.ADMIN));
         btnSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterScreen.class)));
         btnSignIn.setOnClickListener(view -> signIn());
+
+
     }
 
     private void setRole(Role role) {

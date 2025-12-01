@@ -24,3 +24,7 @@
 * [Work Distribution](https://github.com/CMPUT301F25String/String-events/wiki/Project-Part-3-Work-Distributions)
 * [Object‐Oriented Design (UML Diagram)](https://github.com/CMPUT301F25String/String-events/wiki/Object%E2%80%90Oriented-Design-(UML-Diagram))
 * [Sprint Planning and Reviews](https://github.com/CMPUT301F25String/String-events/wiki/Sprint-Planning-and-Reviews)
+
+**Project Part 3 Deliverables**
+* [Work Distribution](https://github.com/CMPUT301F25String/String-events/wiki/Project-Part-4-Work-Distributions))
+* [Sprint Planning and Reviews](https://github.com/CMPUT301F25String/String-events/wiki/Sprint-Planning-and-Reviews)
