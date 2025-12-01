@@ -40,12 +40,5 @@ public class InvitedUsersActivity extends AppCompatActivity {
         }
 
         adapterHelper.loadUsers(eventId);
-
-        findViewById(R.id.btnSendInvited).setOnClickListener(v -> {
-            Intent it = new Intent(this, EventMessageActivity.class);
-            it.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
-            it.putExtra("target_group", "invited");
-            startActivity(it);
-        });
     }
 }

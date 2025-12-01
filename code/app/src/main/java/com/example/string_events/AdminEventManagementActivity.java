@@ -61,11 +61,9 @@ public class AdminEventManagementActivity extends AppCompatActivity {
                         e.imageUrl = d.getString("imageUrl");
                         e.description = d.getString("description");
 
-                        e.categories = d.getString("categories");
                         e.creator = d.getString("creator");
 
                         e.maxAttendees = asInt(d.get("maxAttendees"));
-                        e.attendeesCount = asInt(d.get("attendeesCount"));
                         e.waitlistLimit = asInt(d.get("waitlistLimit"));
 
                         e.startAt = d.getTimestamp("startAt");
@@ -92,9 +90,8 @@ public class AdminEventManagementActivity extends AppCompatActivity {
         String location;
         String imageUrl;
         String description;
-        String categories;
         String creator;
-        int maxAttendees, attendeesCount, waitlistLimit;
+        int maxAttendees, waitlistLimit;
         Timestamp startAt, endAt, regStartAt, regEndAt;
     }
 }

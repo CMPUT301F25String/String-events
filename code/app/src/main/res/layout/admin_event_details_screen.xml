@@ -169,6 +169,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider1" />
 
+                    <!-- Location Row -->
                     <TextView
                         android:id="@+id/tvEventDates"
                         android:layout_width="0dp"
@@ -178,12 +179,10 @@
                         android:text="Date and Time"
                         android:textColor="#101114"
                         android:textSize="14sp"
-                        app:layout_constraintBottom_toBottomOf="@id/ic_date"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/ic_date"
                         app:layout_constraintTop_toTopOf="@id/ic_date" />
 
-                    <!-- Location Row -->
                     <ImageView
                         android:id="@+id/ic_location"
                         android:layout_width="20dp"
@@ -358,7 +357,6 @@
                     android:textColor="#101114"
                     app:backgroundTint="#FFD165"
                     app:cornerRadius="28dp"
-                    app:icon="@drawable/adminqrode"
                     app:iconGravity="textStart"
                     app:iconPadding="12dp"
                     app:iconTint="#101114" />
@@ -367,14 +365,14 @@
             <!-- Delete Button -->
             <ImageButton
                 android:id="@+id/btnDelete"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:background="@null"
+                android:background="@drawable/delete_event_button"
                 android:scaleType="fitCenter"
-                android:src="@drawable/admineventdelete"
-                app:layout_constraintTop_toBottomOf="@id/layout_actions" />
+                app:layout_constraintTop_toBottomOf="@id/layout_actions"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

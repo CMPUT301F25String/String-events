@@ -15,11 +15,13 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import java.util.Date;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,17 +33,20 @@ public class NotificationService extends Service {
     // Flags to prevent duplicates
     private boolean isFirstLoad = true;
     private final Set<String> processedDocIds = new HashSet<>();
+//    private Timestamp listenerStartTime;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+//        listenerStartTime = new Timestamp(new Date());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Start Foreground immediately
         startForeground(999, getStickyNotification());
+        NotificationServiceHelper.isNotificationServiceRunning = true;
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         String username = sharedPreferences.getString("user", null);
@@ -52,7 +57,6 @@ public class NotificationService extends Service {
         if (username != null && isEnabled) {
             startFirestoreListener(username);
         } else {
-
             stopSelf();
         }
 
@@ -64,6 +68,7 @@ public class NotificationService extends Service {
 
         db.collection("notifications")
                 .whereEqualTo("username", username)
+//                .whereGreaterThan("createdAt", listenerStartTime)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
@@ -72,9 +77,9 @@ public class NotificationService extends Service {
                         }
 
                         if (snapshots != null) {
-                            // 1. Handle Initial Load (Existing Data)
+//                             1. Handle Initial Load (Existing Data)
                             if (isFirstLoad) {
-                                // Mark all existing docs as "processed" so we don't notify for them
+//                                 Mark all existing docs as "processed" so we don't notify for them
                                 for (DocumentChange dc : snapshots.getDocumentChanges()) {
                                     processedDocIds.add(dc.getDocument().getId());
                                 }
@@ -87,7 +92,9 @@ public class NotificationService extends Service {
                                 String docId = dc.getDocument().getId();
 
                                 // Only process ADDED documents that we haven't seen this session
-                                if (dc.getType() == DocumentChange.Type.ADDED && !processedDocIds.contains(docId)) {
+                                if (dc.getType() == DocumentChange.Type.ADDED
+                                        && !processedDocIds.contains(docId)
+                                ) {
 
                                     // Mark as processed immediately
                                     processedDocIds.add(docId);

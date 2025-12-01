@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +41,8 @@ public class LotteryHelper {
 
             ArrayList<Notification> notificationUploadList = new ArrayList<>();
             for (String username : inviteList) {
-                Notification newNotification = new Notification(username, true, eventRef.getId(), eventPhoto, eventName);
+                Notification newNotification = new Notification(
+                        username, true, eventRef.getId(), eventPhoto, eventName);
                 notificationUploadList.add(newNotification);
             }
 
@@ -56,6 +58,7 @@ public class LotteryHelper {
                 doc.put("username", notification.getUsername());
                 doc.put("selectedStatus", notification.getSelectedStatus());
                 doc.put("eventId", notification.getEventId());
+                doc.put("createdAt", notification.getTimeStamp());
                 // only add the image url if it's not null
                 if (notification.getEventPhoto() != null) {
                     doc.put("imageUrl", notification.getEventPhoto());

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
     private static final LatLng EDMONTON = new LatLng(53.5461, -113.4938);
 
     private GoogleMap map;
+    MapView mapView;
     private FusedLocationProviderClient fused;
     private FirebaseFirestore db;
     private DocumentReference eventRef;
@@ -46,7 +48,7 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waitlist_map);
 
-        MapView mapView = findViewById(R.id.map_view);
+        mapView = findViewById(R.id.map_view);
         if (mapView == null) {
             throw new IllegalStateException("Missing @id/map_view in activity_waitlist_map.xml");
         }
@@ -60,6 +62,21 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
         eventRef = db.collection("events").document(eventId);
 
         fused = LocationServices.getFusedLocationProviderClient(this);
+
+        ImageButton backButton = findViewById(R.id.btnBack);
+        backButton.setOnClickListener(v -> finish());
+    }
+
+    @Override public void onStart()  { super.onStart();  mapView.onStart();  }
+    @Override public void onResume() { super.onResume(); mapView.onResume(); }
+    @Override public void onPause()  { mapView.onPause();  super.onPause();  }
+    @Override public void onStop()   { mapView.onStop();   super.onStop();   }
+    @Override public void onDestroy(){ mapView.onDestroy();super.onDestroy();}
+    @Override public void onLowMemory(){ super.onLowMemory(); mapView.onLowMemory(); }
+    @Override protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+        fused = LocationServices.getFusedLocationProviderClient(this);
     }
 
     @Override
@@ -69,12 +86,6 @@ public class WaitlistMapActivity extends AppCompatActivity implements OnMapReady
         map.getUiSettings().setCompassEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
-        boolean anyGranted =
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        if (anyGranted) {
-            map.setMyLocationEnabled(true);
-        }
         enableMyLocation();
         loadWaitlistAndPlot();
     }

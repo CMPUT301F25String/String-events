@@ -96,7 +96,6 @@
                 android:layout_width="0dp"
                 android:layout_height="180dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sample_event"
                 android:background="@drawable/bg_round"
                 android:clipToOutline="true"
                 app:layout_constraintTop_toTopOf="parent"
@@ -135,7 +134,7 @@
                 android:layout_marginStart="8dp"
                 android:text="11:00 am"
                 android:textColor="#101114"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 app:layout_constraintTop_toTopOf="@id/iv_time"
                 app:layout_constraintStart_toEndOf="@id/iv_time" />
 

@@ -60,8 +60,6 @@ public class LoginScreen extends AppCompatActivity {
         btnAdmin.setOnClickListener(v -> setRole(Role.ADMIN));
         btnSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterScreen.class)));
         btnSignIn.setOnClickListener(view -> signIn());
-
-
     }
 
     private void setRole(Role role) {
@@ -144,7 +142,7 @@ public class LoginScreen extends AppCompatActivity {
                                                 handleLoginResult(q2.getDocuments().get(0), pass);
                                             } else {
                                                 setLoading(false);
-                                                toast("no account go create one");
+                                                toast("Incorrect login information.");
                                             }
                                         })
                                         .addOnFailureListener(e -> {
@@ -166,7 +164,7 @@ public class LoginScreen extends AppCompatActivity {
                         .addOnSuccessListener(q -> {
                             if (q.isEmpty()) {
                                 setLoading(false);
-                                toast("No account found go create one");
+                                toast("Incorrect login information.");
                                 return;
                             }
                             handleLoginResult(q.getDocuments().get(0), pass);
