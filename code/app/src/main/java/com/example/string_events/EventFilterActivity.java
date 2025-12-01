@@ -51,13 +51,13 @@ public class EventFilterActivity extends AppCompatActivity {
      */
     private final HashSet<String> selected = new HashSet<>();
 
-    private TextView chipBadminton, chipGames, chipArts, chipLearning;
+    private TextView chipSports, chipGames, chipArts, chipLearning, chipMovie, chipCooking, chipMusic, chipDance, chipExercise;
     private EditText etStart, etEnd;
 
     /**
      * Toggles the selection state of a tag and updates the chip UI accordingly.
      *
-     * @param tag  the tag identifier (e.g., "Badminton")
+     * @param tag  the tag identifier (e.g., "Sports")
      * @param chip the TextView acting as a chip representing this tag
      */
     private void toggle(String tag, android.widget.TextView chip) {
@@ -76,10 +76,15 @@ public class EventFilterActivity extends AppCompatActivity {
      * Synchronizes the visual state of all tag chips based on the current selection set.
      */
     private void syncChipUI() {
-        setChipState(chipBadminton, "Badminton");
+        setChipState(chipSports, "Sports");
         setChipState(chipGames,     "Games");
         setChipState(chipArts,      "Arts");
         setChipState(chipLearning,  "Learning");
+        setChipState(chipMovie,  "Movie");
+        setChipState(chipCooking,  "Cooking");
+        setChipState(chipMusic,  "Music");
+        setChipState(chipDance,  "Dance");
+        setChipState(chipExercise,  "Exercise");
     }
 
     /**
@@ -133,10 +138,15 @@ public class EventFilterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_filter);
 
-        chipBadminton = findViewById(R.id.chip_badminton_f);
+        chipSports = findViewById(R.id.chip_sports_f);
         chipGames     = findViewById(R.id.chip_games_f);
         chipArts      = findViewById(R.id.chip_arts_f);
         chipLearning  = findViewById(R.id.chip_learning_f);
+        chipMovie  = findViewById(R.id.chip_movie_f);
+        chipCooking  = findViewById(R.id.chip_cooking_f);
+        chipMusic  = findViewById(R.id.chip_music_f);
+        chipDance  = findViewById(R.id.chip_dance_f);
+        chipExercise  = findViewById(R.id.chip_exercise_f);
 
         etStart = findViewById(R.id.et_start_time);
         etEnd   = findViewById(R.id.et_end_time);
@@ -161,10 +171,16 @@ public class EventFilterActivity extends AppCompatActivity {
         }
 
         // Tag chips toggle handlers
-        chipBadminton.setOnClickListener(v -> toggle("Badminton", chipBadminton));
+        chipSports.setOnClickListener(v -> toggle("Sports", chipSports));
         chipGames.setOnClickListener(v     -> toggle("Games",     chipGames));
         chipArts.setOnClickListener(v      -> toggle("Arts",      chipArts));
         chipLearning.setOnClickListener(v  -> toggle("Learning",  chipLearning));
+        chipMovie.setOnClickListener(v  -> toggle("Movie",  chipMovie));
+        chipCooking.setOnClickListener(v  -> toggle("Cooking",  chipCooking));
+        chipMusic.setOnClickListener(v  -> toggle("Music",  chipMusic));
+        chipDance.setOnClickListener(v  -> toggle("Dance",  chipDance));
+        chipExercise.setOnClickListener(v  -> toggle("Exercise",  chipExercise));
+
 
         // Date/time pickers for start and end fields
         etStart.setOnClickListener(v -> showDateTimePicker(etStart));
