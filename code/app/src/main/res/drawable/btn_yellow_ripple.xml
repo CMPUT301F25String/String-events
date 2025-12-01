@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/drawable/btn_yellow_ripple.xml -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#20000000">
-    <item android:drawable="@drawable/bg_button_yellow"/>
+    android:color="#33FFD165">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFD165"/>
+            <corners android:radius="28dp"/>
+        </shape>
+    </item>
+
 </ripple>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -30,7 +31,6 @@
             android:textStyle="bold"
             android:textColor="#000000"
             android:layout_centerInParent="true"/>
-
     </RelativeLayout>
 
     <ListView
@@ -58,6 +58,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:background="@drawable/btn_yellow_ripple"
+            app:backgroundTint="@null"
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:visibility="visible"/>
@@ -71,6 +72,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:background="@drawable/btn_yellow_ripple"
+            app:backgroundTint="@null"
             android:gravity="center"
             android:visibility="visible"/>
 
@@ -83,6 +85,7 @@
             android:textSize="16sp"
             android:textColor="#000000"
             android:background="@drawable/btn_yellow_ripple"
+            app:backgroundTint="@null"
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:visibility="gone"/>
