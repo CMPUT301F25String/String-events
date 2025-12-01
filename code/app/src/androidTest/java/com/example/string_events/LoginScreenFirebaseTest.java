@@ -90,8 +90,8 @@ public class LoginScreenFirebaseTest {
             SharedPreferences sp = ctx.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
             AtomicBoolean loggedIn = new AtomicBoolean(false);
 
-            String storedUser = null;
-            String storedRole = null;
+            String storedUser;
+            String storedRole;
 
             for (int i = 0; i < 20 && !loggedIn.get(); i++) {
                 storedUser = sp.getString("user", null);

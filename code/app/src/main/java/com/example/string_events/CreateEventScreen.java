@@ -84,7 +84,6 @@ public class CreateEventScreen extends AppCompatActivity {
     EditText eventAttendantsEditText;
     EditText eventWaitlistEdittext;
     SwitchCompat eventGeolocationSwitch;
-//    SwitchCompat eventAutoRollingSwitch;
     ImageButton eventVisibilityPublic;
     ImageButton eventVisibilityPrivate;
 
@@ -126,7 +125,6 @@ public class CreateEventScreen extends AppCompatActivity {
         eventAttendantsEditText = findViewById(R.id.event_attendants_editText);
         eventWaitlistEdittext = findViewById(R.id.event_waitlist_editText);
         eventGeolocationSwitch = findViewById(R.id.geolocation_switch);
-//        eventAutoRollingSwitch = findViewById(R.id.auto_rolling_switch);
         eventVisibilityPublic = findViewById(R.id.event_public_button);
         eventVisibilityPrivate = findViewById(R.id.event_private_button);
         // needs to be atomic boolean to avoid an error
@@ -271,7 +269,6 @@ public class CreateEventScreen extends AppCompatActivity {
             int maxAttendees = Integer.parseInt(eventAttendantsEditText.getText().toString());
             int waitlistLimit = Integer.parseInt(eventWaitlistEdittext.getText().toString());
             boolean geolocationRequirement = eventGeolocationSwitch.isChecked();
-//            boolean autoRoll = eventAutoRollingSwitch.isChecked();
 
             ArrayList<String> tags = new ArrayList<>(selectedTags);
             Event newEvent = new Event(eventId, username, title, photo, description, tags,
@@ -415,6 +412,7 @@ public class CreateEventScreen extends AppCompatActivity {
         doc.put("attendees", event.getAttendees()); // when creating a new event, this attendees list is empty
         doc.put("invited", event.getInvited()); // when creating a new event, this invited list is empty
         doc.put("waitlist", event.getWaitlist()); // when creating a new event, this waitlist is empty
+        doc.put("cancelled", event.getCancelled()); // when creating a new event, this cancelled list is empty
         doc.put("lotteryRolled", event.isLotteryRolled()); // when creating a new event, lotteryRolled is set to false
         doc.put("waitlistLimit", event.getWaitlistLimit());
         doc.put("geolocationReq", event.getGeolocationRequirement());

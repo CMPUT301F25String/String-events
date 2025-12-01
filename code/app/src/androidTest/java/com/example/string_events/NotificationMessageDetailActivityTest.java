@@ -33,8 +33,6 @@ public class NotificationMessageDetailActivityTest {
     public ActivityScenarioRule<NotificationMessageDetailActivity> rule =
             new ActivityScenarioRule<>(NotificationMessageDetailActivity.class);
 
-    // ---------- Helper ----------
-
     /** Try scrollTo(); if it fails (e.g., animations), swipe the root and retry. */
     private void safeScrollToId(int viewId) {
         final int MAX_ATTEMPTS = 6;
@@ -50,8 +48,6 @@ public class NotificationMessageDetailActivityTest {
         }
         onView(withId(viewId)).perform(ViewActions.scrollTo());
     }
-
-    // ---------- Tests ----------
 
     /** Header (back button + title) is visible on first render. */
     @Test

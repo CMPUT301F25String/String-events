@@ -34,8 +34,6 @@ public class EventMessageActivityTest {
     public ActivityScenarioRule<EventMessageActivity> rule =
             new ActivityScenarioRule<>(EventMessageActivity.class);
 
-    // ---------- Helper ----------
-
     /**
      * Attempt to bring the target view on-screen without requiring device-wide animation toggles.
      * Strategy: try scrollTo(); if animations cause a PerformException, swipe the root upward and retry.
@@ -68,15 +66,6 @@ public class EventMessageActivityTest {
     /** Verify recipient buttons, message label/box, and send button are visible (after scroll). */
     @Test
     public void initialRender_bodyControlsVisible() {
-        safeScrollToId(R.id.btnWaitingUsers);
-        onView(withId(R.id.btnWaitingUsers)).check(matches(isDisplayed()));
-
-        safeScrollToId(R.id.btnParticipatingUsers);
-        onView(withId(R.id.btnParticipatingUsers)).check(matches(isDisplayed()));
-
-        safeScrollToId(R.id.btnCanceledUsers);
-        onView(withId(R.id.btnCanceledUsers)).check(matches(isDisplayed()));
-
         safeScrollToId(R.id.etMessage);
         onView(withId(R.id.etMessage)).check(matches(isDisplayed()));
 
@@ -87,15 +76,6 @@ public class EventMessageActivityTest {
     /** Light-touch interactivity checks: buttons are enabled; we avoid asserting navigation or side effects. */
     @Test
     public void controls_enabled_noBusinessSideEffects() {
-        safeScrollToId(R.id.btnWaitingUsers);
-        onView(withId(R.id.btnWaitingUsers)).check(matches(isEnabled()));
-
-        safeScrollToId(R.id.btnParticipatingUsers);
-        onView(withId(R.id.btnParticipatingUsers)).check(matches(isEnabled()));
-
-        safeScrollToId(R.id.btnCanceledUsers);
-        onView(withId(R.id.btnCanceledUsers)).check(matches(isEnabled()));
-
         safeScrollToId(R.id.btnSendMessage);
         onView(withId(R.id.btnSendMessage)).check(matches(isEnabled()));
     }

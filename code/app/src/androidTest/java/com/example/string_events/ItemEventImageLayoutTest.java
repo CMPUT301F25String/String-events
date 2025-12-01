@@ -28,20 +28,17 @@ import org.junit.runner.RunWith;
 public class ItemEventImageLayoutTest {
 
     /** Launch launcher activity and replace its content with the layout under test. */
-    private ActivityScenario<? extends Activity> launchWithLayout() {
+    private static Intent hostIntentFor(int layoutResId) {
         Context ctx = ApplicationProvider.getApplicationContext();
-        Intent launch = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
-        if (launch == null) launch = new Intent(Intent.ACTION_MAIN);
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        ActivityScenario<? extends Activity> sc = ActivityScenario.launch(launch);
-        sc.onActivity(a -> a.setContentView(R.layout.item_event_image));
-        return sc;
+        Intent i = new Intent(ctx, UiHostActivity.class);
+        i.putExtra(UiHostActivity.EXTRA_LAYOUT_RES_ID, layoutResId);
+        return i;
     }
 
     @Test
     public void views_areDisplayed_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.item_event_image))) {
             onView(withId(R.id.img_event)).check(matches(isDisplayed()));
             onView(withId(R.id.tv_event_title)).check(matches(isDisplayed()));
         }
@@ -49,7 +46,8 @@ public class ItemEventImageLayoutTest {
 
     @Test
     public void defaults_areCorrect_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.item_event_image))) {
             // title text & overlay default visibility from XML
             onView(withId(R.id.tv_event_title)).check(matches(withText("Event Title")));
             onView(withId(R.id.overlay_selected))
@@ -59,7 +57,8 @@ public class ItemEventImageLayoutTest {
 
     @Test
     public void overlay_toggle_programmatic_test() {
-        try (ActivityScenario<? extends Activity> sc = launchWithLayout()) {
+        try (ActivityScenario<UiHostActivity> sc =
+                     ActivityScenario.launch(hostIntentFor(R.layout.item_event_image))) {
             // Simulate adapter selection effect by toggling overlay visibility in test host
             sc.onActivity(a -> {
                 View overlay = a.findViewById(R.id.overlay_selected);

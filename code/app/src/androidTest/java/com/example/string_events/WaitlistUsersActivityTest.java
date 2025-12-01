@@ -31,14 +31,6 @@ public class WaitlistUsersActivityTest {
                 .putExtra("organizerId", "org-123");
     }
 
-    @Before
-    public void initFirebase() {
-        Context ctx = ApplicationProvider.getApplicationContext();
-        if (FirebaseApp.getApps(ctx).isEmpty()) {
-            FirebaseApp.initializeApp(ctx);
-        }
-    }
-
     @Test
     public void showsCoreWidgets() {
         try (ActivityScenario<WaitlistUsersActivity> sc =

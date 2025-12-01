@@ -35,6 +35,7 @@ public class Event {
     ArrayList<User> attendees;
     ArrayList<User> invited;
     ArrayList<User> waitlist;
+    ArrayList<User> cancelled;
     boolean lotteryRolled;
 
     /**
@@ -86,6 +87,7 @@ public class Event {
         this.attendees = new ArrayList<>(); // when creating a new event, an empty attendees list is created
         this.invited = new ArrayList<>(); // when creating a new event, an empty invited list is created
         this.waitlist = new ArrayList<>(); // when creating a new event, an empty waitlist is created
+        this.cancelled = new ArrayList<>(); // when creating a new event, an empty cancelled list is created
         this.lotteryRolled = false; // when creating a new event, the lottery for participants hasn't been rolled yet
     }
 
@@ -340,6 +342,10 @@ public class Event {
 
     public ArrayList<User> getAttendees() {
         return attendees;
+    }
+
+    public ArrayList<User> getCancelled() {
+        return cancelled;
     }
 
     public boolean isLotteryRolled() {

@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -89,7 +90,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     String location = doc.getString("location");
                     String description = doc.getString("description");
                     String imageUrl = doc.getString("imageUrl");
-                    String categories = doc.getString("categories");
+                    ArrayList<String> categories = (ArrayList<String>) doc.get("categories");
                     String creator = doc.getString("creator");
 
                     Boolean geoReq = doc.getBoolean("geolocationReq");

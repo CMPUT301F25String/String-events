@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.content.Intent;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.test.core.app.ActivityScenario;
@@ -12,7 +13,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -76,7 +76,7 @@ public class EditInformationActivityFirebaseTest {
 
             ActivityScenario<EditInformationActivity> finalScenario = scenario;
             finalScenario.onActivity(activity -> {
-                TextInputEditText etName = activity.findViewById(R.id.et_new_name);
+                EditText etName = activity.findViewById(R.id.et_new_name);
                 MaterialButton btnDone = activity.findViewById(R.id.btn_done);
 
                 if (etName != null) {

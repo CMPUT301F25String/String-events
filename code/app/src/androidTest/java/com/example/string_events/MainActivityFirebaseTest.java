@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,8 @@ public class MainActivityFirebaseTest {
         inc.put("attendeesCount", 0);
         inc.put("categories", java.util.Arrays.asList("TestTag"));
         inc.put("visibility", true);
+        inc.put("waitlist", new ArrayList<String>());
+        inc.put("attendees", new ArrayList<String>());
 
         CountDownLatch createLatch = new CountDownLatch(1);
         db.collection(EVENTS_COLLECTION)
