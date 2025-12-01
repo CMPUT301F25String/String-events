@@ -21,22 +21,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
-
-
-//client side listener, server wont push message to the phoen, phone uses something that keep watching notification on firebase User A creates a notification in the database for User B.
-//
-//User B's phone (running the background service) detects a new document instantly.
-//
-//User B's phone triggers a local notification.
-// should be no backend not sure how to test it.
-
-
-
+import java.util.HashSet;
+import java.util.Set;
 
 public class NotificationService extends Service {
 
     private final String CHANNEL_ID = "event_updates_channel";
-    private boolean isFirstLoad = true; // Prevents spamming old notifications on startup
+
+    // Flags to prevent duplicates
+    private boolean isFirstLoad = true;
+    private final Set<String> processedDocIds = new HashSet<>();
 
     @Override
     public void onCreate() {
@@ -46,50 +40,61 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // start the service in the foreground
+        // Start Foreground immediately
         startForeground(999, getStickyNotification());
 
-        // 2. Get current username
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         String username = sharedPreferences.getString("user", null);
 
-        if (username != null) {
+        // Only start listener if enabled in settings
+        boolean isEnabled = sharedPreferences.getBoolean("notifications_enabled", true);
+
+        if (username != null && isEnabled) {
             startFirestoreListener(username);
+        } else {
+
+            stopSelf();
         }
 
-        return START_STICKY; //  restart this service
+        return START_STICKY;
     }
 
     private void startFirestoreListener(String username) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // watch for any documents where username matches the logged in user
         db.collection("notifications")
                 .whereEqualTo("username", username)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
-                            Log.w("NotifService", "Listen failed.", e);
                             return;
                         }
 
                         if (snapshots != null) {
-                            // If its the very first time connect, don't send notifications
-
+                            // 1. Handle Initial Load (Existing Data)
                             if (isFirstLoad) {
+                                // Mark all existing docs as "processed" so we don't notify for them
+                                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                    processedDocIds.add(dc.getDocument().getId());
+                                }
                                 isFirstLoad = false;
                                 return;
                             }
 
+                            // 2. Handle New Updates
                             for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                                // Only trigger if a new document is added
-                                if (dc.getType() == DocumentChange.Type.ADDED) {
+                                String docId = dc.getDocument().getId();
+
+                                // Only process ADDED documents that we haven't seen this session
+                                if (dc.getType() == DocumentChange.Type.ADDED && !processedDocIds.contains(docId)) {
+
+                                    // Mark as processed immediately
+                                    processedDocIds.add(docId);
 
                                     String eventName = dc.getDocument().getString("eventName");
                                     String message = "You have a new update!";
 
-                                    // Customizing message based on your fields
                                     if (Boolean.TRUE.equals(dc.getDocument().getBoolean("ismessage"))) {
                                         message = "New Message: " + dc.getDocument().getString("message");
                                     } else if (Boolean.TRUE.equals(dc.getDocument().getBoolean("selectedStatus"))) {
@@ -122,9 +127,9 @@ public class NotificationService extends Service {
                 .setContentIntent(pendingIntent);
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // Use current time as ID so multiple notifications can stack
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
-
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -140,11 +145,10 @@ public class NotificationService extends Service {
         }
     }
 
-
     private Notification getStickyNotification() {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Event Monitor")
-                .setContentText("Listening for new events...")
+                .setContentText("Listening for new updates...")
                 .setSmallIcon(R.drawable.event_image)
                 .build();
     }

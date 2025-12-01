@@ -8,19 +8,21 @@
     android:layout_marginBottom="8dp">
 
     <!--
-      Card Background: Fully Rounded (Top and Bottom)
+      Card Background: Uses the new white drawable
+      Added outlineProvider to make the shadow follow the rounded corners
     -->
     <ImageView
         android:id="@+id/profile_background"
         android:layout_width="165dp"
         android:layout_height="240dp"
+        android:background="@drawable/card_background_white"
         android:elevation="4dp"
+        android:outlineProvider="background"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <!--
-      Event Image: Rounded Top, Square Bottom
-      (Matches the top of the card, but sits flush with text below)
+      Event Image
     -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/event_image"

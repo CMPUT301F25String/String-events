@@ -3,7 +3,7 @@ package com.example.string_events;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.os.Build; // <--- ADD THIS IMPORT
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -95,15 +95,19 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         String username = sharedPreferences.getString("user", null);
 
-        if (username != null) {
+
+        boolean isNotifEnabled = sharedPreferences.getBoolean("notifications_enabled", true);
+
+        if (username != null && isNotifEnabled) {
             Intent serviceIntent = new Intent(this, NotificationService.class);
-            // Android 8.0+ requires startForegroundService
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent);
             } else {
                 startService(serviceIntent);
             }
         }
+
+
 
         tvFilterHint = findViewById(R.id.tv_filter_hint);
         TextView btnOpenFilter = findViewById(R.id.btn_open_filter);

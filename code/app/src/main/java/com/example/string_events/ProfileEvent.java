@@ -1,8 +1,6 @@
 package com.example.string_events;
 
-import android.net.Uri;
-
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * Model representing a user's event shown on the profile screen,
@@ -12,21 +10,22 @@ public class ProfileEvent {
     String profileEventId;
     String profileEventPhotoUrl;
     String profileEventName;
-    ZonedDateTime profileEventStartDateTime;
-    ZonedDateTime profileEventEndDateTime;
+    Date profileEventStartDateTime;
+    Date profileEventEndDateTime;
     String profileEventLocation;
 
     /**
      * Creates a profile event entry.
      *
+     * @param profileEventId             the unique ID of the event
      * @param profileEventPhotoUrl       URL to the event cover image
      * @param profileEventName           display name of the event
-     * @param profileEventStartDateTime  event start time (with zone)
-     * @param profileEventEndDateTime    event end time (with zone)
+     * @param profileEventStartDateTime  event start time
+     * @param profileEventEndDateTime    event end time
      * @param location                   event location text
      */
     public ProfileEvent(String profileEventId, String profileEventPhotoUrl, String profileEventName,
-                        ZonedDateTime profileEventStartDateTime, ZonedDateTime profileEventEndDateTime,
+                        Date profileEventStartDateTime, Date profileEventEndDateTime,
                         String location) {
         this.profileEventId = profileEventId;
         this.profileEventPhotoUrl = profileEventPhotoUrl;
@@ -56,23 +55,23 @@ public class ProfileEvent {
         this.profileEventName = profileEventName;
     }
 
-    /** @return start time (zoned) */
-    public ZonedDateTime getProfileEventStartDateTime() {
+    /** @return start time */
+    public Date getProfileEventStartDateTime() {
         return profileEventStartDateTime;
     }
 
-    /** @param profileEventStartDateTime new start time (zoned) */
-    public void setProfileEventStartDateTime(ZonedDateTime profileEventStartDateTime) {
+    /** @param profileEventStartDateTime new start time */
+    public void setProfileEventStartDateTime(Date profileEventStartDateTime) {
         this.profileEventStartDateTime = profileEventStartDateTime;
     }
 
-    /** @return end time (zoned) */
-    public ZonedDateTime getProfileEventEndDateTime() {
+    /** @return end time */
+    public Date getProfileEventEndDateTime() {
         return profileEventEndDateTime;
     }
 
-    /** @param profileEventEndDateTime new end time (zoned) */
-    public void setProfileEventEndDateTime(ZonedDateTime profileEventEndDateTime) {
+    /** @param profileEventEndDateTime new end time */
+    public void setProfileEventEndDateTime(Date profileEventEndDateTime) {
         this.profileEventEndDateTime = profileEventEndDateTime;
     }
 
