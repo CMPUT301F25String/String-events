@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -218,8 +219,12 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         Timestamp regStartAt  = doc.getTimestamp("regStartAt");
         Timestamp regEndAt    = doc.getTimestamp("regEndAt");
 
-        int waitlistLimit     = asInt(doc.get("waitlistLimit"));
-        int attendeesCount    = asInt(doc.get("attendeesCount"));
+        ArrayList<String> waitlist = (ArrayList<String>) doc.get("waitlist");
+        assert waitlist != null;
+        int waitlistLimit = asInt(doc.get("waitlistLimit"));
+        ArrayList<String> attendees = (ArrayList<String>) doc.get("attendees");
+        assert attendees != null;
+        int maxAttendees = asInt(doc.get("maxAttendees"));
 
         tvEventName.setText(title != null ? title : "");
 
@@ -234,11 +239,11 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
 
         tvEventLocation.setText(location != null ? location : "");
 
-        tvRegStart.setText(regStartAt != null ? dateTimeFmt.format(regStartAt.toDate()) : "");
-        tvRegEnd.setText(regEndAt != null ? dateTimeFmt.format(regEndAt.toDate()) : "");
+        tvRegStart.setText(regStartAt != null ? "Start: " + dateTimeFmt.format(regStartAt.toDate()) : "");
+        tvRegEnd.setText(regEndAt != null ? "End: " + dateTimeFmt.format(regEndAt.toDate()) : "");
 
-        tvWaitlistLimit.setText(String.valueOf(waitlistLimit));
-        tvAttendees.setText(String.valueOf(attendeesCount));
+        tvWaitlistLimit.setText("Waitlist: " + waitlist.size() + "/" + waitlistLimit);
+        tvAttendees.setText("Attendees: " + attendees.size() + "/" + maxAttendees);
 
         // Handle categories field, which can be a list or a single string
         Object cats = doc.get("categories");

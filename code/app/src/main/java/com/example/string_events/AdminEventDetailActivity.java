@@ -1,5 +1,6 @@
 package com.example.string_events;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -86,10 +87,11 @@ public class AdminEventDetailActivity extends AppCompatActivity {
 
         // Delete event from Firestore
         btnDelete.setOnClickListener(v -> deleteEvent());
-
-        // Placeholder action for QR code button
-        btnQRCode.setOnClickListener(v ->
-                Toast.makeText(this, "QR Code clicked", Toast.LENGTH_SHORT).show());
+        btnQRCode.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminEventDetailActivity.this, QrCodeActivity.class);
+            intent.putExtra(QrCodeActivity.EXTRA_EVENT_ID, eventId);
+            startActivity(intent);
+        });
 
         // Fetch and display event details
         loadEventDetails();
@@ -137,7 +139,6 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     // Numeric fields
                     Long waitlist = doc.getLong("waitlistLimit");
                     Long attendees = doc.getLong("maxAttendees");
-                    Long attendeeCount = doc.getLong("attendeesCount");
 
                     // Timestamp fields
                     Timestamp startAt = doc.getTimestamp("startAt");
@@ -173,8 +174,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     }
 
                     tvWaitlist.setText("Waitlist Limit: " + (waitlist != null ? waitlist : "-"));
-                    tvAttendees.setText("Max Attendees: " + (attendees != null ? attendees : "-") +
-                            " | Current: " + (attendeeCount != null ? attendeeCount : "0"));
+                    tvAttendees.setText("Max Attendees: " + (attendees != null ? attendees : "-"));
 
                     tvRegStart.setText("Registration Start: " +
                             (regStart != null ? df.format(regStart.toDate()) : "-"));

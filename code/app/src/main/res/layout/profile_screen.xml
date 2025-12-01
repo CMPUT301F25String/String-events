@@ -79,7 +79,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="130dp">
+            android:paddingBottom="145dp">
 
             <!-- Profile Image Container -->
             <androidx.cardview.widget.CardView
@@ -340,10 +340,9 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter"
-            android:padding="8dp"
-            android:src="@drawable/profileorange"
-            android:contentDescription="Profile"
-            app:tint="#FFD165"/>
+            android:padding="3dp"
+            android:src="@drawable/profile_clicked"
+            android:contentDescription="Profile" />
     </LinearLayout>
 
     <LinearLayout

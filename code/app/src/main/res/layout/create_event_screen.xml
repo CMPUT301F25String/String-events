@@ -72,8 +72,9 @@
                 <EditText
                     android:id="@+id/event_title_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_marginStart="17dp"
+                    android:layout_marginTop="5dp"
                     android:ems="15"
                     android:inputType="text"
                     android:hint="@string/add_text_hint"
@@ -229,11 +230,13 @@
                 <EditText
                     android:id="@+id/event_start_date_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select start date"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_start_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_start_time_editText"/>
@@ -241,11 +244,13 @@
                 <EditText
                     android:id="@+id/event_start_time_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select start time"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_start_datetime"
                     app:layout_constraintStart_toEndOf="@id/event_start_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -272,11 +277,13 @@
                 <EditText
                     android:id="@+id/event_end_date_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select end date"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_end_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_end_time_editText"/>
@@ -284,11 +291,13 @@
                 <EditText
                     android:id="@+id/event_end_time_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select end time"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/event_end_datetime"
                     app:layout_constraintStart_toEndOf="@id/event_end_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -315,8 +324,9 @@
                 <EditText
                     android:id="@+id/event_location_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_marginStart="17dp"
+                    android:layout_marginTop="5dp"
                     android:ems="15"
                     android:inputType="text"
                     android:hint="@string/add_text_hint"
@@ -345,11 +355,13 @@
                 <EditText
                     android:id="@+id/registration_start_date_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select start date"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_start_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/registration_start_time_editText"/>
@@ -357,11 +369,13 @@
                 <EditText
                     android:id="@+id/registration_start_time_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select start time"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_start_datetime"
                     app:layout_constraintStart_toEndOf="@id/registration_start_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -388,11 +402,13 @@
                 <EditText
                     android:id="@+id/registration_end_date_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select end date"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_end_datetime"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/registration_end_time_editText"/>
@@ -400,11 +416,13 @@
                 <EditText
                     android:id="@+id/registration_end_time_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
                     android:ems="7"
-                    android:inputType="datetime"
+                    android:inputType="none"
                     android:hint="Select end time"
                     android:focusable="false"
+                    android:textIsSelectable="false"
                     app:layout_constraintTop_toBottomOf="@id/registration_end_datetime"
                     app:layout_constraintStart_toEndOf="@id/registration_end_date_editText"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -431,8 +449,9 @@
                 <EditText
                     android:id="@+id/event_attendants_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_marginStart="17dp"
+                    android:layout_marginTop="5dp"
                     android:ems="15"
                     android:inputType="number"
                     android:hint="@string/add_number_hint"
@@ -461,8 +480,9 @@
                 <EditText
                     android:id="@+id/event_waitlist_editText"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_marginStart="17dp"
+                    android:layout_marginTop="5dp"
                     android:ems="15"
                     android:inputType="number"
                     android:hint="@string/add_number_hint"
@@ -506,7 +526,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/event_auto_rolling_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/auto_rolling_switch"

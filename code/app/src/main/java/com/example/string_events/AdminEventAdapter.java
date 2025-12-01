@@ -138,7 +138,7 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Vi
             holder.tvStatus.setText("Finished");
             holder.tvStatus.setBackgroundColor(0xFFE45A5A);
         } else {
-            holder.tvStatus.setText("InProgress");
+            holder.tvStatus.setText("In Progress");
             holder.tvStatus.setBackgroundColor(0xFFF1A428);
         }
 

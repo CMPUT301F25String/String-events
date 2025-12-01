@@ -4,50 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_save_my_location_precise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save My Location (precise)"/>
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <ImageButton
-        android:id="@+id/btn_refresh"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:background="@android:color/transparent"
-        android:src="@android:drawable/ic_popup_sync"
-        android:contentDescription="@null" />
-
-    <ImageButton
-        android:id="@+id/btn_capture_location"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:padding="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu_mylocation"
-        android:clickable="true"
-        android:focusable="true"/>
-
-    <ImageButton
-        android:id="@+id/btn_save_join_location"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom|start"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-        android:padding="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu_save"
-        android:clickable="true"
-        android:focusable="true"/>
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/back_button"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"/>
 
 </FrameLayout>

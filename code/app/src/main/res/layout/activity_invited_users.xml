@@ -39,16 +39,4 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:listitem="@layout/item_user_row"
         android:dividerHeight="0dp"/>
-
-    <Button
-        android:id="@+id/btnSendInvited"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Send Message"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:background="@drawable/btn_yellow_ripple"
-        app:backgroundTint="@null"
-        android:layout_margin="16dp"
-        android:gravity="center"/>
 </LinearLayout>

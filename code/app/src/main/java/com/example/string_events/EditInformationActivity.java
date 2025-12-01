@@ -3,10 +3,10 @@ package com.example.string_events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class EditInformationActivity extends AppCompatActivity {
 
-    private TextInputEditText etName, etEmail, etPassword;
+    private EditText etName, etEmail, etPhone, etPassword;
     private FirebaseFirestore db;
     private String username;
 
@@ -39,6 +39,7 @@ public class EditInformationActivity extends AppCompatActivity {
 
         etName = findViewById(R.id.et_new_name);
         etEmail = findViewById(R.id.et_new_email);
+        etPhone = findViewById(R.id.et_new_phone);
         etPassword = findViewById(R.id.et_new_password);
         ImageButton deleteProfileButton = findViewById(R.id.delete_profile_button);
         MaterialButton btnDone = findViewById(R.id.btn_done);
@@ -90,6 +91,7 @@ public class EditInformationActivity extends AppCompatActivity {
         btnDone.setOnClickListener(v -> {
             String newName = etName.getText() != null ? etName.getText().toString().trim() : "";
             String newEmail = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+            String newPhone = etPhone.getText() != null ? etPhone.getText().toString().trim() : "";
             String newPassword = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
 
             db.collection("users")
@@ -106,32 +108,20 @@ public class EditInformationActivity extends AppCompatActivity {
 
                         String currentName = snapshot.getString("name");
                         String currentEmail = snapshot.getString("email");
+                        String currentPhone = snapshot.getString("phone");
                         String currentPassword = snapshot.getString("password");
-                        String currentUsername = snapshot.getString("username");
-
-                        // compute new username automatically when email changes
-                        String updatedEmail = TextUtils.isEmpty(newEmail) ? currentEmail : newEmail;
-                        String updatedUsername = currentUsername;
-
-                        if (!TextUtils.isEmpty(newEmail)) {
-                            if (newEmail.contains("@")) {
-                                updatedUsername = newEmail.substring(0, newEmail.indexOf("@"));
-                            } else {
-                                updatedUsername = newEmail;
-                            }
-                        }
 
                         Map<String, Object> updates = new HashMap<>();
                         updates.put("name", TextUtils.isEmpty(newName) ? currentName : newName);
-                        updates.put("email", updatedEmail);
+                        updates.put("email", TextUtils.isEmpty(newEmail) ? currentEmail : newEmail);
+                        updates.put("phone", TextUtils.isEmpty(newPhone) ? currentPhone : newPhone);
                         updates.put("password", TextUtils.isEmpty(newPassword) ? currentPassword : newPassword);
-                        updates.put("username", updatedUsername);
 
                         db.collection("users").document(snapshot.getId())
                                 .update(updates)
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(this, "Information updated successfully", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    startActivity(new Intent(EditInformationActivity.this, ProfileScreen.class));
                                 })
                                 .addOnFailureListener(e ->
                                         Toast.makeText(this, "Failed to update: " + e.getMessage(), Toast.LENGTH_SHORT).show());
