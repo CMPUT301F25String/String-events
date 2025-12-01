@@ -27,12 +27,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Organizer-facing overview screen for a single event.
+ * <p>
+ * This activity:
+ * <ul>
+ *     <li>Displays the event cover image, title, time range, location, registration window,
+ *     waitlist and attendee counts, tags, and description.</li>
+ *     <li>Allows the organizer to:
+ *         <ul>
+ *             <li>Edit the event (opens {@link CreateEventScreen}).</li>
+ *             <li>View detailed information (opens {@link OrganizerEventDetailScreen}).</li>
+ *             <li>Generate a QR code (opens {@link QrCodeActivity}).</li>
+ *             <li>Cancel and delete the event.</li>
+ *         </ul>
+ *     </li>
+ * </ul>
+ */
 public class OrganizerEventOverviewScreen extends AppCompatActivity {
 
+    /**
+     * Tag used for logging errors or debug information.
+     */
     private static final String TAG = "EventOverview";
 
+    /**
+     * Firestore database instance for loading and deleting events.
+     */
     private FirebaseFirestore db;
 
+    // UI elements for displaying event information
     private ImageView imgEventCover;
     private TextView tvEventName;
     private TextView tvEventTimeRange;
@@ -45,13 +69,36 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
     private TextView tvTag2;
     private TextView tvDescription;
     private ImageButton btnBack;
-    private ImageButton btnCancelEvent; // image-style button at bottom
+    /**
+     * Bottom image-style button that confirms and triggers event cancellation/deletion.
+     */
+    private ImageButton btnCancelEvent;
 
+    /**
+     * Button that opens a QR code screen for the current event.
+     */
     private MaterialButton btnQrCode;
 
+    /**
+     * Formatter used to display date/time values (e.g., {@code 2025-11-28 17:00}).
+     */
     private final SimpleDateFormat dateTimeFmt =
             new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Inflates the organizer event overview layout.</li>
+     *     <li>Binds all UI elements.</li>
+     *     <li>Retrieves the {@code event_id} from the launching intent.</li>
+     *     <li>Wires up navigation and action buttons (back, cancel, edit, details, QR code).</li>
+     *     <li>Loads the event data from Firestore.</li>
+     * </ul>
+     *
+     * @param savedInstanceState saved state, or {@code null} if newly created
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +123,7 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         MaterialButton btnEventDetails = findViewById(R.id.btnEventDetails);
         btnQrCode         = findViewById(R.id.btnQrCode);
 
-
+        // Read event id from intent; if missing, show error and close
         String eventId = getIntent().getStringExtra("event_id");
         if (eventId == null || eventId.isEmpty()) {
             Toast.makeText(this, "No event id provided", Toast.LENGTH_SHORT).show();
@@ -84,8 +131,10 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
             return;
         }
 
+        // Navigate back to previous screen
         btnBack.setOnClickListener(v -> finish());
 
+        // Confirm and delete the event when cancel button is pressed
         btnCancelEvent.setOnClickListener(v -> {
             new androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Cancel Event")
@@ -97,27 +146,37 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
                     .show();
         });
 
+        // Open event in edit screen, passing the event ID
         btnEditEvent.setOnClickListener(v -> {
             Intent intent = new Intent(OrganizerEventOverviewScreen.this, CreateEventScreen.class);
             intent.putExtra(OrganizerEventDetailScreen.EVENT_ID, eventId);
             startActivity(intent);
         });
 
+        // Open detailed organizer view of the event
         btnEventDetails.setOnClickListener(v -> {
             Intent intent = new Intent(OrganizerEventOverviewScreen.this, OrganizerEventDetailScreen.class);
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
 
+        // Open QR code screen for this event
         btnQrCode.setOnClickListener(v -> {
             Intent intent = new Intent(OrganizerEventOverviewScreen.this, QrCodeActivity.class);
             intent.putExtra(QrCodeActivity.EXTRA_EVENT_ID, eventId);
             startActivity(intent);
         });
 
+        // Load event data from Firestore
         loadEvent(eventId);
     }
 
+    /**
+     * Fetches event data from Firestore and delegates to {@link #bindEvent(DocumentSnapshot)}
+     * to populate the UI.
+     *
+     * @param eventId ID of the event document to load
+     */
     private void loadEvent(String eventId) {
         db.collection("events").document(eventId)
                 .get()
@@ -129,6 +188,20 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Binds Firestore document fields to the overview UI.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Extracts title, location, description, image URL, timestamps, categories, and counts.</li>
+     *     <li>Formats and displays the event time range and registration dates.</li>
+     *     <li>Shows waitlist and attendee counts.</li>
+     *     <li>Displays up to two category tags.</li>
+     *     <li>Loads the cover image asynchronously if a URL is present.</li>
+     * </ul>
+     *
+     * @param doc Firestore document snapshot containing event data
+     */
     private void bindEvent(DocumentSnapshot doc) {
         if (!doc.exists()) {
             Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -172,6 +245,7 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         tvWaitlistLimit.setText("Waitlist: " + waitlist.size() + "/" + waitlistLimit);
         tvAttendees.setText("Attendees: " + attendees.size() + "/" + maxAttendees);
 
+        // Handle categories field, which can be a list or a single string
         Object cats = doc.get("categories");
         if (cats instanceof List) {
             List<?> list = (List<?>) cats;
@@ -203,6 +277,15 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Deletes the event document from Firestore.
+     * <p>
+     * On success, the user is informed and navigated back to
+     * {@link OrganizerEventScreen}. On failure, an error message
+     * is shown in a toast and a log entry is recorded.
+     *
+     * @param eventId ID of the event document to delete
+     */
     private void deleteEvent(String eventId) {
         db.collection("events").document(eventId)
                 .delete()
@@ -217,6 +300,16 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Utility method to safely convert an {@link Object} to {@code int}.
+     * <p>
+     * Supports {@link Number} instances directly and falls back to
+     * parsing via {@link String#valueOf(Object)} when possible.
+     * Returns {@code 0} if parsing fails or the value is {@code null}.
+     *
+     * @param o value to convert
+     * @return integer representation, or {@code 0} if invalid
+     */
     private int asInt(Object o) {
         if (o == null) return 0;
         if (o instanceof Number) return ((Number) o).intValue();
@@ -227,6 +320,12 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads the event cover image from a URL in a background thread and sets it into
+     * {@link #imgEventCover}. If any error occurs, it is logged and the image is left unchanged.
+     *
+     * @param imageUrl HTTP(S) URL of the image to load
+     */
     private void loadImageAsync(String imageUrl) {
         new Thread(() -> {
             try {
@@ -243,6 +342,11 @@ public class OrganizerEventOverviewScreen extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Handles the back button press from the system navigation.
+     * <p>
+     * Calls the super implementation and ensures the activity is finished.
+     */
     @Override
     public void onBackPressed() {
         super.onBackPressed();

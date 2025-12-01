@@ -13,11 +13,38 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Activity that displays a log of notifications for admin users.
+ * <p>
+ * This screen shows a list of notifications (lottery notifications and messages)
+ * loaded from the {@code notifications} collection in Firestore.
+ * Admins can tap an item to see more details (handled by the adapter).
+ */
 public class AdminNotificationsActivity extends AppCompatActivity {
 
+    /**
+     * In-memory list of notifications displayed in the RecyclerView.
+     */
     private ArrayList<Notification> notifList;
+
+    /**
+     * Adapter that binds {@link Notification} objects to the RecyclerView.
+     */
     private AdminNotificationAdapter adapter;
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Inflates the notification log layout.</li>
+     *     <li>Initializes the RecyclerView and its adapter.</li>
+     *     <li>Configures the back button to close the activity.</li>
+     *     <li>Triggers loading of notifications from Firestore.</li>
+     * </ul>
+     *
+     * @param savedInstanceState previously saved state, or {@code null} if created fresh
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +63,18 @@ public class AdminNotificationsActivity extends AppCompatActivity {
         loadNotifications();
     }
 
+    /**
+     * Loads notifications from the Firestore {@code notifications} collection.
+     * <p>
+     * This method:
+     * <ul>
+     *     <li>Fetches all documents in the {@code notifications} collection.</li>
+     *     <li>Parses each document into a {@link Notification} object depending on its type
+     *         (lottery notification or message notification).</li>
+     *     <li>Clears and repopulates the internal list, then notifies the adapter.</li>
+     *     <li>Shows a toast if loading fails.</li>
+     * </ul>
+     */
     private void loadNotifications() {
 
         FirebaseFirestore.getInstance()
@@ -59,7 +98,7 @@ public class AdminNotificationsActivity extends AppCompatActivity {
 
                         Notification n = null;
 
-                        // lottery notification
+                        // Lottery notification
                         if (selectedStatus) {
                             n = new Notification(
                                     username,
@@ -69,7 +108,7 @@ public class AdminNotificationsActivity extends AppCompatActivity {
                                     eventName
                             );
                         }
-                        // message notification
+                        // Message notification
                         else if (isMessage) {
                             n = new Notification(
                                     username,
@@ -81,7 +120,7 @@ public class AdminNotificationsActivity extends AppCompatActivity {
                             );
                         }
 
-                        // if it matched one of the types, add to list
+                        // If it matched one of the types, add to list
                         if (n != null) {
                             notifList.add(n);
                         }
